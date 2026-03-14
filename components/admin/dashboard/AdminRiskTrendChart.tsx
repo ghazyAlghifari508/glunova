@@ -5,73 +5,105 @@ import { Card } from '@/components/ui/card'
 import { 
   Tooltip, 
   ResponsiveContainer,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
-  CartesianGrid
+  CartesianGrid,
 } from 'recharts'
-import { ArrowUpRight, TrendingUp } from 'lucide-react'
+import { ArrowUpRight, TrendingUp, Activity } from 'lucide-react'
 
 const mockRiskTrend = [
-  { month: 'Jan', risk: 42 },
-  { month: 'Feb', risk: 38 },
-  { month: 'Mar', risk: 35 },
-  { month: 'Apr', risk: 32 },
-  { month: 'May', risk: 28 },
-  { month: 'Jun', risk: 25 },
+  { month: 'JAN', risk: 42 },
+  { month: 'FEB', risk: 38 },
+  { month: 'MAR', risk: 35 },
+  { month: 'APR', risk: 45 },
+  { month: 'MAY', risk: 28 },
+  { month: 'JUN', risk: 25 },
 ]
 
 export function AdminRiskTrendChart() {
   return (
-    <Card className="p-6 rounded-[2rem] border-none shadow-sm bg-white  h-full relative overflow-hidden transition-colors">
+    <Card className="p-6 rounded-2xl shadow-sm h-full" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
        <div className="flex justify-between items-start mb-6">
         <div>
-          <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2 transition-colors">
-            <TrendingUp className="w-5 h-5 text-medical-green" /> 
-            Tren Risiko Diabetes
+          <div className="flex items-center gap-2 mb-1">
+             <Activity className="w-3.5 h-3.5" style={{ color: 'var(--success)' }} />
+             <span className="text-[10px] font-bold uppercase tracking-wider font-heading" style={{ color: 'var(--success)' }}>Analisis Tren</span>
+          </div>
+          <h3 className="text-lg font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>
+            Indeks Risiko
           </h3>
-          <p className="text-xs text-slate-400  mt-1 transition-colors">Platform-wide average risk index</p>
+          <p className="text-xs font-body mt-1" style={{ color: 'var(--neutral-500)' }}>Rata-rata risiko platform (6 bulan)</p>
         </div>
-        <button className="p-2 rounded-full hover:bg-slate-50  transition-colors">
-          <ArrowUpRight className="w-5 h-5 text-slate-400 " />
+        <button className="w-9 h-9 rounded-lg flex items-center justify-center transition-all"
+                style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
+          <ArrowUpRight className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="h-[250px] w-full mt-4">
+      <div className="h-[240px] w-full mt-4">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={mockRiskTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#94a3b8" strokeOpacity={0.1} vertical={false} />
+          <AreaChart data={mockRiskTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorRisk" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#1A56DB" stopOpacity={0.15}/>
+                <stop offset="95%" stopColor="#1A56DB" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={0.5} vertical={false} />
             <XAxis 
               dataKey="month" 
-              stroke="#94a3b8" 
-              fontSize={12} 
+              fontSize={10} 
               axisLine={false}
               tickLine={false}
+              tick={{ fill: '#9CA3AF', fontWeight: '600' }}
               dy={10}
             />
             <YAxis 
-              stroke="#94a3b8" 
-              fontSize={12} 
+              fontSize={10} 
               axisLine={false}
               tickLine={false}
-              dx={-10}
+              tick={{ fill: '#9CA3AF', fontWeight: '600' }}
+              dx={-5}
             />
             <Tooltip 
-              contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
-              itemStyle={{ color: '#fff' }}
-              cursor={{ stroke: '#FFD93D', strokeWidth: 1, strokeDasharray: '3 3' }}
+              contentStyle={{ 
+                background: '#fff', 
+                border: '1px solid #E5E7EB', 
+                borderRadius: '12px', 
+                color: '#111827', 
+                fontSize: '12px', 
+                fontWeight: '600',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.08)'
+              }}
+              cursor={{ stroke: '#1A56DB', strokeWidth: 1 }}
             />
-            <Line
+            <Area
               type="monotone"
               dataKey="risk"
-              stroke="#00A699"
+              stroke="#1A56DB"
               strokeWidth={3}
-              dot={{ fill: '#00A699', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, fill: '#FFD93D', stroke: '#fff', strokeWidth: 2 }}
+              fillOpacity={1}
+              fill="url(#colorRisk)"
+              activeDot={{ r: 5, fill: '#1A56DB', stroke: '#fff', strokeWidth: 2 }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
+      </div>
+      
+      <div className="mt-6 pt-4 flex items-center justify-between" style={{ borderTop: '1px solid var(--neutral-100)' }}>
+         <div className="flex gap-4">
+            <div className="flex flex-col">
+               <span className="text-[10px] font-bold uppercase tracking-wider font-heading" style={{ color: 'var(--neutral-400)' }}>Penurunan</span>
+               <span className="text-sm font-bold" style={{ color: 'var(--success)' }}>-12.4%</span>
+            </div>
+            <div className="flex flex-col">
+               <span className="text-[10px] font-bold uppercase tracking-wider font-heading" style={{ color: 'var(--neutral-400)' }}>Stabilitas</span>
+               <span className="text-sm font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>Tinggi</span>
+            </div>
+         </div>
+         <TrendingUp className="w-5 h-5" style={{ color: 'var(--neutral-300)' }} />
       </div>
     </Card>
   )

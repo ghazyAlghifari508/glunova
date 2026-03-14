@@ -15,7 +15,7 @@ interface StatCardProps {
   className?: string
 }
 
-export function StatCard({ title, value, icon: Icon, subLabel, footer, chart, className }: StatCardProps) {
+export const StatCard = React.memo(function StatCard({ title, value, icon: Icon, subLabel, footer, chart, className }: StatCardProps) {
   return (
     <Card className={cn("p-6 rounded-[2rem] border-none shadow-sm bg-white  hover:shadow-md transition-all duration-300", className)}>
       <div className="flex justify-between items-start mb-4">
@@ -45,7 +45,7 @@ export function StatCard({ title, value, icon: Icon, subLabel, footer, chart, cl
       )}
     </Card>
   )
-}
+})
 
 interface StatProgressProps {
   label: string
@@ -54,7 +54,7 @@ interface StatProgressProps {
   color: string
 }
 
-export function StatProgress({ label, value, total, color }: StatProgressProps) {
+export const StatProgress = React.memo(function StatProgress({ label, value, total, color }: StatProgressProps) {
   const percentage = total > 0 ? Math.min(100, Math.max(0, (value / total) * 100)) : 0
   
   return (
@@ -71,4 +71,4 @@ export function StatProgress({ label, value, total, color }: StatProgressProps) 
       </div>
     </div>
   )
-}
+})

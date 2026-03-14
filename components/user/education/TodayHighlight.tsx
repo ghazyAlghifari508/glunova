@@ -10,15 +10,12 @@ import { Sparkles } from 'lucide-react'
 import { EducationContent, UserProfile } from '@/types/education'
 
 interface TodayHighlightProps {
-  profile: UserProfile | null
   contents: EducationContent[]
-  onToggleFavorite: (day: number) => void
 }
 
-export const TodayHighlight = React.memo(({ profile, contents, onToggleFavorite }: TodayHighlightProps) => {
+export const TodayHighlight = React.memo(({ contents }: TodayHighlightProps) => {
   const router = useRouter()
-  const currentDay = profile?.current_day || 1
-  const content = contents.find(c => c.day === currentDay) || contents[0]
+  const content = contents[0]
 
   if (!content) return null
   
@@ -36,17 +33,11 @@ export const TodayHighlight = React.memo(({ profile, contents, onToggleFavorite 
         <div className="pointer-events-none absolute -left-16 top-10 h-44 w-44 rounded-full border border-[color:var(--primary-700)]/20" />
         <div className="pointer-events-none absolute -right-16 -top-14 h-52 w-52 rounded-full bg-[color:var(--primary-700)]/15 blur-3xl" />
 
-        <div className="relative grid gap-4 p-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-center md:p-6">
-          <div className="rounded-3xl border border-[color:var(--primary-700)]/25 bg-white/70 p-4 text-center backdrop-blur">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--primary-700)]">Day</p>
-            <p className="mt-2 text-6xl font-bold leading-none text-slate-900">{currentDay}</p>
-            <p className="mt-2 text-xs font-semibold text-slate-500">Pilihan personal hari ini</p>
-          </div>
-
+        <div className="relative p-6 px-10">
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-600">
               <Sparkles className="h-3.5 w-3.5 text-[color:var(--primary-700)]" />
-              Daily Highlight
+              Edukasi Glunova
             </div>
 
             <h2 className="text-2xl font-bold leading-tight tracking-tight text-slate-900 md:text-3xl">

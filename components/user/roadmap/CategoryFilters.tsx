@@ -1,5 +1,8 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import { Filter } from 'lucide-react'
+
 type CategoryFilter = 'all' | 'exercise' | 'nutrition'
 
 interface CategoryFiltersProps {
@@ -7,8 +10,8 @@ interface CategoryFiltersProps {
   setCategory: (val: CategoryFilter) => void
   categoryTabs: Array<{ key: CategoryFilter; label: string }>
   categoryCounts: Record<CategoryFilter, number>
-  trimester: number
-  setTrimester: (val: number) => void
+  level: number
+  setLevel: (val: number) => void
 }
 
 export function CategoryFilters({
@@ -16,51 +19,71 @@ export function CategoryFilters({
   setCategory,
   categoryTabs,
   categoryCounts,
-  trimester,
-  setTrimester
+  level,
+  setLevel
 }: CategoryFiltersProps) {
   return (
-    <section className="mx-auto max-w-[1400px] px-4 -mt-10 sm:px-6 lg:px-8 relative z-30">
-      <div className="rounded-2xl border border-slate-200/50  bg-white/80  p-5 shadow-[0_24px_54px_rgba(15,23,42,0.1)] backdrop-blur-xl">
+    <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 relative z-30 -mt-8 mb-12">
+      <div className="rounded-[28px] border border-neutral-200/60 bg-white/90 p-4 md:p-6 shadow-[0_20px_40px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-3">
-            {categoryTabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setCategory(tab.key)}
-                className={`inline-flex items-center gap-3 rounded-2xl border px-5 py-3 text-xs font-bold transition-all duration-300 ${
-                  category === tab.key
-                    ? 'border-[color:var(--primary-700)] bg-[color:var(--primary-700)] text-white shadow-md active:scale-95'
-                    : 'border-slate-100  bg-white  text-slate-500  hover:border-slate-300 '
-                }`}
-              >
-                <span className="tracking-wide">{tab.label}</span>
-                <span
-                  className={`rounded-lg px-2 py-0.5 text-[10px] font-black ${
-                    category === tab.key ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400'
-                  }`}
-                >
-                  {categoryCounts[tab.key]}
-                </span>
-              </button>
-            ))}
+          
+          <div className="flex items-center gap-4">
+             <div className="hidden md:flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-400">
+                <Filter className="w-5 h-5" />
+             </div>
+             
+             <div className="flex flex-wrap items-center gap-2">
+               {categoryTabs.map((tab) => {
+                 const isActive = category === tab.key
+                 return (
+                   <button
+                     key={tab.key}
+                     onClick={() => setCategory(tab.key)}
+                     className={`relative inline-flex items-center gap-3 rounded-2xl px-5 py-3 text-sm font-bold transition-all duration-300 ${
+                       isActive
+                         ? 'bg-neutral-900 text-white shadow-lg shadow-black/10 active:scale-95'
+                         : 'bg-transparent text-neutral-500 hover:bg-neutral-100'
+                     }`}
+                   >
+                     <span className="tracking-wide">{tab.label}</span>
+                     <span
+                       className={`flex h-6 min-w-[24px] items-center justify-center rounded-full px-2 text-[10px] font-black ${
+                         isActive ? 'bg-white/20 text-white' : 'bg-neutral-200/60 text-neutral-600'
+                       }`}
+                     >
+                       {categoryCounts[tab.key]}
+                     </span>
+                   </button>
+                 )
+               })}
+             </div>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-100  bg-slate-50/50  p-1.5">
-            {[1, 2, 3].map((t) => (
-              <button
-                key={t}
-                onClick={() => setTrimester(t)}
-                className={`h-11 rounded-xl px-5 text-[11px] font-black uppercase tracking-[0.1em] transition-all ${
-                  trimester === t
-                    ? 'bg-slate-900  text-white  shadow-md'
-                    : 'text-slate-400  hover:text-slate-600  hover:bg-white '
-                }`}
-              >
-                TM {t}
-              </button>
-            ))}
+          <div className="flex items-center gap-4 lg:pl-6 lg:border-l border-neutral-200">
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 hidden sm:block">Perawatan</p>
+             <div className="inline-flex items-center gap-1 rounded-2xl bg-neutral-100 p-1.5 shadow-inner">
+               {[1, 2, 3].map((l) => {
+                 const isActive = level === l
+                 return (
+                   <button
+                     key={l}
+                     onClick={() => setLevel(l)}
+                     className={`relative rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-[0.1em] transition-all duration-300 ${
+                       isActive
+                         ? 'bg-white text-primary-600 shadow-md'
+                         : 'text-neutral-400 hover:text-neutral-600'
+                     }`}
+                   >
+                     {isActive && (
+                        <motion.div layoutId="active-fase" className="absolute inset-0 bg-white rounded-xl shadow-sm border border-neutral-200/50" />
+                     )}
+                     <span className="relative z-10">Fase {l}</span>
+                   </button>
+                 )
+               })}
+             </div>
           </div>
+          
         </div>
       </div>
     </section>

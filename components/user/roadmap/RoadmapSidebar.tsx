@@ -1,11 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Compass, TrendingUp } from 'lucide-react'
+import { Activity, Beaker, FileSignature, TrendingUp } from 'lucide-react'
 import { RoadmapProgress } from './roadmap-progress'
+import { useHealthData } from '@/hooks/useHealthData'
 
 interface RoadmapSidebarProps {
-  pregnancyWeek: number
+  monitoringWeek: number
   timelineWeeks: number[]
   journal: string
   setJournal: (val: string) => void
@@ -14,11 +15,11 @@ interface RoadmapSidebarProps {
   completedCount: number
   activitiesCount: number
   streakDays: number
-  trimester: number
+  level: number
 }
 
 export default function RoadmapSidebar({
-  pregnancyWeek,
+  monitoringWeek,
   timelineWeeks,
   journal,
   setJournal,
@@ -26,45 +27,60 @@ export default function RoadmapSidebar({
   journalSaved,
   completedCount,
   activitiesCount,
-  streakDays
+  streakDays,
+  level
 }: RoadmapSidebarProps) {
+  const { education, loading, activeLevel } = useHealthData()
   return (
-    <aside className="space-y-8 xl:sticky xl:top-24 xl:self-start">
-      <div className="rounded-3xl border border-slate-100  bg-white  p-6 shadow-sm relative overflow-hidden">
-         <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50  rounded-bl-2xl -mr-4 -mt-4 transition-colors" />
-         
-        <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2 relative z-10">
-           <Compass className="h-5 w-5 text-[color:var(--primary-700)]" />
-           Timeline Minggu Ini
-        </h3>
-        <div className="relative mt-8 space-y-4">
-          <div className="absolute left-[20px] top-1 h-[calc(100%-12px)] w-px bg-slate-100 " />
+    <aside className="space-y-8 xl:sticky xl:top-32 xl:self-start">
+      
+      {/* TIMELINE CARD */}
+      <div className="rounded-[32px] border border-neutral-100 bg-white p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden">
+         <h3 className="text-2xl font-heading font-black text-neutral-900 flex items-center gap-3 relative z-10">
+            <Activity className="h-6 w-6 text-primary-600" />
+            Timeline Medis
+         </h3>
+         <p className="text-neutral-500 font-medium text-sm mt-2 mb-8">Pemantauan Metrik Tiap Minggu</p>
+
+        <div className="relative space-y-2">
+          {/* Vertical Track */}
+          <div className="absolute left-[24px] top-6 bottom-6 w-0.5 bg-neutral-100 rounded-full" />
+          
           {timelineWeeks.map((week) => {
-            const isCurrent = week === pregnancyWeek
-            const isPast = week < pregnancyWeek
+            const isCurrent = week === monitoringWeek
+            const isPast = week < monitoringWeek
+            
             return (
-              <div key={week} className="relative flex items-center gap-4 group/item">
-                <motion.span
-                  animate={isCurrent ? { scale: [1, 1.3, 1] } : {}}
+              <div key={week} className="relative flex items-center gap-6 group/item py-3">
+                {/* Node */}
+                <motion.div
+                  animate={isCurrent ? { scale: [1, 1.2, 1] } : {}}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className={`z-10 h-3.5 w-3.5 rounded-full border-2 border-white shadow-sm transition-colors ${
-                    isCurrent ? 'bg-[color:var(--primary-700)] ring-4 ring-[color:var(--primary-700)]/15' : isPast ? 'bg-emerald-500' : 'bg-slate-200'
-                  }`}
-                />
-                <div
-                  className={`flex-1 rounded-xl border px-4 py-3 transition-all ${
-                    isCurrent
-                      ? 'border-[color:var(--primary-200)] bg-[color:var(--primary-50)] text-slate-900  shadow-sm'
-                      : isPast
-                        ? 'border-emerald-100 bg-emerald-50/50  text-emerald-700 '
-                        : 'border-slate-50  bg-slate-50/50  text-slate-400  group-hover/item:border-slate-200 '
+                  className={`z-10 h-12 w-12 shrink-0 rounded-full border-4 border-white flex items-center justify-center font-black text-sm transition-colors shadow-sm ${
+                    isCurrent ? 'bg-primary-600 text-white shadow-primary-500/30' : 
+                    isPast ? 'bg-emerald-500 text-white' : 'bg-neutral-100 text-neutral-400'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest">Minggu</span>
-                     {isCurrent && <span className="bg-[color:var(--primary-700)] text-white text-[9px] font-black px-2 py-0.5 rounded-full">NOW</span>}
-                  </div>
-                  <p className="text-lg font-black mt-0.5">{week}</p>
+                   {week}
+                </motion.div>
+                
+                {/* Content */}
+                <div
+                  className={`flex-1 rounded-2xl border px-5 py-4 transition-all ${
+                    isCurrent
+                      ? 'border-primary-200 bg-primary-50/50 text-neutral-900 shadow-sm'
+                      : isPast
+                        ? 'border-emerald-100 bg-emerald-50/30 text-emerald-800'
+                        : 'border-transparent bg-transparent text-neutral-400 group-hover/item:border-neutral-100 group-hover/item:bg-neutral-50'
+                  }`}
+                >
+                   <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-[color:var(--primary-700)] uppercase tracking-wider block mb-1">Fase {activeLevel}</span>
+                      {isCurrent && <span className="bg-primary-600 text-white text-[9px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full">Saat Ini</span>}
+                   </div>
+                  <p className={`text-base font-bold mt-1 ${isCurrent ? 'text-primary-900' : ''}`}>
+                     {isPast ? 'Selesai Dipantau' : isCurrent ? 'Fokus Gula Darah' : 'Menunggu Evaluasi'}
+                  </p>
                 </div>
               </div>
             )
@@ -72,50 +88,49 @@ export default function RoadmapSidebar({
         </div>
       </div>
 
-      <div id="roadmap-journal" className="rounded-3xl border border-slate-100 bg-slate-900 p-8 shadow-2xl relative group overflow-hidden">
-        <div className="absolute bottom-0 left-0 w-32 h-32 opacity-10 pointer-events-none" 
-             style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
+      {/* MEDICAL LOGBOOK */}
+      <div id="roadmap-journal" className="rounded-[40px] bg-neutral-900 p-8 shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary-500/20 rounded-full blur-[60px] pointer-events-none" />
         
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-           Catatan Hari Ini
-           <div className="h-1.5 w-1.5 rounded-full bg-[color:var(--warning)] animate-pulse" />
-        </h3>
-        <p className="mt-2 text-sm font-medium text-white/50 leading-relaxed">Penting untuk dibahas saat sesi konsultasi Bunda.</p>
+        <div className="flex items-center gap-4 mb-2">
+           <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
+              <FileSignature className="w-5 h-5 text-white" />
+           </div>
+           <div>
+              <h3 className="text-xl font-heading font-black text-white">Logbook Medis</h3>
+              <p className="text-[11px] font-bold text-white/50 uppercase tracking-widest mt-1">Catatan Pribadi</p>
+           </div>
+        </div>
+        
+        <p className="mt-6 text-sm font-medium text-white/60 leading-relaxed">
+           Catat keluhan, lonjakan glukosa, atau hasil tes untuk dibahas dengan dokter.
+        </p>
 
         <textarea
           value={journal}
           onChange={(e) => setJournal(e.target.value)}
-          placeholder='E.g. "Agak mual pagi ini, tapi tetap konsumsi vitamin..."'
-          className="mt-6 h-32 w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-all focus:border-[color:var(--primary-700)] focus:bg-white/10 focus:ring-4 focus:ring-[color:var(--primary-700)]/20"
+          placeholder='Contoh: "Puasa jam 8 malam, cek gula darah pagi ini ada di 95 mg/dL..."'
+          className="mt-6 h-40 w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-sm font-medium text-white placeholder:text-white/20 outline-none transition-all focus:border-primary-500 focus:bg-black/60 focus:ring-4 focus:ring-primary-500/20"
         />
 
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between px-1">
-             {journalSaved ? (
-               <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Disk tersimpan • {journalSaved}</p>
-             ) : (
-               <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Menunggu input...</p>
-             )}
-             <TrendingUp size={12} className="text-white/20" />
-          </div>
-          <button
+        <div className="mt-8 flex flex-col gap-5">
+           <button
             onClick={handleSaveJournal}
-            className="h-12 w-full inline-flex items-center justify-center rounded-xl bg-[color:var(--primary-700)] px-6 text-sm font-black text-white hover:bg-[color:var(--primary-900)] shadow-md transition-all active:scale-95"
-          >
-            Save Logbook
-          </button>
+            className="h-14 w-full rounded-2xl bg-primary-600 px-6 text-sm font-black text-white hover:bg-primary-500 shadow-lg shadow-primary-600/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+           >
+            <TrendingUp className="w-4 h-4" /> Simpan Catatan
+           </button>
+           
+           <div className="flex items-center justify-center text-center">
+             {journalSaved ? (
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-full inline-block">Disinkronisasi • {journalSaved}</p>
+             ) : (
+               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Menunggu Input...</p>
+             )}
+          </div>
         </div>
       </div>
 
-      <div className="bg-white  border border-slate-100  rounded-3xl p-6 shadow-sm overflow-hidden text-center relative">
-         <div className="absolute -left-10 -top-10 w-24 h-24 bg-[color:var(--warning-bg)] rounded-full blur-2xl" />
-         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 italic">Current Achievement</p>
-         <RoadmapProgress
-           completedCount={completedCount}
-           totalCount={activitiesCount || 10}
-           streakDays={streakDays}
-         />
-      </div>
     </aside>
   )
 }

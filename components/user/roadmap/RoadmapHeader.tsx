@@ -3,66 +3,85 @@
 import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import type { RoadmapActivity, UserRoadmapProgress } from '@/types/roadmap'
+import { Target, Activity } from 'lucide-react'
+import { useHealthData } from '@/hooks/useHealthData'
 
 interface RoadmapHeaderProps {
-  pregnancyWeek: number
-  trimester: number
   progress: UserRoadmapProgress[]
   activities: RoadmapActivity[]
 }
 
-export function RoadmapHeader({ pregnancyWeek, trimester, progress, activities }: RoadmapHeaderProps) {
+export function RoadmapHeader({ progress, activities }: RoadmapHeaderProps) {
+  const { monitoring_week, activeLevel } = useHealthData()
   const completedCount = progress.filter(p => p.status === 'completed' && activities.some(a => a.id === p.activity_id)).length
   const totalCount = activities.length
   const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
 
   return (
-    <section className="w-full bg-white  border-b border-slate-100  relative overflow-hidden transition-colors duration-300">
-      <div className="absolute top-0 right-0 w-64 h-full opacity-[0.03] pointer-events-none" 
-           style={{ backgroundImage: 'radial-gradient(circle, #227c9d 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
-      
-      <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <section className="w-full relative overflow-hidden pt-10 md:pt-14 pb-4">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div className="flex flex-col lg:flex-row items-end justify-between mb-8 gap-6">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
+             initial={{ opacity: 0, y: 30 }}
+             animate={{ opacity: 1, y: 0 }}
+             className="space-y-6 max-w-3xl"
           >
-            <div className="flex items-center gap-3">
-              <Badge className="rounded-xl border-none bg-[color:var(--primary-50)] text-[color:var(--primary-700)] font-black px-4 py-1.5 text-xs">
-                MINGGU {pregnancyWeek}
-              </Badge>
-              <Badge className="rounded-xl border-none bg-amber-500/10 text-amber-500 font-black px-4 py-1.5 text-xs">
-                TRIMESTER {trimester}
-              </Badge>
-            </div>
-            
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900  leading-none">
-              Roadmap <span className="text-[color:var(--primary-700)] italic relative inline-block">
-                1000 HPK
-                <svg className="absolute w-full h-3 -bottom-2 left-0 text-[color:var(--warning)]" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                  <path d="M2 9.5C50 3 150 2 198 9.5" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-                </svg>
-              </span>
-            </h1>
-            <p className="text-slate-500  font-medium max-w-lg">
-              Peta jalan harian adaptif untuk tumbuh kembang optimal Bunda & Si Kecil.
-            </p>
+             <div>
+                <span className="text-[color:var(--primary-700)] font-bold uppercase tracking-[0.2em] text-sm mb-4 block">Glunova Care</span>
+              <h1 className="text-4xl md:text-5xl font-heading font-black text-[color:var(--neutral-900)] tracking-tighter leading-[0.9]">
+                  Roadmap <br />
+                  <span className="text-[color:var(--neutral-400)] italic font-serif">
+                    Metabolik
+                  </span> Anda.
+                </h1>
+             </div>
+
+             <div className="flex flex-wrap items-center gap-3">
+               <Badge className="rounded-full bg-[color:var(--neutral-100)] text-[color:var(--neutral-700)] border border-[color:var(--neutral-200)] font-black uppercase tracking-[0.2em] px-5 py-2 text-xs">
+                 Minggu Monitoring: {monitoring_week}
+               </Badge>
+               <Badge className="rounded-full bg-[color:var(--warning)]/10 text-[color:var(--warning)] border border-[color:var(--warning)]/20 font-black uppercase tracking-[0.2em] px-5 py-2 text-xs">
+                 Fase Monitoring {activeLevel}
+               </Badge>
+             </div>
+             
+             <p className="text-lg font-medium text-[color:var(--neutral-500)] max-w-xl leading-relaxed">
+               Peta jalan harian adaptif untuk mengontrol gula darah, nutrisi, dan target kesehatan secara presisi.
+             </p>
           </motion.div>
 
-          <div className="flex items-center gap-6">
-            <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Aktivitas Selesai</p>
-              <div className="flex items-center gap-2">
-                <span className="text-3xl font-black text-slate-900 ">{percentage}%</span>
-                <div className="h-8 w-[2px] bg-slate-100 hidden sm:block mx-2" />
-                <div className="hidden sm:block text-left">
-                  <p className="text-xs font-black text-slate-900  leading-tight">{completedCount}/{totalCount}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Aktivitas</p>
+          {/* Stats Card - Light Mode styling */}
+          <motion.div
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ delay: 0.2 }}
+             className="relative shrink-0 w-full lg:w-auto"
+          >
+             <div className="bg-white border border-[color:var(--neutral-200)] rounded-[2rem] p-6 md:p-8 shadow-sm flex items-center justify-between lg:justify-start gap-8 lg:gap-10 w-full">
+                <div>
+                   <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[color:var(--neutral-400)] mb-2 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-[color:var(--warning)]" /> Pencapaian Fase
+                   </p>
+                   <div className="flex items-baseline gap-1">
+                      <span className="text-3xl md:text-4xl font-heading font-black text-[color:var(--neutral-900)]">{percentage}</span>
+                      <span className="text-xl font-bold text-[color:var(--neutral-400)]">%</span>
+                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+
+                <div className="h-16 w-px bg-[color:var(--neutral-200)]" />
+
+                <div>
+                   <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[color:var(--neutral-400)] mb-2 flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-[color:var(--success)]" /> Selesai
+                   </p>
+                   <div className="flex items-baseline gap-1">
+                      <span className="text-2xl md:text-3xl font-heading font-black text-[color:var(--neutral-900)]">{completedCount}</span>
+                      <span className="text-sm font-black" style={{ color: 'var(--primary-700)' }}>Fase {activeLevel}</span>
+                   </div>
+                </div>
+             </div>
+          </motion.div>
         </div>
       </div>
     </section>

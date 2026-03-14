@@ -17,10 +17,10 @@ interface PhaseFilterProps {
 }
 
 const phaseIcons: Record<Phase, React.ReactNode> = {
-  kehamilan: <Heart className="h-4 w-4" />,
-  bayi_0_3: <Baby className="h-4 w-4" />,
-  bayi_3_12: <Utensils className="h-4 w-4" />,
-  anak_1_2: <User className="h-4 w-4" />,
+  kesehatan: <Heart className="h-4 w-4" />,
+  fase_2: <Baby className="h-4 w-4" />,
+  fase_3: <Utensils className="h-4 w-4" />,
+  fase_4: <User className="h-4 w-4" />,
 }
 
 export function PhaseFilter({

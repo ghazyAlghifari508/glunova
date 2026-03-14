@@ -44,10 +44,10 @@ export interface DoctorRegistrationFormData {
 }
 
 export const SPECIALIZATIONS = [
-  'Pediatri',
+  'Endokrin',
   'Gizi',
   'Umum',
-  'Obgyn',
+  'Penyakit Dalam',
   'Psikologi',
 ] as const
 

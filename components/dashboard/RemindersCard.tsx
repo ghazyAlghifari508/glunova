@@ -14,7 +14,7 @@ interface RemindersCardProps {
 
 export function RemindersCard({ reminders, currentWeek }: RemindersCardProps) {
   return (
-    <div className="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-800 relative overflow-hidden group transition-colors">
+    <div className="rounded-2xl p-8 shadow-2xl relative overflow-hidden group transition-colors" style={{ background: 'linear-gradient(135deg, var(--primary-700), var(--primary-900))', border: '1px solid var(--primary-600)' }}>
       <div className="absolute top-0 right-0 w-32 h-32 opacity-10 pointer-events-none" 
            style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '12px 12px' }} />
       

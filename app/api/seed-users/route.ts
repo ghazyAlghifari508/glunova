@@ -48,9 +48,9 @@ export async function GET(request: Request) {
       {
         email: "user@glunova.id",
         password: userPassword,
-        name: "Bunda Glunova",
+        name: "Anda Glunova",
         role: "user",
-        username: "bunda_glunova"
+        username: "user_glunova"
       }
     ];
 

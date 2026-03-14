@@ -44,6 +44,6 @@ export async function getCurrentUser() {
     name: profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name,
     image: user.user_metadata?.avatar_url,
     role: finalRole,
-    onboarding_completed: profile?.onboarding_completed ?? user.user_metadata?.onboarding_completed ?? false,
+    onboarding_completed: true,
   };
 }

@@ -21,7 +21,7 @@ export function DailyTasksCard({ currentWeek, dailyTasks, isCompleted }: DailyTa
                <Sparkles size={18} className="text-[color:var(--warning)]" />
             </h2>
             <p className="text-slate-500  font-medium text-sm mt-1 transition-colors">
-              Minggu {currentWeek} • Bulan {Math.ceil(currentWeek / 4)} • Pastikan aktivitas terpenuhi.
+              Minggu {currentWeek} • Bulan {Math.ceil(currentWeek / 4)} • Pertahankan rutinitas sehat Anda.
             </p>
           </div>
         </div>
@@ -37,10 +37,10 @@ export function DailyTasksCard({ currentWeek, dailyTasks, isCompleted }: DailyTa
             </div>
             <div className="space-y-1">
               <h3 className="text-xl font-bold text-slate-900  flex items-center justify-center gap-2">
-                Luar Biasa, Bunda! <PartyPopper className="w-5 h-5 text-[color:var(--warning)]" />
+                Luar Biasa! <PartyPopper className="w-5 h-5 text-[color:var(--warning)]" />
               </h3>
               <p className="text-slate-600  max-w-md mx-auto">
-                Semua kegiatan roadmap untuk trimester ini telah selesai. Istirahat yang cukup dan terus pantau kesehatan ya!
+                Semua kegiatan roadmap untuk fase ini telah selesai. Istirahat yang cukup dan terus pantau glukosa Anda ya!
               </p>
             </div>
           </motion.div>

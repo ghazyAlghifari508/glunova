@@ -69,6 +69,30 @@ export async function submitDoctorRegistration(userId: string, formData: DoctorR
 
   const supabase = await createClient()
 
+  // 1. Check for duplicate license number in already approved doctors
+  const { data: existingDoctor } = await supabase
+    .from('doctors')
+    .select('user_id, full_name')
+    .eq('license_number', formData.licenseNumber)
+    .maybeSingle()
+
+  if (existingDoctor && existingDoctor.user_id !== userId) {
+    throw new Error(`Nomor lisensi ${formData.licenseNumber} sudah digunakan oleh dokter lain (${existingDoctor.full_name})`)
+  }
+
+  // 2. Check for duplicate license number in pending registrations
+  const { data: pendingReg } = await supabase
+    .from('doctor_registrations')
+    .select('user_id, full_name')
+    .eq('license_number', formData.licenseNumber)
+    .neq('user_id', userId)
+    .eq('status', 'pending')
+    .maybeSingle()
+
+  if (pendingReg) {
+    throw new Error(`Nomor lisensi ${formData.licenseNumber} sudah dalam proses pendaftaran oleh orang lain (${pendingReg.full_name})`)
+  }
+
   // Check if user already has a pending/approved registration
   const { data: existing } = await supabase
     .from('doctor_registrations')
@@ -137,6 +161,18 @@ export async function submitDoctorRegistration(userId: string, formData: DoctorR
       throw new Error('Anda sudah memiliki pendaftaran aktif.')
     }
     handleServiceError(error, 'Gagal mengirim pendaftaran dokter')
+  }
+
+  // Update the user's role in the profiles table to doctor_pending
+  const { error: roleError } = await supabase
+    .from('profiles')
+    .update({ role: 'doctor_pending' })
+    .eq('id', userId)
+
+  if (roleError) {
+    console.error('Failed to update user role to doctor_pending:', roleError)
+    // We don't necessarily throw here if the registration itself was successful, 
+    // but it's important to track.
   }
 
   return data.id

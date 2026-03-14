@@ -58,7 +58,7 @@ export async function getTodayEarnings(doctorId: string) {
     .gte('ended_at', today.toISOString())
 
   if (error) handleServiceError(error, 'Gagal mengambil data penghasilan hari ini')
-  return data.reduce((acc, curr) => acc + (curr.total_cost || 0), 0)
+  return (data || []).reduce((acc, curr) => acc + (curr.total_cost || 0), 0)
 }
 
 export async function getMonthlyStats(doctorId: string) {
@@ -75,7 +75,8 @@ export async function getMonthlyStats(doctorId: string) {
 
   if (error) handleServiceError(error, 'Gagal mengambil statistik bulanan')
 
-  const completed = data.filter(c => c.status === 'completed')
+  const consultations = data || []
+  const completed = consultations.filter(c => c.status === 'completed')
   const totalEarnings = completed.reduce((acc, curr) => acc + (curr.total_cost || 0), 0)
   const ratings = completed.filter(c => c.rating !== null).map(c => c.rating as number)
   const avgRating = ratings.length > 0 
@@ -198,9 +199,21 @@ export async function markMessagesAsRead(consultationId: string, readerType: 'us
 export async function createConsultation(payload: Partial<Consultation>): Promise<Consultation> {
   await assertAuthenticated()
   const supabase = await createClient()
+  
+  // Calculate total_cost if hourly_rate and duration are present
+  const finalPayload = { ...payload }
+  if (payload.hourly_rate && payload.duration_minutes) {
+    // total_cost = (hourly_rate / 60) * duration
+    // But usually hourly_rate is for the whole session if duration is fixed, 
+    // or duration_minutes / 60 * hourly_rate.
+    // Based on the UI: 30 min = 50k, 60 min = 100k. Hourly rate is 100k.
+    const durationMultiplier = payload.duration_minutes === 30 ? 0.5 : 1
+    finalPayload.total_cost = payload.hourly_rate * durationMultiplier
+  }
+
   const { data, error } = await supabase
     .from('consultations')
-    .insert([payload])
+    .insert([finalPayload])
     .select()
     .single()
 
@@ -312,15 +325,16 @@ export async function getDoctorConversations(doctorId: string): Promise<Consulta
   })
 
   return consultations
-    .filter(con => messageMap.has(con.id))
     .map(con => {
       const joinedUser = (Array.isArray(con.user) ? con.user[0] : con.user) as ConsultationConversation['user']
       return {
         consultation_id: con.id,
         user: joinedUser ?? null,
-        lastMessage: messageMap.get(con.id)!,
+        lastMessage: messageMap.get(con.id),
       }
     })
+    .filter(con => !!con.lastMessage)
+    .map(con => con as ConsultationConversation & { lastMessage: ConsultationMessage })
     .sort((a, b) => 
       new Date(b.lastMessage.created_at).getTime() - new Date(a.lastMessage.created_at).getTime()
     )
@@ -343,4 +357,59 @@ export async function getDoctorEarnings(doctorId: string): Promise<DoctorEarning
     ...item,
     user: Array.isArray(item.user) ? item.user[0] ?? null : item.user,
   })) as DoctorEarningRecord[]
+}
+
+export async function syncMayarPaymentStatus(consultationId: string): Promise<string> {
+  const supabase = await createClient()
+  const { data: consultation, error } = await supabase
+    .from('consultations')
+    .select('payment_reference, payment_status')
+    .eq('id', consultationId)
+    .single()
+
+  if (error || !consultation || !consultation.payment_reference) {
+    return 'pending'
+  }
+
+  if (consultation.payment_status === 'confirmed') {
+    return 'confirmed'
+  }
+
+  try {
+    const { getMayarStatus } = await import('./mayarService')
+    const rawStatus = await getMayarStatus(consultation.payment_reference)
+    
+    // Normalize status to lowercase for robust comparison
+    const status = String(rawStatus || '').toLowerCase()
+    
+    // Status from Mayar can be: 'paid', 'success', 'settlement', 'completed', 'captured'
+    const isPaid = status === 'paid' || 
+                   status === 'success' || 
+                   status === 'settlement' || 
+                   status === 'completed' || 
+                   status === 'captured'
+    
+    if (isPaid) {
+      const { error: updateError } = await supabase
+        .from('consultations')
+        .update({ 
+          payment_status: 'confirmed', 
+          updated_at: new Date().toISOString(),
+          payment_date: new Date().toISOString()
+        })
+        .eq('id', consultationId)
+      
+      if (updateError) {
+        console.error('Error updating consultation status:', updateError)
+        return 'pending'
+      }
+        
+      return 'confirmed'
+    }
+    
+    return status || 'pending'
+  } catch (err) {
+    console.error('Error syncing Mayar status for consultation:', consultationId, err)
+    return 'pending'
+  }
 }

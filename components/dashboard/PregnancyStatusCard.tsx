@@ -1,21 +1,21 @@
 import { motion } from 'framer-motion'
-import { Baby } from 'lucide-react'
+import { Activity } from 'lucide-react'
 
-interface PregnancyStatusCardProps {
-  activeTrimester: number
-  pregnancyProgress: number
+interface HealthStatusCardProps {
+  activeLevel: number
+  monitoringProgress: number
   currentWeek: number
   currentDay: number
-  daysTo1000: number
+  daysToTarget: number
 }
 
-export function PregnancyStatusCard({
-  activeTrimester,
-  pregnancyProgress,
+export function HealthStatusCard({
+  activeLevel,
+  monitoringProgress,
   currentWeek,
   currentDay,
-  daysTo1000
-}: PregnancyStatusCardProps) {
+  daysToTarget
+}: HealthStatusCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -30,24 +30,24 @@ export function PregnancyStatusCard({
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-[color:var(--warning-bg)] p-2 rounded-xl">
-              <Baby className="w-5 h-5 text-[color:var(--warning)]" />
+              <Activity className="w-5 h-5 text-[color:var(--warning)]" />
             </div>
-            <h3 className="text-xl font-bold text-white">Status Kehamilan Aktif</h3>
-            <div className="ml-auto md:ml-0 bg-[color:var(--warning-bg)] text-[color:var(--warning)] px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase">Trimester {activeTrimester}</div>
+            <h3 className="text-xl font-bold text-white">Status Kesehatan Aktif</h3>
+            <div className="ml-auto md:ml-0 bg-[color:var(--warning-bg)] text-[color:var(--warning)] px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase">Level {activeLevel}</div>
           </div>
           
           <div className="relative h-3 bg-white/5 rounded-full mb-3 overflow-hidden border border-white/5">
             <motion.div 
               initial={{ width: 0 }}
-              animate={{ width: `${pregnancyProgress}%` }}
+              animate={{ width: `${monitoringProgress}%` }}
               transition={{ duration: 1.5, ease: "circOut" }}
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-[color:var(--warning)] via-yellow-400 to-yellow-200 rounded-full" 
             />
           </div>
           <div className="flex justify-between text-white/40 text-[10px] font-bold uppercase tracking-[0.1em]">
             <span>Minggu 1</span>
-            <span className="text-[color:var(--warning)]">{pregnancyProgress}% Kehamilan Terlewati</span>
-            <span>Minggu 40</span>
+            <span className="text-[color:var(--warning)]">{monitoringProgress}% Target Tercapai</span>
+            <span>Target Akhir</span>
           </div>
         </div>
 
@@ -62,7 +62,7 @@ export function PregnancyStatusCard({
           </div>
           <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
             <p className="text-white/40 text-[9px] font-black uppercase tracking-wider mb-1">Sisa</p>
-            <p className="text-2xl font-bold text-white leading-none">{daysTo1000}</p>
+            <p className="text-2xl font-bold text-white leading-none">{daysToTarget}</p>
           </div>
         </div>
       </div>

@@ -20,7 +20,7 @@ const mockAppointments = [
     status: 'In Progress',
     avatar: 'RW',
     color: 'bg-[color:var(--primary-50)] text-[color:var(--primary-700)]',
-    condition: 'Pemeriksaan Rutin Kehamilan (Trimester 2)'
+    condition: 'Pemeriksaan Rutin Kesehatan (Fase 2)'
   },
   {
     id: 2,
@@ -50,7 +50,7 @@ const mockAppointments = [
     status: 'Confirmed',
     avatar: 'DL',
     color: 'bg-green-100 text-green-600',
-    condition: 'Pemeriksaan Pasca Melahirkan'
+    condition: 'Pemeriksaan Pasca Evaluasi Terapi'
   }
 ]
 

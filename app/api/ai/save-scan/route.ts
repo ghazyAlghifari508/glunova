@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         calcium: analysis.calcium,
         folic_acid: analysis.folicAcid,
         vitamin_a: analysis.vitaminA,
-        stunting_nutrition_score: analysis.stuntingNutritionScore,
+        health_nutrition_score: analysis.healthNutritionScore,
         tip: analysis.tip,
         is_healthy: analysis.isHealthy,
       })

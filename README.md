@@ -1,67 +1,110 @@
-# Glunova — Platform Manajemen Diabetes
+# 🩺 Glunova — Generasi Sadar Diabetes
 
-Glunova adalah platform berbasis web untuk manajemen diabetes yang komprehensif, menghubungkan pasien dengan dokter spesialis dan menyediakan edukasi kesehatan serta pemantauan nutrisi berbasis AI.
+[![Build Status](https://img.shields.io/badge/Build-Success-emerald?style=for-the-badge&logo=nextdotjs)](https://github.com/alghifari/glunova)
+[![Tech Stack](https://img.shields.io/badge/Stack-Next.js%2016%20%7C%20Supabase-blue?style=for-the-badge)](https://nextjs.org)
+[![Competition](https://img.shields.io/badge/Project-Competition-orange?style=for-the-badge)](https://glunova.id)
 
-## Fitur Utama
+**Glunova** adalah platform ekosistem kesehatan digital berbasis Web yang dirancang khusus untuk revolusi manajemen diabetes. Menggabungkan kekuatan **Artificial Intelligence**, **Precision Monitoring**, dan **Telemedicine**, Glunova membantu pasien mengelola kadar glukosa dalam rentang optimal melalui pendekatan yang interaktif dan data-driven.
 
-- 🩺 **Konsultasi Dokter** — Booking dan chat real-time dengan dokter spesialis
-- 📚 **Edukasi Kesehatan** — 1000 hari konten edukasi diabetes terstruktur
-- 🔬 **Glunova Vision** — Analisis nutrisi makanan berbasis AI dari foto
-- 🗺️ **Roadmap Kesehatan** — Aktivitas harian terpersonalisasi per trimester
-- 🤖 **Glunova AI** — Asisten virtual untuk konsultasi kesehatan
-- 👨‍⚕️ **Portal Dokter** — Dashboard, jadwal, dan manajemen konsultasi
-- 🛡️ **Portal Admin** — Dashboard analitik, approval dokter, manajemen konten
+---
 
-## Tech Stack
+## 🚀 Visi Proyek
+Membangun "Generasi Sadar Diabetes" dengan menyediakan alat bantu yang cerdas, mudah diakses, dan secara medis tervalidasi untuk mencegah komplikasi diabetes demi kualitas hidup yang lebih baik.
 
-- **Frontend**: Next.js 16, React 19, Framer Motion
-- **Styling**: Tailwind CSS v4 + CSS Custom Properties (Glunova Design System)
-- **Backend**: Supabase (Auth, Database, Storage)
-- **AI**: OpenAI-compatible API via OpenRouter
-- **UI Components**: Radix UI, Lucide React, Recharts
-- **Fonts**: Sora (heading) + DM Sans (body)
+## 🎨 Design System & Color Palette
+Glunova menggunakan identitas visual **"Premium Glassmorphism"** yang menggabungkan kesan futuristik dengan profesionalisme medis.
 
-## Getting Started
+| Palette | Hex Code | Purpose |
+| :--- | :--- | :--- |
+| **Glunova Royal** | `#1A56DB` | Primary, Branding, Buttons |
+| **Ocean Sky** | `#3F83F8` | Secondary, Accents |
+| **Success Emerald** | `#0E9F6E` | Healthy Status, Normal Glucose |
+| **Warning Amber** | `#FF8A00` | High Risk, Attention |
+| **Soft Neutral** | `#F8FAFF` | Background, Clean Interfaces |
 
+---
+
+## 🛠️ Core Tech Stack
+Dibangun dengan teknologi terbaru untuk performa ekstrem dan pengalaman pengguna yang seamless:
+
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org) + [React 19](https://reactjs.org)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com) (Modern utility-first architecture)
+- **Database & Auth**: [Supabase](https://supabase.com) (PostgreSQL + RLS Security)
+- **Intelligence**: Vision AI & LLM integration via AI SDK
+- **Animation**: [Framer Motion 12](https://www.framer.com/motion/) (Smooth transitions)
+- **Dataviz**: [Recharts](https://recharts.org)
+
+---
+
+## 👥 Roles & Aksesibilitas
+Sistem Glunova mengelola 3 entitas utama dengan integrasi data real-time:
+
+1. **Pasien (User)**
+   - Akses Roadmap Metabolik harian.
+   - Glunova Vision (Deteksi nutrisi makanan via AI).
+   - Konsultasi Chat dengan Dokter Spesialis.
+   - Lab Result Tracking (HbA1c & Glucose levels).
+2. **Dokter (Specialist)**
+   - Dashboard Manajemen Pasien.
+   - Jadwal Konsultasi & Riwayat Medis Pasien.
+   - Verifikasi data harian pasien.
+3. **Administrator**
+   - Analitik Kesehatan Global.
+   - Manajemen Konten Edukasi.
+   - Approval Pendaftaran Dokter.
+
+---
+
+## ✨ Fitur Unggulan
+- 🦾 **Glunova Vision AI**: Pindai makanan Anda, biarkan AI kami menghitung estimasi indeks glikemik secara instan.
+- 🗺️ **Roadmap Care**: Peta jalan harian yang adaptif berdasarkan fase monitoring (Level 1-3).
+- 💬 **Tele-Consultation**: Hubungkan pasien dengan dokter tanpa hambatan geografis.
+- 📚 **GiziDukasi**: Modul edukasi terstruktur untuk pemahaman mendalam tentang pola hidup sehat.
+
+---
+
+## 💻 Cara Menjalankan
+
+### Persyaratan
+- Node.js 20+
+- NPM / PNPM / Bun
+
+### Instalasi
 ```bash
+# Clone repository
+git clone https://github.com/user/glunova.git
+
+# Masuk ke direktori
+cd glunova
+
 # Install dependencies
 npm install
 
-# Run development server
+# Setup Environment (.env.local)
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+OPENROUTER_API_KEY=your_ai_key
+
+# Jalankan Development Mode
 npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
 ```
 
-Buka [http://localhost:3000](http://localhost:3000) di browser.
+---
 
-## Environment Variables
-
-Buat file `.env.local` dengan variabel berikut:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-OPENROUTER_API_KEY=your_openrouter_api_key
+## 📂 Struktur Folder Utama
+```text
+├── app/               # Next.js App Router (Layouts & Pages)
+├── components/        # UI Components (Atomic Design)
+├── hooks/             # Custom React Hooks
+├── lib/               # Shared Utilities & Supabase Client
+├── services/          # API & Server Action Logic
+├── types/             # TypeScript Type Definitions
+└── public/            # Static Assets
 ```
 
-## Roles
+---
 
-| Role | Akses |
-|------|-------|
-| **User** | Dashboard, edukasi, vision AI, konsultasi, roadmap |
-| **Doctor** | Portal dokter, konsultasi, jadwal, earnings |
-| **Admin** | Dashboard admin, approval dokter, manajemen konten |
-
-## Design System
-
-Glunova menggunakan design system berbasis CSS Custom Properties dengan palet warna biru profesional:
-
-- **Primary**: `#1A56DB` (blue-700) — warna utama
-- **Accent**: `#E5A00D` (warning/yellow) — aksen
-- **Neutral**: grayscale untuk teks dan background
-- **Typography**: Sora (headings) + DM Sans (body text)
+<div align="center">
+  <p>Dibuat dengan ❤️ untuk Masa Depan Kesehatan Indonesia.</p>
+  <p><b>Glunova Team — 2026</b></p>
+</div>

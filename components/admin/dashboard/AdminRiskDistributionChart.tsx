@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { Card } from '@/components/ui/card'
 import { 
   ResponsiveContainer,
   PieChart,
@@ -9,65 +8,85 @@ import {
   Cell,
   Tooltip
 } from 'recharts'
-import { AlertTriangle, ArrowUpRight } from 'lucide-react'
+import { AlertTriangle, ShieldCheck, Activity } from 'lucide-react'
 
 const riskDistribution = [
-  { name: 'Rendah', value: 45, color: '#137A74' }, // medical-green
-  { name: 'Sedang', value: 35, color: '#DDF247' }, // [color:var(--warning)]
-  { name: 'Tinggi', value: 20, color: '#FF6B6B' }, // medical-red
+  { name: 'Low Risk', value: 45, color: '#10B981' }, // emerald
+  { name: 'Moderate', value: 35, color: '#F59E0B' }, // amber
+  { name: 'Critical', value: 20, color: '#F43F5E' }, // rose
 ]
 
 export function AdminRiskDistributionChart() {
   return (
-    <Card className="p-6 rounded-[2rem] border-none shadow-sm bg-white  h-full flex flex-col relative overflow-hidden transition-colors">
-       <div className="flex justify-between items-start mb-2">
-        <div>
-          <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2 transition-colors">
-            <AlertTriangle className="w-5 h-5 text-[color:var(--warning)]" />
-            Distribusi Risiko
-          </h3>
-          <p className="text-xs text-slate-400  mt-1 transition-colors">Based on latest user assessments</p>
-        </div>
-        <button className="p-2 rounded-full hover:bg-slate-50  transition-colors">
-          <ArrowUpRight className="w-5 h-5 text-slate-400 " />
-        </button>
-      </div>
-
-      <div className="flex-1 min-h-[200px] w-full relative">
+    <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-[300px] w-full relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={riskDistribution}
               cx="50%"
               cy="50%"
-              innerRadius={70}
-              outerRadius={95}
-              paddingAngle={5}
+              innerRadius={80}
+              outerRadius={100}
+              paddingAngle={8}
               dataKey="value"
               stroke="none"
-              cornerRadius={8}
+              cornerRadius={12}
             >
               {riskDistribution.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+                <Cell 
+                   key={`cell-${index}`} 
+                   fill={entry.color} 
+                   className="hover:opacity-80 transition-opacity cursor-pointer"
+                />
               ))}
             </Pie>
             <Tooltip 
-              contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
-              itemStyle={{ color: '#fff' }}
+              contentStyle={{ 
+                 background: 'var(--white)', 
+                 border: '1px solid var(--neutral-200)', 
+                 borderRadius: '16px', 
+                 color: 'var(--neutral-900)', 
+                 fontSize: '10px', 
+                 fontWeight: 'black',
+                 textTransform: 'uppercase',
+                 letterSpacing: '0.1em',
+                 boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+              }}
+              itemStyle={{ color: 'var(--neutral-900)' }}
               cursor={{ fill: 'transparent' }}
             />
           </PieChart>
         </ResponsiveContainer>
+        
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none group">
+           <div className="w-24 h-24 rounded-full border border-[color:var(--neutral-100)] flex flex-col items-center justify-center bg-[color:var(--neutral-50)]/50 backdrop-blur-sm shadow-inner">
+              <p className="text-[8px] font-black uppercase tracking-widest leading-none mb-1" style={{ color: 'var(--neutral-400)' }}>Status</p>
+              <p className="text-xl font-black leading-none" style={{ color: 'var(--neutral-900)' }}>Global</p>
+              <div className="flex items-center gap-1 mt-2">
+                 <ShieldCheck className="w-3 h-3 text-[color:var(--success)]" />
+                 <span className="text-[10px] font-black text-[color:var(--success)]">SECURE</span>
+              </div>
+           </div>
+        </div>
       </div>
 
-      <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-slate-50  transition-colors">
+      <div className="grid grid-cols-1 gap-3 mt-8">
         {riskDistribution.map((item) => (
-          <div key={item.name} className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
-            <span className="text-xs font-bold text-slate-600  transition-colors">{item.name}</span>
+          <div key={item.name} className="flex items-center justify-between p-4 bg-[color:var(--neutral-50)] border border-[color:var(--neutral-100)] rounded-2xl group hover:bg-[color:var(--neutral-100)] transition-all">
+            <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
+              <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: 'var(--neutral-500)' }}>{item.name}</span>
+            </div>
+            <div className="flex items-center gap-2">
+               <span className="text-xs font-bold" style={{ color: 'var(--neutral-900)' }}>{item.value}%</span>
+               <div className="w-20 h-1.5 bg-[color:var(--neutral-200)] rounded-full overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
+               </div>
+            </div>
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   )
 }

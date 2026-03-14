@@ -12,18 +12,19 @@ export function MessageBubble({
   const time = new Date(message.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className={`mb-3 flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[78%] rounded-2xl px-3 py-2.5 text-sm ${
-        isOwn
-          ? 'bg-[color:var(--primary-900)] text-white'
-          : 'border border-slate-100/80 bg-white/95 shadow-[0_10px_26px_rgba(15,23,42,0.06)] text-slate-800'
-      }`}>
-        <p className="whitespace-pre-wrap break-words">{message.message}</p>
-        <p className={`mt-1 text-[10px] ${isOwn ? 'text-slate-300' : 'text-slate-400'}`}>{time}</p>
+    <div className={`mb-8 flex ${isOwn ? 'justify-end' : 'justify-start'} group`}>
+      <div className={`max-w-[85%] md:max-w-[70%] relative ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
+        <div className={`rounded-[2rem] px-8 py-5 text-[15px] font-medium leading-relaxed backdrop-blur-3xl transition-all duration-300 shadow-sm ${
+          isOwn
+            ? 'bg-[color:var(--primary-700)] text-white rounded-br-none shadow-[0_20px_40px_-10px_rgba(26,86,219,0.2)]'
+            : 'bg-white border border-[color:var(--neutral-100)] text-[color:var(--neutral-800)] rounded-bl-none shadow-sm'
+        }`}>
+          <p className="whitespace-pre-wrap break-words">{message.message}</p>
+        </div>
+        <p className={`mt-3 text-[9px] font-black uppercase tracking-[0.3em] opacity-0 group-hover:opacity-40 transition-opacity italic ${isOwn ? 'text-[color:var(--primary-700)]' : 'text-[color:var(--neutral-400)]'}`}>
+           Log_Transmisi // {time}
+        </p>
       </div>
     </div>
   )
 }
-
-
-

@@ -7,14 +7,13 @@ export function ConsultationTimer({ startedAt, endedAt }: { startedAt?: string; 
   const { formatted, isRunning } = useConsultationTimer(startedAt, endedAt)
 
   return (
-    <div className={`inline-flex items-center gap-2 rounded-xl px-3 py-1.5 font-mono text-xs font-semibold ${
-      isRunning ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
+    <div className={`inline-flex items-center gap-3 rounded-xl px-5 py-2 font-mono text-[11px] font-black uppercase tracking-[0.2em] shadow-sm transition-all ${
+      isRunning 
+        ? 'bg-[color:var(--primary-700)] text-white shadow-[0_10px_20px_rgba(26,86,219,0.2)]' 
+        : 'bg-[color:var(--neutral-100)] text-[color:var(--neutral-400)] border border-[color:var(--neutral-200)]'
     }`}>
-      <Clock size={14} className={isRunning ? 'animate-pulse' : ''} />
-      {formatted}
+      <Clock size={14} className={isRunning ? 'animate-pulse text-white' : ''} />
+      <span className="tabular-nums italic leading-none">{formatted}</span>
     </div>
   )
 }
-
-
-

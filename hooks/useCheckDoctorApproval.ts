@@ -43,7 +43,7 @@ export function useCheckDoctorApproval() {
             return
           }
 
-          router.replace('/onboarding/doctor-approved')
+          router.replace('/register-doctor/approved')
         } else {
           if (mounted) setCheckedUserId(user.id)
         }

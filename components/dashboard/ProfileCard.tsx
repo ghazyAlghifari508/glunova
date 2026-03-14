@@ -39,7 +39,7 @@ export function ProfileCard({ fullName, firstName, profileCompletion, avatarUrl 
         </div>
         <div className="flex-1 min-w-0 pt-1">
           <h4 className="text-lg font-bold text-slate-900  truncate transition-colors">{fullName || firstName}</h4>
-          <p className="text-xs font-bold text-slate-500  uppercase tracking-widest leading-none transition-colors">Profil Kehamilan</p>
+          <p className="text-xs font-bold text-slate-500  uppercase tracking-widest leading-none transition-colors">Profil Kesehatan</p>
         </div>
       </div>
 

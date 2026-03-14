@@ -40,11 +40,11 @@ export function EducationCalendarView({
   const currentMonthPhase = getPhaseFromDay(monthStartDay);
   const phaseInfo = getPhaseInfo(currentMonthPhase);
   const phaseTone =
-    currentMonthPhase === 'kehamilan'
+    currentMonthPhase === 'kesehatan'
       ? 'bg-[color:var(--primary-700)]'
-      : currentMonthPhase === 'bayi_0_3'
+      : currentMonthPhase === 'fase_2'
         ? 'bg-sky-500'
-        : currentMonthPhase === 'bayi_3_12'
+        : currentMonthPhase === 'fase_3'
           ? 'bg-emerald-500'
           : 'bg-slate-700';
 

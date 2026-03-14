@@ -127,14 +127,18 @@ export function AiChatFloating() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let fullText = '';
+      let buffer = '';
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep partial line in buffer
+
         for (const line of lines) {
-          if (!line.startsWith('data: ') || line === 'data: [DONE]') continue;
+          if (!line.startsWith('data: ') || line.includes('[DONE]')) continue;
           try {
             const json = JSON.parse(line.slice(6));
             const delta = json.choices?.[0]?.delta?.content || '';
@@ -149,7 +153,9 @@ export function AiChatFloating() {
                 }
               });
             }
-          } catch { /* skip malformed chunks */ }
+          } catch (e) {
+            console.warn('Malformed AI chunk:', line);
+          }
         }
       }
 
@@ -223,7 +229,7 @@ export function AiChatFloating() {
 
                     <Button 
                       onClick={handleCreateNewChat}
-                      className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl py-6 font-bold shadow-lg shadow-slate-900/20 mb-6 gap-2"
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-2xl py-6 font-bold shadow-lg shadow-blue-600/20 mb-6 gap-2"
                     >
                        <PlusCircle className="w-5 h-5" />
                        Diskusi Baru
@@ -274,7 +280,7 @@ export function AiChatFloating() {
                   <div>
                     <h3 className="font-black text-slate-900 leading-tight">Glunova AI</h3>
                     <p className="text-[10px] font-bold text-[color:var(--primary-700)] uppercase tracking-widest">
-                      {isTyping ? 'Sedang mengetik...' : 'Asisten Kesehatan Bunda'}
+                      {isTyping ? 'Sedang mengetik...' : 'Asisten Kesehatan Anda'}
                     </p>
                   </div>
                 </div>
@@ -294,12 +300,12 @@ export function AiChatFloating() {
                       <Bot size={40} className="text-[color:var(--primary-700)]" />
                     </div>
                     <div>
-                      <h4 className="text-2xl font-black text-slate-900 leading-tight">Halo, Bunda!</h4>
+                      <h4 className="text-2xl font-black text-slate-900 leading-tight">Halo, Anda!</h4>
                       <p className="text-slate-400 font-bold text-sm mt-2">Ada yang bisa dibantu hari ini?</p>
                     </div>
                     <Button 
                       onClick={handleCreateNewChat}
-                      className="bg-slate-900 hover:bg-slate-800 text-white rounded-2xl px-8 h-12 font-bold shadow-lg shadow-slate-900/10"
+                      className="bg-blue-600 hover:bg-blue-500 text-white rounded-2xl px-8 h-12 font-bold shadow-lg shadow-blue-600/10"
                     >
                       Mulai Konsultasi →
                     </Button>
@@ -315,11 +321,13 @@ export function AiChatFloating() {
                       >
                         <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${
-                            msg.role === 'user' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-[color:var(--primary-700)]'
+                            msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-[color:var(--primary-700)]'
                           }`}>
                             {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                           </div>
-                          <div className={`px-4 py-3 rounded-2xl text-sm font-medium leading-relaxed shadow-sm w-full overflow-hidden break-words ${
+                          <div 
+                            data-testid={msg.role === 'assistant' ? 'ai-message' : 'user-message'}
+                            className={`px-4 py-3 rounded-2xl text-sm font-medium leading-relaxed shadow-sm w-full overflow-hidden break-words ${
                             msg.role === 'user' 
                               ? 'bg-[color:var(--primary-700)] text-white rounded-tr-none' 
                               : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none'
@@ -327,27 +335,29 @@ export function AiChatFloating() {
                             {msg.role === 'user' ? (
                               <div className="whitespace-pre-wrap">{msg.content}</div>
                             ) : (
-                              <ReactMarkdown
-                                remarkPlugins={[remarkGfm]}
-                                components={{
-                                  p: ({...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                                  ul: ({...props}) => <ul className="list-disc pl-4 mb-2" {...props} />,
-                                  ol: ({...props}) => <ol className="list-decimal pl-4 mb-2" {...props} />,
-                                  li: ({...props}) => <li className="mb-1" {...props} />,
-                                  strong: ({...props}) => <strong className="font-bold text-slate-900" {...props} />,
-                                  em: ({...props}) => <em className="italic" {...props} />,
-                                  table: ({...props}) => (
-                                    <div className="overflow-x-auto mb-2 w-full">
-                                      <table className="min-w-full divide-y divide-slate-200 border border-slate-200 rounded-lg" {...props} />
-                                    </div>
-                                  ),
-                                  th: ({...props}) => <th className="px-3 py-2 bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase" {...props} />,
-                                  td: ({...props}) => <td className="px-3 py-2 text-sm border-t border-slate-100" {...props} />,
-                                  a: ({...props}) => <a className="text-[color:var(--primary-700)] hover:underline font-semibold" target="_blank" rel="noopener noreferrer" {...props} />,
-                                }}
-                              >
-                                {msg.content || ''}
-                              </ReactMarkdown>
+                              <div className="ai-response-content" data-testid="ai-response-text">
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
+                                  components={{
+                                    p: ({...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                                    ul: ({...props}) => <ul className="list-disc pl-4 mb-2" {...props} />,
+                                    ol: ({...props}) => <ol className="list-decimal pl-4 mb-2" {...props} />,
+                                    li: ({...props}) => <li className="mb-1" {...props} />,
+                                    strong: ({...props}) => <strong className="font-bold text-slate-900" {...props} />,
+                                    em: ({...props}) => <em className="italic" {...props} />,
+                                    table: ({...props}) => (
+                                      <div className="overflow-x-auto mb-2 w-full">
+                                        <table className="min-w-full divide-y divide-slate-200 border border-slate-200 rounded-lg" {...props} />
+                                      </div>
+                                    ),
+                                    th: ({...props}) => <th className="px-3 py-2 bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase" {...props} />,
+                                    td: ({...props}) => <td className="px-3 py-2 text-sm border-t border-slate-100" {...props} />,
+                                    a: ({...props}) => <a className="text-[color:var(--primary-700)] hover:underline font-semibold" target="_blank" rel="noopener noreferrer" {...props} />,
+                                  }}
+                                >
+                                  {msg.content || ''}
+                                </ReactMarkdown>
+                              </div>
                             )}
                           </div>
                         </div>

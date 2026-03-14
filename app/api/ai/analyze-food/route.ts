@@ -19,9 +19,9 @@ const FoodAnalysisSchema = z.object({
   calcium: z.number().describe('Perkiraan kalsium dalam mg'),
   folicAcid: z.number().describe('Perkiraan asam folat dalam mcg'),
   vitaminA: z.number().describe('Perkiraan vitamin A dalam mcg'),
-  stuntingNutritionScore: z.number().min(0).max(100).describe('Skor nutrisi diabetes care 0-100, berdasarkan kandungan protein, zat besi, zinc, dan nutrisi penting lainnya'),
+  healthNutritionScore: z.number().min(0).max(100).describe('Skor nutrisi diabetes care 0-100, berdasarkan kandungan protein, zat besi, zinc, dan nutrisi penting lainnya'),
   tip: z.string().describe('Tips singkat dalam bahasa Indonesia tentang makanan ini untuk manajemen diabetes, maksimal 2 kalimat'),
-  isHealthy: z.boolean().describe('Apakah makanan ini baik untuk ibu hamil'),
+  isHealthy: z.boolean().describe('Apakah makanan ini baik untuk ibu berisiko'),
 })
 
 export async function POST(req: Request) {
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     const base64 = Buffer.from(bytes).toString('base64')
     const mimeType = image.type || 'image/jpeg'
 
-    const prompt = `Kamu adalah ahli gizi Indonesia. Analisis foto makanan ini untuk ibu hamil yang ingin mengontrol diabetes.
+    const prompt = `Kamu adalah ahli gizi Indonesia. Analisis foto makanan ini untuk ibu berisiko yang ingin mengontrol diabetes.
 
 PENTING: Semua jawaban WAJIB dalam BAHASA INDONESIA. Nama makanan HARUS dalam bahasa Indonesia (contoh: "Bubur Ayam", "Nasi Goreng", "Soto Betawi", bukan nama Inggris).
 
@@ -59,7 +59,7 @@ Struktur JSON harus persis seperti ini:
   "calcium": 0,
   "folicAcid": 0,
   "vitaminA": 0,
-  "stuntingNutritionScore": 0,
+  "healthNutritionScore": 0,
   "tip": "Tips singkat dalam Bahasa Indonesia (string)",
   "isHealthy": true
 }
@@ -91,10 +91,17 @@ Jika bukan gambar makanan, berikan foodName: "Bukan Makanan", nilai 0, dan isHea
     try {
       // Clean potential markdown code blocks
       const cleanJson = jsonString.replace(/```json/g, '').replace(/```/g, '').trim();
-      analysis = FoodAnalysisSchema.parse(JSON.parse(cleanJson));
-    } catch {
-      console.error('[analyze-food] Failed to parse AI response');
-      throw new Error('Gagal memproses hasil analisis AI');
+      const parsed = JSON.parse(cleanJson);
+      analysis = FoodAnalysisSchema.parse(parsed);
+    } catch (parseErr) {
+      console.error('[analyze-food] Failed to parse AI response:', parseErr, 'Raw:', jsonString);
+      return new Response(
+        JSON.stringify({ 
+          error: 'AI gagal menghasilkan data nutrisi yang valid. Silakan coba lagi dengan foto yang lebih jelas ya.',
+          details: parseErr instanceof Error ? parseErr.message : 'Parsing failed'
+        }),
+        { status: 422, headers: { 'Content-Type': 'application/json' } }
+      )
     }
 
     // Save to database if user is logged in
@@ -115,7 +122,7 @@ Jika bukan gambar makanan, berikan foodName: "Bukan Makanan", nilai 0, dan isHea
             calcium: analysis.calcium,
             folic_acid: analysis.folicAcid,
             vitamin_a: analysis.vitaminA,
-            stunting_nutrition_score: analysis.stuntingNutritionScore,
+            health_nutrition_score: analysis.healthNutritionScore,
             tip: analysis.tip,
             is_healthy: analysis.isHealthy,
           })
@@ -140,7 +147,7 @@ Jika bukan gambar makanan, berikan foodName: "Bukan Makanan", nilai 0, dan isHea
     
     return new Response(
       JSON.stringify({ 
-        error: `Gagal menganalisis gambar Bunda. Silakan coba lagi nanti ya. 🙏`,
+        error: `Gagal menganalisis gambar Anda. Silakan coba lagi nanti ya. 🙏`,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     )

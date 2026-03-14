@@ -1,25 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import {
-  Stethoscope,
-  Check,
-  Loader2,
-  Search,
-  FileText,
-} from 'lucide-react'
+import { Stethoscope, Check, Loader2, Search, FileText, ShieldAlert, UserCheck, UserX, BadgeCheck, AlertCircle } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { approveDoctor, rejectDoctor } from '@/services/adminService'
 import Image from 'next/image'
-import { AdminTopHeader } from '@/components/admin/AdminTopHeader'
 import { useAdminContext } from '@/components/providers/Providers'
+import { useToast } from '@/components/ui/use-toast'
 import type { DoctorRegistration } from '@/types/doctor'
 
-
 export default function DoctorApprovalsPage() {
+  const { toast } = useToast()
   const adminContext = useAdminContext()
   const doctors = (adminContext?.pendingDoctors || []) as DoctorRegistration[]
   const loading = adminContext?.loading
@@ -30,228 +23,177 @@ export default function DoctorApprovalsPage() {
 
   const handleApprove = async (doctorId: string) => {
     if (processingId) return
-    try {
+    try { 
       setProcessingId(doctorId)
       await approveDoctor(doctorId)
-      await adminContext?.loadAdminData(true)
-    } catch (error) {
-      console.error('Error approving doctor:', error)
-    } finally {
-      setProcessingId(null)
+      toast({ title: 'Dokter Disetujui', description: 'Profil dokter berhasil dibuat dan diverifikasi.' })
+      await adminContext?.loadAdminData(true) 
     }
+    catch (error: any) { 
+      console.error(error)
+      toast({ 
+        title: 'Gagal Menyetujui', 
+        description: error.message || 'Terjadi kesalahan sistem saat menyetujui dokter.',
+        variant: 'destructive'
+      })
+    } finally { setProcessingId(null) }
   }
 
   const handleReject = async () => {
     if (!rejectModal || processingId) return
-    try {
+    try { 
       setProcessingId(rejectModal.id)
       await rejectDoctor(rejectModal.id, rejectModal.userId, rejectReason)
+      toast({ title: 'Pendaftaran Ditolak', description: 'Alasan penolakan telah dikirim ke pemohon.' })
       await adminContext?.loadAdminData(true)
       setRejectModal(null)
-      setRejectReason('')
-    } catch (error) {
-      console.error('Error rejecting doctor:', error)
-    } finally {
-      setProcessingId(null)
+      setRejectReason('') 
     }
+    catch (error: any) { 
+      console.error(error)
+      toast({ 
+        title: 'Gagal Menolak', 
+        description: error.message || 'Terjadi kesalahan sistem saat menolak pendaftaran.',
+        variant: 'destructive'
+      })
+    } finally { setProcessingId(null) }
   }
 
-  const filteredDoctors = doctors.filter(
-    (d) =>
-      d.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.license_number.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredDoctors = doctors.filter(d =>
+    d.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    d.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    d.license_number.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   if (loading && doctors.length === 0) {
-    return (
-      <div className="p-8 max-w-[1600px] mx-auto min-h-screen bg-white  transition-colors">
-        <div className="mb-6">
-          <Skeleton className="h-8 w-64 mb-2" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-        
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-          <Skeleton className="h-10 w-full sm:max-w-md rounded-xl" />
-          <Skeleton className="h-10 w-full sm:w-40 rounded-xl" />
-        </div>
-
-        <div className="space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="p-5 rounded-2xl bg-white  border-none shadow-sm flex items-center justify-between transition-colors">
-               <div className="flex items-center gap-4">
-                 <Skeleton className="w-14 h-14 rounded-2xl" />
-                 <div className="space-y-2">
-                   <Skeleton className="h-5 w-40" />
-                   <Skeleton className="h-4 w-56" />
-                   <Skeleton className="h-3 w-32" />
-                 </div>
-               </div>
-               <div className="space-y-2">
-                 <Skeleton className="h-8 w-24 rounded-xl" />
-                 <Skeleton className="h-8 w-24 rounded-xl" />
-               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
+    return <div className="p-8 min-h-screen"><Skeleton className="w-full h-[600px] rounded-2xl" style={{ background: 'var(--neutral-200)' }} /></div>
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-[1600px] mx-auto min-h-screen bg-white  transition-colors">
-      <AdminTopHeader title="Doctor Approvals" showSearch={false} />
-
-      <div className="mb-6">
-        <p className="text-sm text-slate-500  transition-colors">Verifikasi pendaftaran dokter baru</p>
-      </div>
-
-      <div className="space-y-4">
-        {/* Search & Pending Count */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400  transition-colors" />
-            <input
-              type="text"
-              placeholder="Cari nama, spesialisasi, atau STR..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200  bg-white  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] transition-all font-medium transition-colors"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm bg-white  px-4 py-2 rounded-xl shadow-sm border border-slate-100  w-full sm:w-auto shrink-0 justify-center transition-colors">
-            <div className="w-2 h-2 rounded-full bg-[color:var(--warning)] animate-pulse" />
-            <span className="font-bold text-slate-600  transition-colors">
-              {filteredDoctors.length} Menunggu Verifikasi
-            </span>
-          </div>
+    <div className="p-6 md:p-8 min-h-screen font-sans">
+      <div className="max-w-[1400px] mx-auto space-y-6">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+           <div>
+              <h1 className="text-2xl font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>Verifikasi Dokter</h1>
+              <p className="text-sm font-body mt-1" style={{ color: 'var(--neutral-500)' }}>Tinjau lisensi medis dan sertifikasi profesional.</p>
+           </div>
+           <div className="relative w-full md:w-80 rounded-xl" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--neutral-400)' }} />
+              <input type="text" placeholder="Cari nama, spesialisasi, lisensi..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                 className="w-full h-11 bg-transparent pl-10 pr-4 text-sm font-body focus:outline-none" style={{ color: 'var(--neutral-900)' }} />
+           </div>
         </div>
 
-        {/* Doctor Cards */}
-        {filteredDoctors.length === 0 ? (
-          <Card className="p-12 rounded-2xl border-0 shadow-sm bg-white  text-center mt-6 transition-colors">
-            <Check className="w-12 h-12 text-medical-green mx-auto mb-4" />
-            <p className="font-bold text-slate-800  text-lg transition-colors">Semua Terverifikasi!</p>
-            <p className="text-sm text-slate-500  font-medium mt-1 transition-colors">Tidak ada dokter yang menunggu verifikasi saat ini.</p>
-          </Card>
-        ) : (
-          <div className="space-y-4 mt-6">
-            {filteredDoctors.map((doctor, index) => (
-              <motion.div
-                key={doctor.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Card className="p-5 rounded-2xl border-0 shadow-sm bg-white  hover:shadow-md transition-shadow group transition-colors">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="w-14 h-14 rounded-2xl bg-[color:var(--primary-50)]  flex items-center justify-center shrink-0 overflow-hidden relative transition-colors">
-                         {doctor.users?.avatar_url ? (
-                           <Image src={doctor.users.avatar_url} alt={doctor.full_name} fill className="object-cover" unoptimized/>
-                         ) : (
-                           <Stethoscope className="w-7 h-7 text-[color:var(--primary-700)]" />
-                         )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-900  text-base transition-colors">{doctor.full_name}</p>
-                        <div className="flex flex-wrap items-center gap-2 mt-1">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-[color:var(--primary-50)]  text-[color:var(--primary-700)] uppercase tracking-wider transition-colors">
-                            {doctor.specialization}
-                          </span>
-                          <span className="w-1 h-1 rounded-full bg-slate-300  transition-colors" />
-                          <span className="text-xs text-slate-500  font-medium transition-colors">STR: {doctor.license_number}</span>
-                          {doctor.years_of_experience && (
-                            <>
-                              <span className="w-1 h-1 rounded-full bg-slate-300  transition-colors" />
-                              <span className="text-xs text-slate-500  font-medium transition-colors">{doctor.years_of_experience} thn peng.</span>
-                            </>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 mt-2 text-xs text-slate-400  transition-colors">
-                          <span className="font-medium">Dikirim: {new Date(doctor.submitted_at).toLocaleDateString('id-ID', { dateStyle: 'medium' })}</span>
-                          {doctor.certification_url && (
-                            <a
-                              href={doctor.certification_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-[color:var(--primary-700)] hover:text-[#0f605c] font-bold transition-colors"
-                            >
-                              <FileText className="w-3 h-3" />
-                              Lihat Dokumen
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:flex-col sm:w-32 shrink-0">
-                      <Button
-                        onClick={() => handleApprove(doctor.id)}
-                        disabled={processingId === doctor.id}
-                        size="sm"
-                        className="rounded-xl w-full bg-[color:var(--primary-700)] hover:bg-[#0f605c] text-white font-bold transition-colors"
-                      >
-                        {processingId === doctor.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                        ) : (
-                          <Check className="w-4 h-4 mr-1" />
-                        )}
-                        Terima
-                      </Button>
-                      <Button
-                        onClick={() => setRejectModal({ id: doctor.id, userId: doctor.user_id })}
-                        disabled={processingId === doctor.id}
-                        variant="outline"
-                        size="sm"
-                        className="rounded-xl w-full border-slate-200  text-slate-600  hover:bg-grapefruit/10 hover:text-grapefruit hover:border-grapefruit/20 font-bold transition-colors"
-                      >
-                        Tolak
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
+        {/* List */}
+        <div className="space-y-4">
+           {filteredDoctors.length === 0 ? (
+              <motion.div initial={{opacity:0}} animate={{opacity:1}} className="rounded-2xl p-16 text-center flex flex-col items-center"
+                 style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+                 <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-5" style={{ background: 'rgba(16,185,129,0.08)' }}>
+                    <BadgeCheck className="w-8 h-8" style={{ color: 'var(--success)' }} />
+                 </div>
+                 <h2 className="text-xl font-bold font-heading mb-2" style={{ color: 'var(--neutral-900)' }}>Tidak Ada Permintaan</h2>
+                 <p className="text-sm font-body" style={{ color: 'var(--neutral-500)' }}>Semua verifikasi dokter sudah diproses.</p>
               </motion.div>
-            ))}
-          </div>
-        )}
+           ) : (
+              <div className="grid grid-cols-1 gap-4">
+                 <AnimatePresence mode="popLayout">
+                    {filteredDoctors.map((doctor) => (
+                       <motion.div key={doctor.id} layout initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+                          className="group rounded-xl p-5 md:p-6 transition-all shadow-sm"
+                          style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}
+                       >
+                          <div className="flex flex-col xl:flex-row items-center gap-6">
+                             {/* Avatar */}
+                             <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden relative shadow-sm shrink-0"
+                                  style={{ background: 'var(--neutral-100)', border: '1px solid var(--neutral-200)' }}>
+                                {doctor.users?.avatar_url ? (
+                                   <Image src={doctor.users.avatar_url} alt={doctor.full_name} fill className="object-cover" unoptimized />
+                                ) : (
+                                   <div className="w-full h-full flex items-center justify-center text-2xl font-bold font-heading" style={{ color: 'var(--neutral-400)' }}>
+                                      {doctor.full_name.charAt(0)}
+                                   </div>
+                                )}
+                             </div>
+
+                             {/* Info */}
+                             <div className="flex-1 min-w-0 text-center xl:text-left">
+                                <div className="flex flex-wrap items-center justify-center xl:justify-start gap-3 mb-2">
+                                   <h3 className="text-lg font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>{doctor.full_name}</h3>
+                                   <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold font-body" style={{ background: 'var(--primary-50)', color: 'var(--primary-700)', border: '1px solid var(--primary-100)' }}>
+                                      {doctor.specialization}
+                                   </span>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-center xl:justify-start gap-x-5 gap-y-1.5 mb-4">
+                                   <div className="flex items-center gap-1.5">
+                                      <FileText className="w-3.5 h-3.5" style={{ color: 'var(--neutral-400)' }} />
+                                      <span className="text-xs font-body" style={{ color: 'var(--neutral-500)' }}>Lisensi: <strong style={{ color: 'var(--neutral-900)' }}>{doctor.license_number}</strong></span>
+                                   </div>
+                                   <div className="flex items-center gap-1.5">
+                                      <Stethoscope className="w-3.5 h-3.5" style={{ color: 'var(--neutral-400)' }} />
+                                      <span className="text-xs font-body" style={{ color: 'var(--neutral-500)' }}>Pengalaman: <strong style={{ color: 'var(--neutral-900)' }}>{doctor.years_of_experience} Tahun</strong></span>
+                                   </div>
+                                   <div className="flex items-center gap-1.5">
+                                      <AlertCircle className="w-3.5 h-3.5" style={{ color: 'var(--neutral-400)' }} />
+                                      <span className="text-xs font-body" style={{ color: 'var(--neutral-500)' }}>Diajukan: <strong style={{ color: 'var(--neutral-900)' }}>{new Date(doctor.submitted_at).toLocaleDateString('id-ID')}</strong></span>
+                                   </div>
+                                </div>
+                                {doctor.certification_url && (
+                                   <a href={doctor.certification_url} target="_blank"
+                                      className="inline-flex items-center gap-2 h-8 px-3 rounded-lg text-xs font-semibold transition-all font-body"
+                                      style={{ background: 'var(--neutral-100)', color: 'var(--neutral-600)', border: '1px solid var(--neutral-200)' }}>
+                                      <FileText className="w-3 h-3" /> Lihat Dokumen
+                                   </a>
+                                )}
+                             </div>
+
+                             {/* Actions */}
+                             <div className="flex flex-col md:flex-row gap-3 w-full xl:w-auto shrink-0">
+                                <Button onClick={() => handleApprove(doctor.id)} disabled={!!processingId}
+                                   className="h-11 px-6 rounded-xl text-white font-bold text-sm" style={{ background: 'var(--success)' }}>
+                                   {processingId === doctor.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCheck className="w-4 h-4 mr-2" />}
+                                   Setujui
+                                </Button>
+                                <Button onClick={() => setRejectModal({ id: doctor.id, userId: doctor.user_id })} disabled={!!processingId}
+                                   className="h-11 px-6 rounded-xl font-bold text-sm" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-600)' }}>
+                                   <UserX className="w-4 h-4 mr-2" /> Tolak
+                                </Button>
+                             </div>
+                          </div>
+                       </motion.div>
+                    ))}
+                 </AnimatePresence>
+              </div>
+           )}
+        </div>
 
         {/* Reject Modal */}
-        {rejectModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setRejectModal(null)} />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="relative bg-white  rounded-[2rem] p-6 w-full max-w-sm shadow-2xl transition-colors"
-            >
-              <h3 className="text-lg font-black text-slate-800  mb-2 transition-colors">Tolak Pendaftaran</h3>
-              <p className="text-sm border-l-2 pl-3 border-[color:var(--warning)] text-slate-600  mb-4 font-medium transition-colors">
-                Berikan alasan mengapa pendaftaran dokter ini ditolak (Opsional):
-              </p>
-              <textarea
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Contoh: Dokumen STR tidak valid, foto tidak jelas..."
-                className="w-full p-4 rounded-xl border border-slate-200  text-sm resize-none h-28 focus:outline-none focus:ring-2 focus:ring-grapefruit/30 bg-slate-50  text-slate-900  font-medium transition-colors"
-              />
-              <div className="flex gap-3 mt-6">
-                <Button variant="ghost" onClick={() => setRejectModal(null)} className="flex-1 rounded-xl font-bold bg-slate-100  text-slate-600  hover:bg-slate-200  transition-colors">
-                  Batal
-                </Button>
-                <Button
-                  onClick={handleReject}
-                  disabled={processingId !== null}
-                  className="flex-1 rounded-xl bg-grapefruit hover:bg-red-600 text-white font-bold shadow-lg shadow-grapefruit/20 transition-colors"
-                >
-                  {processingId ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
-                  Tolak
-                </Button>
+        <AnimatePresence>
+           {rejectModal && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm">
+                 <motion.div initial={{ opacity:0, scale: 0.95 }} animate={{ opacity:1, scale: 1 }} exit={{ opacity:0, scale: 0.95 }}
+                    className="rounded-2xl p-8 max-w-md w-full shadow-xl" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+                    <h3 className="text-lg font-bold font-heading mb-2 flex items-center gap-2" style={{ color: 'var(--neutral-900)' }}>
+                       <UserX className="w-5 h-5" style={{ color: 'var(--danger)' }} /> Konfirmasi Penolakan
+                    </h3>
+                    <p className="text-sm font-body mb-5" style={{ color: 'var(--neutral-500)' }}>Berikan alasan penolakan. Alasan ini akan dikirim ke pemohon.</p>
+                    <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)}
+                       className="w-full h-28 rounded-xl p-3 text-sm font-body focus:outline-none resize-none"
+                       style={{ background: 'var(--neutral-50)', border: '1px solid var(--neutral-200)', color: 'var(--neutral-900)' }}
+                       placeholder="Dokumen tidak valid, lisensi kedaluwarsa..." />
+                    <div className="grid grid-cols-2 gap-3 mt-5">
+                       <Button onClick={() => setRejectModal(null)} className="h-11 rounded-xl font-semibold text-sm" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-700)' }}>Batal</Button>
+                       <Button onClick={handleReject} disabled={!!processingId} className="h-11 rounded-xl font-semibold text-sm text-white" style={{ background: 'var(--danger)' }}>
+                          Tolak Dokter
+                       </Button>
+                    </div>
+                 </motion.div>
               </div>
-            </motion.div>
-          </div>
-        )}
+           )}
+        </AnimatePresence>
+
       </div>
     </div>
   )

@@ -87,10 +87,21 @@ export async function approveDoctor(registrationId: string) {
 
   // 2. Create the actual doctor profile in the `doctors` table
   // Generate unique email using name and short UID suffix if registration email is missing
-  const uidSuffix = registration.user_id.substring(0, 4)
-  const safeName = registration.full_name.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const uidSuffix = (registration.user_id || 'glun').substring(0, 4)
+  const safeName = (registration.full_name || 'doctor').toLowerCase().replace(/[^a-z0-9]/g, '')
   const generatedEmail = `${safeName}.${uidSuffix}@glunova.id`
   const doctorEmail = registration.email || generatedEmail
+
+  // Pre-check for duplicate license number
+  const { data: existingDoctor } = await supabase
+    .from('doctors')
+    .select('user_id, full_name')
+    .eq('license_number', registration.license_number)
+    .maybeSingle()
+
+  if (existingDoctor && existingDoctor.user_id !== registration.user_id) {
+    throw new Error(`Nomor lisensi ${registration.license_number} sudah digunakan oleh dokter lain (${existingDoctor.full_name})`)
+  }
 
   const { error: doctorError } = await supabase
     .from('doctors')

@@ -5,109 +5,94 @@ import {
   Users, 
   Stethoscope, 
   Clock, 
-  BookOpen
+  BookOpen,
+  ArrowUpRight,
+  Activity
 } from 'lucide-react'
-import { StatCard, StatProgress } from '@/components/doctor/dashboard/StatCard'
 import type { DashboardStats } from '@/services/adminService'
+import { motion } from 'framer-motion'
 
+interface AdminStatCardProps {
+  title: string
+  value: string | number
+  icon: any
+  desc: string
+  trend: string
+  color: 'primary' | 'success' | 'info' | 'danger'
+}
 
-// Mock Data for Bars
-const MockBars = () => (
-  <div className="flex items-end gap-[2px] h-10 w-full mt-2">
-    {[35, 60, 45, 70, 50, 65, 40, 55, 75, 50, 60, 45, 35, 60, 45, 70, 50, 65, 40, 55, 75, 50, 60].map((h, i) => (
-      <div 
-        key={i} 
-        className={`w-full rounded-t-sm transition-colors ${i % 2 === 0 ? 'bg-[color:var(--primary-600)]' : 'bg-slate-200 '}`} 
-        style={{ height: `${h}%` }} 
-      />
-    ))}
-  </div>
-)
+const colorMap = {
+  primary: { bg: 'var(--primary-50)', icon: 'var(--primary-700)', border: 'var(--primary-100)' },
+  success: { bg: 'rgba(16,185,129,0.08)', icon: 'var(--success)', border: 'rgba(16,185,129,0.15)' },
+  info: { bg: 'rgba(59,130,246,0.08)', icon: '#3B82F6', border: 'rgba(59,130,246,0.15)' },
+  danger: { bg: 'rgba(239,68,68,0.08)', icon: 'var(--danger)', border: 'rgba(239,68,68,0.15)' },
+}
 
-const MockLines = () => (
-  <div className="flex items-end gap-[2px] h-10 w-full mt-2">
-    {[20, 40, 30, 50, 35, 55, 25, 45, 60, 40, 50, 35, 20, 40, 30, 50, 35, 55, 25, 45, 60, 40, 50].map((h, i) => (
-      <div 
-        key={i} 
-        className={`w-full rounded-t-sm transition-colors ${i % 3 === 0 ? 'bg-[color:var(--primary-700)]/60' : 'bg-slate-200 '}`} 
-        style={{ height: `${h}%` }} 
-      />
-    ))}
-  </div>
-)
+const AdminStatCard = ({ title, value, icon: Icon, desc, trend, color }: AdminStatCardProps) => {
+   const c = colorMap[color]
+   return (
+      <motion.div 
+         whileHover={{ y: -3 }}
+         className="p-6 rounded-2xl shadow-sm transition-all"
+         style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}
+      >
+         <div className="flex justify-between items-start mb-5">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: c.bg, border: `1px solid ${c.border}` }}>
+               <Icon className="w-6 h-6" style={{ color: c.icon }} />
+            </div>
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg" style={{ background: c.bg }}>
+               <ArrowUpRight className="w-3 h-3" style={{ color: c.icon }} />
+               <span className="text-[10px] font-bold" style={{ color: c.icon }}>{trend}</span>
+            </div>
+         </div>
+
+         <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5 font-heading" style={{ color: 'var(--neutral-400)' }}>{title}</p>
+            <h3 className="text-3xl font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>{value}</h3>
+            
+            <div className="flex items-center gap-2 pt-4 mt-4" style={{ borderTop: '1px solid var(--neutral-100)' }}>
+               <div className="w-1.5 h-1.5 rounded-full" style={{ background: c.icon }} />
+               <p className="text-[10px] font-semibold font-body" style={{ color: 'var(--neutral-400)' }}>{desc}</p>
+            </div>
+         </div>
+      </motion.div>
+   )
+}
 
 export const AdminMetricsGrid = ({ stats }: { stats: DashboardStats }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-      {/* 1. Total Users */}
-      <StatCard 
-        title="Total Patients" 
-        value={stats.totalUsers || 0} 
-        icon={Users}
-        chart={<MockBars />}
-        footer={
-          <div className="flex justify-between items-end">
-            <div className="text-xs">
-              <span className="text-slate-400 ">Active</span>
-              <p className="font-bold text-slate-700  transition-colors">{Math.floor((stats.totalUsers || 0) * 0.8)}</p>
-            </div>
-            <div className="text-xs text-right">
-              <span className="text-slate-400">Inactive</span>
-              <p className="font-bold text-slate-700">{Math.ceil((stats.totalUsers || 0) * 0.2)}</p>
-            </div>
-          </div>
-        }
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+      <AdminStatCard 
+         title="Total Pasien" 
+         value={stats.totalUsers || 0} 
+         icon={Users} 
+         desc="Tersinkronisasi" 
+         trend="+12.5%" 
+         color="primary" 
       />
-
-      {/* 2. Total Doctors */}
-      <StatCard 
-        title="Active Doctors" 
-        value={stats.totalDoctors || 0} 
-        icon={Stethoscope}
-        chart={<MockLines />}
-        footer={
-          <div className="flex justify-between items-end">
-             <div className="text-xs">
-              <span className="text-slate-400 ">Available</span>
-              <p className="font-bold text-slate-700  transition-colors">{Math.floor((stats.totalDoctors || 0) * 0.9)}</p>
-            </div>
-            <div className="text-xs text-right">
-              <span className="text-slate-400">On Leave</span>
-              <p className="font-bold text-slate-700">{Math.ceil((stats.totalDoctors || 0) * 0.1)}</p>
-            </div>
-          </div>
-        }
+      <AdminStatCard 
+         title="Dokter Terverifikasi" 
+         value={stats.totalDoctors || 0} 
+         icon={Stethoscope} 
+         desc="Lisensi aktif" 
+         trend="+4.2%" 
+         color="success" 
       />
-
-      {/* 3. Pending Approvals */}
-      <StatCard 
-        title="Pending Verifications" 
-        value={stats.pendingVerifications || 0} 
-        icon={Clock}
-        footer={
-          <div className="flex gap-4 mt-2">
-            <div className="flex-1 space-y-3">
-               <StatProgress label="New Request" value={stats.pendingVerifications > 0 ? stats.pendingVerifications - 1 : 0} total={stats.pendingVerifications} color="bg-yellow-400" />
-            </div>
-            <div className="flex-1 space-y-3">
-               <StatProgress label="Reviewed" value={stats.pendingVerifications > 0 ? 1 : 0} total={stats.pendingVerifications} color="bg-slate-200" />
-            </div>
-          </div>
-        }
+      <AdminStatCard 
+         title="Menunggu Verifikasi" 
+         value={stats.pendingVerifications || 0} 
+         icon={Clock} 
+         desc="Butuh tindakan" 
+         trend="Kritis" 
+         color="danger" 
       />
-
-      {/* 4. Education & Roadmap */}
-      <StatCard 
-        title="System Engagement" 
-        value={stats.totalRoadmap + stats.totalEducation || 0} 
-        icon={BookOpen}
-        footer={
-          <div className="mt-2 text-xs font-semibold text-[color:var(--primary-700)] bg-[color:var(--primary-50)] p-2 rounded-xl flex items-center justify-center gap-1">
-            <span className="text-slate-500  font-medium transition-colors">Articles: {stats.totalEducation}</span>
-            <span className="text-slate-300  mx-1">|</span>
-            <span className="text-slate-500  font-medium transition-colors">Roadmaps: {stats.totalRoadmap}</span>
-          </div>
-        }
+      <AdminStatCard 
+         title="Konten Edukasi" 
+         value={stats.totalRoadmap + stats.totalEducation || 0} 
+         icon={Activity} 
+         desc="Roadmap & Edukasi" 
+         trend="Stabil" 
+         color="info" 
       />
     </div>
   )

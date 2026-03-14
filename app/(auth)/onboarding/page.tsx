@@ -6,11 +6,14 @@ import { OnboardingForm, type OnboardingFormData } from '@/components/user/educa
 import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
-import { format } from 'date-fns';
 import { upsertUserProfile, getUserProfile } from '@/services/userService';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  
+  useEffect(() => {
+    router.replace('/dashboard');
+  }, [router]);
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -28,6 +31,18 @@ export default function OnboardingPage() {
     const checkOnboarding = async () => {
       try {
         checkRef.current = true;
+        
+        // 1. Check metadata role first
+        const role = user.user_metadata?.role;
+        if (role === 'doctor') {
+          router.push('/doctor');
+          return;
+        }
+        if (role === 'doctor_pending') {
+          router.push('/register-doctor/pending');
+          return;
+        }
+
         const profile = await getUserProfile(user.id);
 
         if (profile?.onboarding_completed) {
@@ -68,22 +83,15 @@ export default function OnboardingPage() {
       await upsertUserProfile({
         id: user.id,
         status: data.status,
-        pregnancy_month: data.pregnancyMonth,
-        pregnancy_week: data.pregnancyWeek,
-        due_date: data.dueDate ? format(data.dueDate, 'yyyy-MM-dd') : undefined,
         current_weight: data.weight,
         height: data.height,
-        child_name: data.childName,
-        child_birth_date: data.childBirthDate ? format(data.childBirthDate, 'yyyy-MM-dd') : undefined,
-        child_weight: data.childWeight,
-        child_height: data.childHeight,
         current_day: data.currentDay,
         onboarding_completed: true,
       });
 
       toast({
         title: "Onboarding Berhasil",
-        description: "Data Anda telah disimpan. Selamat datang di Glunova!",
+        description: "Selamat datang di program kesehatan Glunova!",
       });
 
       window.location.assign('/dashboard');
@@ -132,9 +140,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6"
-      style={{ background: 'var(--neutral-50)' }}
-    >
+    <div className="min-h-screen flex items-center justify-center bg-white">
       <OnboardingForm onComplete={handleComplete} />
     </div>
   );

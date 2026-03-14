@@ -32,7 +32,7 @@ export function DashboardSkeleton() {
                 <Skeleton key={i} className="h-48 rounded-[28px] " />
               ))}
             </div>
-            {/* Pregnancy Status Card Skeleton */}
+            {/* Dashboard Status Card Skeleton */}
             <Skeleton className="h-64 rounded-[32px] " />
             {/* Daily Tasks Skeleton */}
             <Skeleton className="h-96 rounded-[32px] " />

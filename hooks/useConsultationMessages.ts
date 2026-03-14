@@ -46,7 +46,7 @@ export function useConsultationMessages(consultationId: string) {
             const updatedMsg = payload.new as ConsultationMessage
             setMessages((prev) => prev.map(msg => msg.id === updatedMsg.id ? updatedMsg : msg))
           } else if (payload.eventType === 'DELETE') {
-            setMessages((prev) => prev.filter(msg => msg.id === payload.old.id))
+            setMessages((prev) => prev.filter(msg => msg.id !== payload.old.id))
           }
         }
       )

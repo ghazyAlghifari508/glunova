@@ -21,7 +21,7 @@ export async function getDoctors(filters?: {
   }
   
   if (filters?.search) {
-    query = query.ilike('full_name', `%${filters.search}%`)
+    query = query.or(`full_name.ilike.%${filters.search}%,specialization.ilike.%${filters.search}%`)
   }
 
   const { data, error } = await query.order('created_at', { ascending: false })
@@ -133,12 +133,24 @@ export async function getDoctorStats(doctorId: string): Promise<DoctorStats> {
   if (cError) handleServiceError(cError, 'Gagal mengambil statistik dokter')
 
   const consultations = allConsultations || []
+  if (consultations.length === 0) return {
+    totalPatients: 0,
+    activeConsultations: 0,
+    todayAppointments: { total: 0, completed: 0, upcoming: 0 },
+    monthlyRevenue: 0,
+    newPatientsThisMonth: 0,
+    averageRating: 0,
+    totalConsultations: 0,
+    completedConsultations: 0,
+    weeklyTrend: [],
+    statusSummary: { completed: 0, pending: 0, cancelled: 0 }
+  }
 
   // 1. Total Unique Patients
   const uniquePatients = new Set(consultations.map(c => c.user_id)).size
 
   // 2. Ongoing/Active Consultations
-  const activeConsultations = consultations.filter(c => c.status === 'ongoing').length
+  const activeConsultations = consultations.filter(c => c?.status === 'ongoing').length
 
   // 3. Today's Appointments
   const todayConsultations = consultations.filter(c => {

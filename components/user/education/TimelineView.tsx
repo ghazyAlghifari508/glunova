@@ -24,10 +24,10 @@ export function TimelineView({
   currentDay = 1
 }: TimelineViewProps) {
   const phaseTone: Record<string, string> = {
-    kehamilan: 'bg-[color:var(--primary-700)]',
-    bayi_0_3: 'bg-sky-500',
-    bayi_3_12: 'bg-emerald-500',
-    anak_1_2: 'bg-slate-700',
+    kesehatan: 'bg-[color:var(--primary-700)]',
+    fase_2: 'bg-sky-500',
+    fase_3: 'bg-emerald-500',
+    fase_4: 'bg-slate-700',
   };
 
   const groupedContents = PHASES.map(phase => ({

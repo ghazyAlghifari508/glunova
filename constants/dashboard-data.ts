@@ -8,7 +8,7 @@ import {
 export const serviceCards = [
   {
     title: 'Roadmap',
-    desc: 'Langkah harian 1000 HPK sesuai fase kehamilan.',
+    desc: 'Langkah harian manajemen gula darah yang terpersonalisasi.',
     href: '/roadmap',
     icon: Route,
     color: 'bg-blue-500',
@@ -22,7 +22,7 @@ export const serviceCards = [
   },
   {
     title: 'Edukasi',
-    desc: 'Materi terstruktur untuk ibu hamil dan keluarga.',
+    desc: 'Materi terstruktur untuk gaya hidup sehat dan pencegahan.',
     href: '/education',
     icon: BookOpen,
     color: 'bg-emerald-500',
@@ -36,56 +36,56 @@ export const serviceCards = [
   },
 ]
 
-export const dailyTasksByTrimester: Record<number, string[]> = {
+export const dailyTasksByLevel: Record<number, string[]> = {
   1: [
-    'Konsumsi asam folat dan zat besi sesuai anjuran',
-    'Minum air putih minimal 8 gelas hari ini',
-    'Catat keluhan mual untuk bahan konsultasi',
+    'Lakukan pengecekan gula darah puasa hari ini',
+    'Minum air putih minimal 8 gelas',
+    'Catat menu sarapan untuk evaluasi kalori',
   ],
   2: [
-    'Konsumsi zat besi 60mg sesuai rekomendasi',
-    'Cek gerakan janin (10 gerakan per 2 jam)',
-    'Jadwalkan kontrol rutin pekan ini',
+    'Pertahankan aktivitas fisik minimal 30 menit',
+    'Konsumsi makanan tinggi serat sesuai rekomendasi',
+    'Jadwalkan kontrol berkala dengan dokter',
   ],
   3: [
-    'Pantau kontraksi dan gerakan janin setiap hari',
-    'Siapkan tas persalinan dan dokumen penting',
-    'Konfirmasi rencana kontrol dan persalinan',
+    'Pantau tren glukosa dan sesuaikan porsi makan',
+    'Siapkan camilan sehat untuk cegah hipoglikemia',
+    'Evaluasi metrik mingguan untuk laporan konsultasi',
   ],
 }
 
-export const remindersByTrimester: Record<number, string[]> = {
+export const remindersByLevel: Record<number, string[]> = {
   1: [
-    'USG awal kehamilan penting untuk konfirmasi usia janin.',
-    'Baca edukasi: nutrisi penting trimester pertama.',
-    'Catat gejala yang berulang untuk dibahas saat konsultasi.',
+    'Pemeriksaan rutin penting untuk memantau HbA1c.',
+    'Baca edukasi: Pentingnya manajemen stres bagi kesehatan.',
+    'Catat fluktuasi glukosa yang tidak biasa.',
   ],
   2: [
-    'USG trimester 2 biasanya dilakukan pada minggu 18-22.',
-    'Artikel baru: makanan kaya folat untuk trimester 2.',
-    'Pastikan jadwal kontrol ke bidan tidak terlewat.',
+    'Cek kembali target aktivitas fisik harian Anda.',
+    'Artikel baru: Mengelola porsi karbohidrat kompleks.',
+    'Pastikan jadwal kontrol dokter bulan ini tidak terlewat.',
   ],
   3: [
-    'Pantau tanda persalinan dan konsultasikan bila muncul gejala.',
-    'Baca edukasi: persiapan menyusui di minggu akhir kehamilan.',
-    'Pastikan kontak dokter aktif untuk kondisi darurat.',
+    'Pantau tanda-tanda kelelahan ekstrem dan konsultasikan.',
+    'Baca edukasi: Strategi jangka panjang menjaga gula darah.',
+    'Selalu sediakan cadangan camilan sehat di tas Anda.',
   ],
 }
 
-export const educationByTrimester: Record<number, Array<{ title: string; href: string }>> = {
+export const educationByLevel: Record<number, Array<{ title: string; href: string }>> = {
   1: [
-    { title: 'Nutrisi trimester 1 untuk kontrol gula darah', href: '/education' },
-    { title: 'Tanda bahaya awal kehamilan yang wajib dipantau', href: '/education' },
-    { title: 'Panduan aktivitas aman di trimester pertama', href: '/education' },
+    { title: 'Nutrisi tepat untuk kontrol gula darah harian', href: '/education' },
+    { title: 'Mengenal tanda bahaya lonjakan glukosa', href: '/education' },
+    { title: 'Panduan aktivitas fisik yang aman dan efektif', href: '/education' },
   ],
   2: [
-    { title: 'Kenali tanda bahaya preeklamsia lebih dini', href: '/education' },
-    { title: 'Panduan nutrisi trimester 2 untuk ibu hamil', href: '/education' },
-    { title: 'Video gerakan ringan untuk ibu hamil trimester 2', href: '/education' },
+    { title: 'Kenali perbedaan prediabetes dan diabetes', href: '/education' },
+    { title: 'Panduan menyusun menu makan seimbang', href: '/education' },
+    { title: 'Video peregangan ringan untuk menjaga metabolisme', href: '/education' },
   ],
   3: [
-    { title: 'Checklist persiapan persalinan yang perlu disiapkan', href: '/education' },
-    { title: 'Strategi nutrisi trimester 3 jelang persalinan', href: '/education' },
-    { title: 'Rencana menyusui dan perawatan awal bayi', href: '/education' },
+    { title: 'Checklist kebiasaan sehat yang perlu dipertahankan', href: '/education' },
+    { title: 'Strategi mencegah komplikasi jangka panjang', href: '/education' },
+    { title: 'Rencana perawatan mandiri di rumah', href: '/education' },
   ],
 }

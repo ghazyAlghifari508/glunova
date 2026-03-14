@@ -34,7 +34,7 @@ export function DoctorRegistrationCTA() {
               Apakah Anda Seorang Dokter?
             </h2>
             <p className="text-slate-400 font-medium leading-relaxed mb-6 md:mb-0">
-              Bergabunglah dengan Glunova untuk membantu ribuan ibu hamil di Indonesia. 
+              Bergabunglah dengan Glunova untuk membantu ribuan ibu berisiko di Indonesia. 
               Kelola jadwal konsultasi, dapatkan penghasilan tambahan, dan perluas jangkauan praktik Anda secara digital.
             </p>
           </div>

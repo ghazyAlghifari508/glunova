@@ -1,218 +1,129 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { getDoctors } from '@/services/doctorService'
-import { usePregnancyData } from '@/hooks/usePregnancyData'
-import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
+import * as doctorService from '@/services/doctorService'
+import { DoctorCard } from '@/components/consultation/DoctorCard'
+import { SearchFilter } from '@/components/consultation/SearchFilter'
+import { useAuth } from '@/hooks/useAuth'
+import { 
+  HeartHandshake, Sparkles, MessageSquareHeart
+} from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 
-// Components - Lazy Loaded
-const SearchFilter = dynamic(() => import('@/components/consultation/SearchFilter').then(mod => mod.SearchFilter))
-const DoctorCard = dynamic(() => import('@/components/consultation/DoctorCard').then(mod => mod.DoctorCard))
-const ConsultationHistory = dynamic(() => import('@/components/consultation/ConsultationHistory').then(mod => mod.ConsultationHistory))
-
-import { Skeleton } from '@/components/ui/skeleton'
-import { Stethoscope, UserCheck } from 'lucide-react'
-import type { Doctor } from '@/types/doctor'
-import type { Consultation } from '@/types/consultation'
-import { SPECIALIZATIONS } from '@/types/doctor'
-
-export default function KonsultasiDokterPage() {
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('Semua')
-  const { profile, loading: dataLoading, consultations: consultationsData, doctors: doctorsContext, loadDoctors, loadConsultations } = usePregnancyData()
-  const doctors = doctorsContext.data
-  const router = useRouter() // Added initialization for useRouter
+export default function DoctorListingPage() {
+  const { user } = useAuth()
+  const [doctors, setDoctors] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filters, setFilters] = useState({
+    specialization: '',
+    search: ''
+  })
 
   useEffect(() => {
-    if (dataLoading) return
-    if (!profile) {
-      router.push('/login')
-    }
-  }, [dataLoading, profile, router])
-
-  useEffect(() => {
-    // Rely on Provider internal guard for doctors loading
-    if (!dataLoading && profile) {
-      loadDoctors()
-    }
-  }, [dataLoading, profile, doctors.length, loadDoctors])
-
-  useEffect(() => {
-    if (dataLoading || !profile) return
-    loadConsultations()
-  }, [profile, dataLoading, loadConsultations])
-
-  const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([])
-
-  useEffect(() => {
-    let active = true
-
-    const filterDoctors = async () => {
+    const fetchDoctors = async () => {
+      setLoading(true)
       try {
-        const data = await getDoctors({
-          specialization: category !== 'Semua' ? category : undefined,
-          search: search || undefined,
+        const data = await doctorService.getDoctors({
+          search: filters.search,
+          specialization: filters.specialization === 'Semua' ? '' : filters.specialization
         })
-
-        if (active) {
-          setFilteredDoctors(data || [])
-        }
+        setDoctors(data)
       } catch (error) {
-        console.error('Error filtering doctors:', error)
+        console.error('Error fetching doctors:', error)
+      } finally {
+        setLoading(false)
       }
     }
-
-    if (!search && category === 'Semua') {
-      setFilteredDoctors(doctors)
-    } else {
-      filterDoctors()
-    }
-    
-    return () => { active = false }
-  }, [category, search, doctors])
-
-  const categories = useMemo(() => ['Semua', ...SPECIALIZATIONS], [])
-
-  const activeConsultations = useMemo(() => {
-    return (consultationsData.data || []).filter((c) => c.status === 'ongoing' || c.status === 'scheduled')
-  }, [consultationsData.data])
-
-  if ((dataLoading || doctorsContext.loading) && doctors.length === 0) {
-    return (
-      <div className="pb-32 text-slate-900 relative min-h-screen bg-slate-50/50">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[color:var(--primary-700)]/10 rounded-full blur-[120px] pointer-events-none opacity-30" />
-        
-        {/* Header Skeleton */}
-        <section className="w-full bg-white border-b border-slate-100 relative overflow-hidden">
-          <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-32 rounded-lg mb-4" />
-                <Skeleton className="h-10 w-64 rounded-xl" />
-                <Skeleton className="h-4 w-96 rounded-full mt-2" />
-              </div>
-              <div className="flex items-center gap-4">
-                <Skeleton className="hidden lg:block h-16 w-60 rounded-2xl" />
-                <Skeleton className="h-12 w-40 rounded-2xl" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Content Skeleton */}
-        <section className="mx-auto max-w-[1400px] px-4 -mt-8 sm:px-6 lg:px-8 relative z-20">
-          <div className="grid gap-8 xl:grid-cols-[340px_minmax(0,1fr)]">
-            {/* Sidebar Filter Skeleton */}
-            <aside className="space-y-6">
-              <Skeleton className="h-[400px] rounded-3xl" />
-            </aside>
-            
-            {/* Doctor List Skeleton */}
-            <div className="space-y-6">
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm md:p-8">
-                <div className="mb-10 flex justify-between items-end">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32 rounded-full" />
-                    <Skeleton className="h-10 w-60 rounded-xl" />
-                  </div>
-                  <Skeleton className="h-10 w-32 rounded-xl" />
-                </div>
-                <div className="space-y-6">
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="h-48 rounded-3xl" />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    )
-  }
+    fetchDoctors()
+  }, [filters])
 
   return (
-    <div className="min-h-screen bg-slate-50/50  transition-colors duration-300">
-      {/* Header Section - Aligned with Roadmap Style */}
-      <section className="w-full bg-white border-b border-slate-100 relative overflow-hidden">
-        <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="space-y-2"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pusat Bantuan</span>
-              </div>
-              
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900  leading-none">
-                Konsultasi <span className="text-[color:var(--primary-700)] italic relative inline-block">
-                  1000 HPK
-                  <svg className="absolute w-full h-3 -bottom-2 left-0 text-[color:var(--warning)]" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                    <path d="M2 9.5C50 3 150 2 198 9.5" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-                  </svg>
-                </span>
+    <div className="min-h-screen pb-32 font-sans selection:bg-[color:var(--primary-200)] text-[color:var(--neutral-900)] selection:text-[color:var(--primary-900)] overflow-x-hidden">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 relative z-10 w-full">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 md:mb-12 gap-6">
+           <div>
+              <span className="text-[color:var(--primary-700)] font-bold uppercase tracking-[0.2em] text-xs sm:text-sm mb-3 block">Glunova Health</span>
+              <h1 className="text-4xl md:text-5xl font-heading font-black text-[color:var(--neutral-900)] tracking-tight leading-[1.1]">
+                Konsultasi <span className="text-[color:var(--neutral-400)] italic font-serif">Dokter</span> Spesialis
               </h1>
-              <p className="text-slate-500  font-medium max-w-lg">
-                Terhubung dengan tenaga medis profesional kapan pun Bunda & Si Kecil butuhkan.
-              </p>
-            </motion.div>
-          </div>
+           </div>
+           
+           <div className="w-full lg:w-auto flex justify-start lg:justify-end pb-2">
+             <Link href="/riwayat-transaksi">
+               <button className="flex items-center gap-2 px-4 py-2 bg-white border border-[color:var(--neutral-200)] rounded-xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-sm hover:border-[color:var(--primary-200)] transition-all text-[13px] font-semibold text-[color:var(--neutral-700)] group active:scale-95">
+                 <div className="p-1.5 rounded-lg bg-[color:var(--neutral-50)] group-hover:bg-[color:var(--primary-50)] transition-colors">
+                   <MessageSquareHeart className="w-3.5 h-3.5 text-[color:var(--neutral-500)] group-hover:text-[color:var(--primary-600)]" />
+                 </div>
+                 Riwayat Chat
+               </button>
+             </Link>
+           </div>
         </div>
-      </section>
-      <section className="mx-auto max-w-[1400px] px-4 mt-12 sm:px-6 lg:px-8 relative z-20">
-        <div className="grid gap-8 xl:grid-cols-[340px_minmax(0,1fr)]">
-          <SearchFilter
-            search={search}
-            setSearch={setSearch}
-            category={category}
-            setCategory={setCategory}
-            categories={categories}
+
+        {/* Search & Filter Component */}
+        <motion.div 
+           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+           className="mb-8"
+        >
+          <SearchFilter 
+            onFilterChange={(newFilters: any) => setFilters(prev => ({ ...prev, ...newFilters }))} 
           />
+        </motion.div>
 
-          <div className="space-y-6 flex flex-col min-w-0">
-            <div className="rounded-3xl sm:rounded-3xl border border-slate-100  bg-white  p-4 sm:p-6 shadow-sm md:p-8 relative overflow-hidden w-full transition-colors duration-300">
-              {/* Subtle Horizontal Gradient Line */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[color:var(--primary-700)]/20 to-transparent" />
-              
-              <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6 relative z-10">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                     <div className="h-1.5 w-8 rounded-full bg-[color:var(--primary-700)]" />
-                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[color:var(--primary-700)]">Pilih Ahli</p>
+        {/* Doctor Grid Area - Single Column Full Width */}
+        <div className="flex flex-col gap-4 w-full">
+          <AnimatePresence mode="popLayout">
+            {loading ? (
+              [...Array(4)].map((_, i) => (
+                <motion.div 
+                  key={`skeleton-${i}`}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="w-full bg-white rounded-xl border border-[color:var(--neutral-200)] p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-6 shadow-sm"
+                >
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[color:var(--neutral-100)] animate-pulse shrink-0 mx-auto sm:mx-0" />
+                  <div className="flex-1 flex flex-col gap-3 py-1 w-full text-center sm:text-left">
+                    <div className="h-4 w-20 bg-[color:var(--neutral-100)] rounded mt-2 animate-pulse mx-auto sm:mx-0" />
+                    <div className="h-6 w-40 bg-[color:var(--neutral-100)] rounded-md animate-pulse mx-auto sm:mx-0" />
+                    <div className="h-3 w-28 bg-[color:var(--neutral-100)] rounded animate-pulse mx-auto sm:mx-0" />
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 ">Rekomendasi Spesialis</h2>
+                  <div className="w-full md:w-auto md:min-w-[180px] flex flex-col items-center md:items-end gap-3 mt-3 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 md:border-l border-[color:var(--neutral-100)] md:pl-6">
+                     <div className="h-6 w-16 bg-[color:var(--neutral-100)] rounded animate-pulse" />
+                     <div className="h-10 w-full md:w-28 bg-[color:var(--neutral-100)] rounded-xl animate-pulse" />
+                  </div>
+                </motion.div>
+              ))
+            ) : doctors.length > 0 ? (
+              doctors.map((doctor, index) => (
+                <DoctorCard key={doctor.id} doctor={doctor} index={index} />
+              ))
+            ) : (
+              <motion.div 
+                key="empty"
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                className="w-full py-20 md:py-32 flex flex-col items-center justify-center text-center bg-white border border-[color:var(--neutral-100)] rounded-2xl shadow-sm mt-4"
+              >
+                <div className="w-24 h-24 rounded-full bg-[color:var(--primary-50)] flex items-center justify-center mb-6">
+                  <HeartHandshake className="w-10 h-10 text-[color:var(--primary-500)]" />
                 </div>
-                <div className="flex items-center self-start sm:self-auto gap-2 px-4 py-2 bg-slate-50  rounded-xl border border-slate-100 ">
-                   <UserCheck size={14} className="text-emerald-500" />
-                   <p className="text-xs font-black uppercase tracking-widest text-slate-500">{doctors.length} Terverifikasi</p>
-                </div>
-              </div>
+                <h3 className="text-2xl md:text-3xl font-black text-[color:var(--neutral-900)] tracking-tight mb-3 font-heading">Dokter Tidak Ditemukan</h3>
+                <p className="text-[color:var(--neutral-500)] font-medium max-w-sm font-body mb-8 text-sm md:text-base">
+                  Maaf, tidak ada dokter yang sesuai dengan kriteria spesialisasi atau nama yang dicari.
+                </p>
+                <button 
+                  onClick={() => setFilters({ specialization: '', search: '' })}
+                  className="px-8 py-4 bg-white border border-[color:var(--neutral-200)] text-[color:var(--neutral-700)] font-bold text-sm uppercase tracking-wider rounded-2xl hover:bg-[color:var(--neutral-50)] transition-all flex items-center gap-3 font-heading shadow-sm active:scale-95"
+                >
+                  <Sparkles className="w-4 h-4 text-[color:var(--primary-600)]" /> Atur Ulang Filter
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-              {filteredDoctors.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-[40px] border border-dashed border-slate-200  bg-slate-50/50  py-32 text-center group">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white  shadow-sm mb-8 border border-slate-100  group-hover:scale-110 transition-transform duration-500">
-                    <Stethoscope className="h-10 w-10 text-slate-300" />
-                  </div>
-                   <h3 className="text-3xl font-black text-slate-900  tracking-tight">Dokter tidak ditemukan</h3>
-                  <p className="mt-4 text-sm font-medium text-slate-500 max-w-sm mx-auto leading-relaxed">Mohon ganti kata kunci pencarian atau bersihkan filter spesialisasi Bunda.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-6">
-                  {filteredDoctors.map((doctor, i) => (
-                    <DoctorCard key={doctor.id} doctor={doctor} index={i} />
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <ConsultationHistory consultations={activeConsultations} />
-            </div>
-          </div>
-        </section>
+      </div>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 -- ==========================================
--- GENTING FINAL CONSOLIDATED SCHEMA (VERSI 5.0)
+-- GLUNOVA FINAL CONSOLIDATED SCHEMA (VERSI 6.0)
 -- SINGLE SOURCE OF TRUTH
 -- ==========================================
 
@@ -29,14 +29,15 @@ CREATE TABLE public.profiles (
   role TEXT DEFAULT 'user',
   status TEXT,
   onboarding_completed BOOLEAN DEFAULT FALSE,
-  pregnancy_month INTEGER,
-  pregnancy_week INTEGER,
-  pregnancy_start_date DATE,
-  due_date DATE,
-  trimester INTEGER,
+  monitoring_month INTEGER,
+  monitoring_week INTEGER,
+  monitoring_start_date DATE,
+  monitoring_target_date DATE,
+  monitoring_level INTEGER,
   current_day INTEGER DEFAULT 1,
   current_weight DECIMAL,
   height DECIMAL,
+  hba1c DECIMAL,
   child_name TEXT,
   child_birth_date DATE,
   child_weight DECIMAL,
@@ -183,8 +184,8 @@ CREATE TABLE public.roadmap_activities (
   difficulty_level INTEGER DEFAULT 1,
   icon_name TEXT,
   xp_reward INTEGER DEFAULT 10,
-  min_trimester INTEGER DEFAULT 1,
-  max_trimester INTEGER DEFAULT 3,
+  min_level INTEGER DEFAULT 1,
+  max_level INTEGER DEFAULT 3,
   duration_minutes INTEGER DEFAULT 0,
   frequency_per_week INTEGER DEFAULT 0,
   benefits JSONB DEFAULT '[]',
@@ -283,7 +284,7 @@ BEGIN
     new.id, 
     new.email,
     COALESCE(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)) || '_' || substring(new.id::text from 1 for 4),
-    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User GENTING'),
+    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', 'User Glunova'),
     'user',
     NOW()
   )
@@ -301,10 +302,10 @@ INSERT INTO public.profiles (id, email, username, full_name, role, updated_at)
 SELECT 
     id, email,
     COALESCE(raw_user_meta_data->>'username', split_part(email, '@', 1)) || '_' || substring(id::text from 1 for 4),
-    COALESCE(raw_user_meta_data->>'full_name', raw_user_meta_data->>'name', 'User GENTING'),
+    COALESCE(raw_user_meta_data->>'full_name', raw_user_meta_data->>'name', 'User Glunova'),
     CASE 
-      WHEN email = 'admin@genting.id' THEN 'admin'
-      WHEN email = 'doctor@genting.id' THEN 'doctor'
+      WHEN email LIKE 'admin@%' THEN 'admin'
+      WHEN email LIKE 'doctor@%' THEN 'doctor'
       ELSE 'user'
     END,
     NOW()
@@ -332,7 +333,7 @@ SELECT
   'approved', 
   50000
 FROM public.profiles
-WHERE email = 'doctor@genting.id'
+WHERE email = 'doctor@glunova.id'
 ON CONFLICT (user_id) DO NOTHING;
 
 -- 16. INDEXES

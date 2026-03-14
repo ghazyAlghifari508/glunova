@@ -27,6 +27,7 @@ export function useProtectedRoute(allowedRoles: string[]) {
       // Redirect to appropriate dashboard if role is not allowed
       if (role === 'doctor') router.push('/doctor')
       else if (role === 'admin') router.push('/admin/dashboard')
+      else if (role === 'doctor_pending') router.push('/register-doctor/pending')
       else router.push('/')
     }
   }, [role, loading, dbLoading, router, allowedRolesKey])

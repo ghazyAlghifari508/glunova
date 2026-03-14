@@ -2,359 +2,191 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Save, Loader2, Star, X } from 'lucide-react'
+import { Save, Loader2, X, Route, Info, Layers } from 'lucide-react'
 import { createRoadmapActivity, updateRoadmapActivity } from '@/services/adminService'
 import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 interface RoadmapActivity {
-  id: string
-  activity_name: string
-  category: 'exercise' | 'nutrition' | 'sleep' | 'mental' | 'checkup' | 'bonding'
-  description: string
-  difficulty_level: number
-  min_trimester: number
-  max_trimester: number
-  duration_minutes: number
-  frequency_per_week: number
-  benefits: string[]
-  instructions: string[]
-  tips: string | null
-  warnings: string | null
+  id: string; activity_name: string; category: 'exercise' | 'nutrition' | 'sleep' | 'mental' | 'checkup' | 'bonding'
+  description: string; difficulty_level: number; min_level: number; max_level: number
+  duration_minutes: number; frequency_per_week: number; benefits: string[]; instructions: string[]; tips: string | null; warnings: string | null
 }
 
-interface RoadmapModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => void
-  initialData?: RoadmapActivity | null
-}
+interface RoadmapModalProps { isOpen: boolean; onClose: () => void; onSuccess: () => void; initialData?: RoadmapActivity | null }
+
+const inputStyle = { background: 'var(--neutral-50)', border: '1px solid var(--neutral-200)', color: 'var(--neutral-900)' }
+const labelStyle = { color: 'var(--neutral-500)' }
 
 export function RoadmapModal({ isOpen, onClose, onSuccess, initialData }: RoadmapModalProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [form, setForm] = useState<{
-    activity_name: string
-    category: RoadmapActivity['category']
-    description: string
-    difficulty_level: number
-    min_trimester: number
-    max_trimester: number
-    duration_minutes: number
-    frequency_per_week: number
-    benefits: string
-    instructions: string
-    tips: string
-    warnings: string
-  }>({
-    activity_name: '',
-    category: 'exercise',
-    description: '',
-    difficulty_level: 1,
-    min_trimester: 1,
-    max_trimester: 3,
-    duration_minutes: 15,
-    frequency_per_week: 3,
-    benefits: '',
-    instructions: '',
-    tips: '',
-    warnings: '',
+  const [form, setForm] = useState({
+    activity_name: '', category: 'exercise' as RoadmapActivity['category'], description: '', difficulty_level: 1,
+    min_level: 1, max_level: 3, duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '',
   })
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        activity_name: initialData.activity_name,
-        category: initialData.category,
-        description: initialData.description || '',
-        difficulty_level: initialData.difficulty_level,
-        min_trimester: initialData.min_trimester || 1,
-        max_trimester: initialData.max_trimester || 3,
-        duration_minutes: initialData.duration_minutes || 0,
-        frequency_per_week: initialData.frequency_per_week || 0,
+        activity_name: initialData.activity_name, category: initialData.category, description: initialData.description || '',
+        difficulty_level: initialData.difficulty_level, min_level: initialData.min_level || 1, max_level: initialData.max_level || 3,
+        duration_minutes: initialData.duration_minutes || 0, frequency_per_week: initialData.frequency_per_week || 0,
         benefits: Array.isArray(initialData.benefits) ? initialData.benefits.join('\n') : '',
         instructions: Array.isArray(initialData.instructions) ? initialData.instructions.join('\n') : '',
-        tips: initialData.tips || '',
-        warnings: initialData.warnings || '',
+        tips: initialData.tips || '', warnings: initialData.warnings || '',
       })
     } else {
-      setForm({
-        activity_name: '',
-        category: 'exercise',
-        description: '',
-        difficulty_level: 1,
-        min_trimester: 1,
-        max_trimester: 3,
-        duration_minutes: 15,
-        frequency_per_week: 3,
-        benefits: '',
-        instructions: '',
-        tips: '',
-        warnings: '',
-      })
+      setForm({ activity_name: '', category: 'exercise', description: '', difficulty_level: 1, min_level: 1, max_level: 3, duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '' })
     }
   }, [initialData, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-
-    if (!form.activity_name.trim()) {
-      setError('Nama aktivitas wajib diisi.')
-      return
-    }
-
+    e.preventDefault(); setError('')
+    if (!form.activity_name.trim()) { setError('Nama aktivitas wajib diisi.'); return }
     try {
       setSaving(true)
       const payload = {
-        activity_name: form.activity_name,
-        category: form.category,
-        description: form.description,
-        difficulty_level: form.difficulty_level,
-        min_trimester: form.min_trimester,
-        max_trimester: form.max_trimester,
-        duration_minutes: form.duration_minutes,
-        frequency_per_week: form.frequency_per_week,
-        benefits: form.benefits.split('\n').filter(b => b.trim()),
-        instructions: form.instructions.split('\n').filter(i => i.trim()),
-        tips: form.tips || null,
-        warnings: form.warnings || null,
+        activity_name: form.activity_name, category: form.category, description: form.description, difficulty_level: form.difficulty_level,
+        min_level: form.min_level, max_level: form.max_level, duration_minutes: form.duration_minutes, frequency_per_week: form.frequency_per_week,
+        benefits: form.benefits.split('\n').filter(b => b.trim()), instructions: form.instructions.split('\n').filter(i => i.trim()),
+        tips: form.tips || null, warnings: form.warnings || null,
       }
-
-      if (initialData?.id) {
-        await updateRoadmapActivity(initialData.id, payload)
-      } else {
-        await createRoadmapActivity(payload)
-      }
-      onSuccess()
-      onClose()
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Gagal menyimpan aktivitas.')
-    } finally {
-      setSaving(false)
-    }
+      if (initialData?.id) { await updateRoadmapActivity(initialData.id, payload) } else { await createRoadmapActivity(payload) }
+      onSuccess(); onClose()
+    } catch (err: any) { setError(err?.message || 'Gagal menyimpan.') } finally { setSaving(false) }
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative bg-white  rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl transition-colors"
-      >
-        <div className="p-6 border-b  flex items-center justify-between bg-slate-50/50  transition-colors">
-          <div>
-            <h2 className="text-xl font-black text-slate-800  transition-colors">
-              {initialData ? 'Edit Aktivitas' : 'Tambah Aktivitas'}
-            </h2>
-            <p className="text-xs text-muted-foreground  font-medium transition-colors">Bunda, silakan lengkapi detail aktivitas roadmap di bawah ini.</p>
-          </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl">
-            <X className="w-5 h-5" />
-          </Button>
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.97, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 20 }}
+        className="relative rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl flex flex-col"
+        style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+        
+        {/* Header */}
+        <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid var(--neutral-200)' }}>
+           <div className="flex items-center gap-4">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'var(--primary-50)' }}>
+                 <Route className="w-5 h-5" style={{ color: 'var(--primary-700)' }} />
+              </div>
+              <div>
+                 <h2 className="text-lg font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>
+                    {initialData ? 'Edit Aktivitas' : 'Tambah Aktivitas Baru'}
+                 </h2>
+                 <p className="text-xs font-body" style={{ color: 'var(--neutral-500)' }}>Isi detail aktivitas roadmap</p>
+              </div>
+           </div>
+           <button onClick={onClose} className="w-9 h-9 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
+              <X className="w-5 h-5" />
+           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="overflow-y-auto p-6 scrollbar-hide" style={{ maxHeight: 'calc(90vh - 130px)' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-sm font-black text-[color:var(--primary-700)] uppercase tracking-wider">Informasi Dasar</h3>
-                
-                {error && (
-                  <div className="p-3 rounded-xl bg-grapefruit/10 text-grapefruit text-sm font-medium">
-                    {error}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Nama Aktivitas *</label>
-                  <input
-                    type="text"
-                    value={form.activity_name}
-                    onChange={(e) => setForm((prev) => ({ ...prev, activity_name: e.target.value }))}
-                    placeholder="Contoh: Morning Yoga, Sarapan Sehat..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] transition-all font-medium transition-colors"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Kategori</label>
-                    <select
-                      value={form.category}
-                      onChange={(e) =>
-                        setForm((prev) => ({ ...prev, category: e.target.value as RoadmapActivity['category'] }))
-                      }
-                      className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] appearance-none cursor-pointer font-medium transition-colors"
-                    >
-                      <option value="exercise">Olahraga</option>
-                      <option value="nutrition">Nutrisi</option>
-                      <option value="sleep">Tidur</option>
-                      <option value="mental">Mental</option>
-                      <option value="checkup">Pemeriksaan</option>
-                      <option value="bonding">Bonding</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Tingkat Kesulitan</label>
-                  <div className="flex items-center gap-2">
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <button
-                        key={level}
-                        type="button"
-                        onClick={() => setForm((prev) => ({ ...prev, difficulty_level: level }))}
-                        className="p-1 transition-transform hover:scale-110"
-                      >
-                        <Star
-                          className={`w-6 h-6 ${level <= form.difficulty_level ? 'text-apricot fill-apricot' : 'text-slate-200'}`}
-                        />
-                      </button>
-                    ))}
-                    <span className="text-xs text-slate-400 ml-2 font-bold uppercase tracking-tight">Level {form.difficulty_level}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Min. Trimester</label>
-                    <select
-                      value={form.min_trimester}
-                      onChange={(e) => setForm((prev) => ({ ...prev, min_trimester: Number(e.target.value) }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] font-medium transition-colors"
-                    >
-                      <option value={1}>Trimester 1</option>
-                      <option value={2}>Trimester 2</option>
-                      <option value={3}>Trimester 3</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Max. Trimester</label>
-                    <select
-                      value={form.max_trimester}
-                      onChange={(e) => setForm((prev) => ({ ...prev, max_trimester: Number(e.target.value) }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] font-medium transition-colors"
-                    >
-                      <option value={1}>Trimester 1</option>
-                      <option value={2}>Trimester 2</option>
-                      <option value={3}>Trimester 3</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Durasi (Menit)</label>
-                    <input
-                      type="number"
-                      value={form.duration_minutes}
-                      onChange={(e) => setForm((prev) => ({ ...prev, duration_minutes: Number(e.target.value) }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] font-medium transition-all transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Frekuensi / Minggu</label>
-                    <input
-                      type="number"
-                      value={form.frequency_per_week}
-                      onChange={(e) => setForm((prev) => ({ ...prev, frequency_per_week: Number(e.target.value) }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] font-medium transition-all transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Tips & Peringatan</label>
-                  <p className="text-[10px] text-muted-foreground mt-1 font-medium italic">Isi tips dan peringatan di kolom kanan.</p>
-                </div>
+        {/* Body */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-8">
+           {error && (
+              <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} className="p-3 rounded-xl text-sm font-semibold flex items-center gap-2 font-body"
+                 style={{ background: 'rgba(239,68,68,0.08)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                 <Info className="w-4 h-4" /> {error}
+              </motion.div>
+           )}
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-5">
+                 <h3 className="text-xs font-bold uppercase tracking-wider font-heading" style={labelStyle}>Parameter</h3>
+                 <div className="space-y-1.5">
+                    <label className="text-xs font-semibold font-body" style={labelStyle}>Nama Aktivitas</label>
+                    <input type="text" value={form.activity_name} onChange={(e) => setForm(p => ({ ...p, activity_name: e.target.value }))}
+                       placeholder="Contoh: Jalan Kaki 30 Menit" className="w-full h-11 rounded-xl px-4 text-sm font-body focus:outline-none" style={inputStyle} />
+                 </div>
+                 <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                       <label className="text-xs font-semibold font-body" style={labelStyle}>Kategori</label>
+                       <select value={form.category} onChange={(e) => setForm(p => ({ ...p, category: e.target.value as RoadmapActivity['category'] }))}
+                          className="w-full h-11 rounded-xl px-4 text-sm font-body focus:outline-none appearance-none cursor-pointer" style={inputStyle}>
+                          <option value="exercise">Olahraga</option><option value="nutrition">Nutrisi</option><option value="sleep">Tidur</option>
+                          <option value="mental">Mental</option><option value="checkup">Pemeriksaan</option><option value="bonding">Sosial</option>
+                       </select>
+                    </div>
+                    <div className="space-y-1.5">
+                       <label className="text-xs font-semibold font-body" style={labelStyle}>Tingkat Kesulitan</label>
+                       <div className="h-11 rounded-xl px-4 flex items-center justify-between" style={inputStyle}>
+                          <div className="flex items-center gap-1.5">
+                             {[1,2,3,4,5].map(l => (
+                                <button key={l} type="button" onClick={() => setForm(p => ({ ...p, difficulty_level: l }))}
+                                   className={cn("w-2.5 h-2.5 rounded-full transition-all", l <= form.difficulty_level ? "scale-125" : "")}
+                                   style={{ background: l <= form.difficulty_level ? 'var(--primary-700)' : 'var(--neutral-300)' }} />
+                             ))}
+                          </div>
+                          <span className="text-xs font-semibold font-body" style={labelStyle}>Lv {form.difficulty_level}</span>
+                       </div>
+                    </div>
+                 </div>
+                 <div className="grid grid-cols-2 gap-3">
+                     <div className="space-y-1.5">
+                        <label className="text-xs font-semibold font-body" style={labelStyle}>Fase Monitoring (Min - Max)</label>
+                       <div className="flex gap-2">
+                           <select value={form.min_level} onChange={(e) => setForm(p => ({...p, min_level: Number(e.target.value)}))} className="flex-1 h-11 rounded-xl px-3 text-sm font-body appearance-none cursor-pointer" style={inputStyle}>
+                             {[1,2,3].map(t => <option key={t} value={t}>Fase {t}</option>)}
+                           </select>
+                           <select value={form.max_level} onChange={(e) => setForm(p => ({...p, max_level: Number(e.target.value)}))} className="flex-1 h-11 rounded-xl px-3 text-sm font-body appearance-none cursor-pointer" style={inputStyle}>
+                             {[1,2,3].map(t => <option key={t} value={t}>Fase {t}</option>)}
+                           </select>
+                       </div>
+                    </div>
+                    <div className="flex gap-2">
+                       <div className="flex-1 space-y-1.5">
+                          <label className="text-xs font-semibold font-body" style={labelStyle}>Durasi (m)</label>
+                       </div>
+                       <div className="flex-1 space-y-1.5">
+                          <label className="text-xs font-semibold font-body" style={labelStyle}>Freq/week</label>
+                          <input type="number" value={form.frequency_per_week} onChange={(e) => setForm(p => ({...p, frequency_per_week: Number(e.target.value)}))} className="w-full h-11 rounded-xl px-3 text-sm font-body" style={inputStyle} />
+                       </div>
+                    </div>
+                 </div>
+                 <div className="p-4 rounded-xl" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)' }}>
+                    <div className="flex items-center gap-2 mb-2">
+                       <Info className="w-3.5 h-3.5" style={{ color: 'var(--primary-700)' }} />
+                       <span className="text-xs font-bold font-heading" style={{ color: 'var(--primary-700)' }}>Catatan</span>
+                    </div>
+                     <p className="text-xs font-body leading-relaxed" style={{ color: 'var(--primary-600)' }}>Pastikan aktivitas sesuai dengan panduan medis untuk rentang fase pemantauan yang dipilih.</p>
+                 </div>
               </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-sm font-black text-[color:var(--primary-700)] uppercase tracking-wider">Konten & Detail</h3>
-                
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Deskripsi Singkat</label>
-                  <textarea
-                    value={form.description}
-                    onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                    placeholder="Deskripsi singkat aktivitas..."
-                    rows={2}
-                    className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] resize-none font-medium transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Manfaat (Satu per baris)</label>
-                  <textarea
-                    value={form.benefits}
-                    onChange={(e) => setForm((prev) => ({ ...prev, benefits: e.target.value }))}
-                    placeholder="Meningkatkan energi&#10;Melancarkan pencernaan..."
-                    rows={3}
-                    className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] resize-none font-medium transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase">Langkah Instruksi (Satu per baris)</label>
-                  <textarea
-                    value={form.instructions}
-                    onChange={(e) => setForm((prev) => ({ ...prev, instructions: e.target.value }))}
-                    placeholder="Siapkan alat yoga&#10;Lakukan pemanasan 5 menit..."
-                    rows={4}
-                    className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] resize-none font-medium transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-slate-500 uppercase text-apricot">Tips Bunda</label>
-                  <textarea
-                    value={form.tips}
-                    onChange={(e) => setForm((prev) => ({ ...prev, tips: e.target.value }))}
-                    placeholder="Gunakan pakaian yang nyaman..."
-                    rows={2}
-                    className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] resize-none font-medium border-apricot/20 transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 text-grapefruit uppercase">Peringatan / Warning</label>
-                  <textarea
-                    value={form.warnings}
-                    onChange={(e) => setForm((prev) => ({ ...prev, warnings: e.target.value }))}
-                    placeholder="Hentikan jika merasa pusing..."
-                    rows={2}
-                    className="w-full px-4 py-2.5 rounded-xl border border-border  bg-slate-50  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] resize-none font-medium border-grapefruit/20 transition-colors"
-                  />
-                </div>
+              <div className="space-y-5">
+                 <h3 className="text-xs font-bold uppercase tracking-wider font-heading" style={labelStyle}>Detail Konten</h3>
+                 <div className="space-y-1.5">
+                    <label className="text-xs font-semibold font-body" style={labelStyle}>Deskripsi</label>
+                    <textarea value={form.description} onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))}
+                       className="w-full h-20 rounded-xl p-4 text-sm font-body focus:outline-none resize-none" style={inputStyle} />
+                 </div>
+                 <div className="space-y-1.5">
+                    <label className="text-xs font-semibold font-body" style={labelStyle}>Instruksi (per baris)</label>
+                    <textarea value={form.instructions} onChange={(e) => setForm(p => ({ ...p, instructions: e.target.value }))}
+                       className="w-full h-32 rounded-xl p-4 text-sm font-body focus:outline-none resize-none" style={inputStyle} />
+                 </div>
+                 <div className="space-y-1.5">
+                    <label className="text-xs font-semibold font-body" style={{ color: 'var(--success)' }}>Manfaat (per baris)</label>
+                    <textarea value={form.benefits} onChange={(e) => setForm(p => ({ ...p, benefits: e.target.value }))}
+                       className="w-full h-20 rounded-xl p-4 text-sm font-body focus:outline-none resize-none" style={{ ...inputStyle, borderColor: 'rgba(16,185,129,0.2)' }} />
+                 </div>
+                 <div className="space-y-1.5">
+                    <label className="text-xs font-semibold font-body" style={{ color: 'var(--danger)' }}>Peringatan</label>
+                    <textarea value={form.warnings} onChange={(e) => setForm(p => ({ ...p, warnings: e.target.value }))}
+                       className="w-full h-20 rounded-xl p-4 text-sm font-body focus:outline-none resize-none" style={{ ...inputStyle, borderColor: 'rgba(239,68,68,0.2)' }} />
+                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-8 pb-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 h-12 rounded-xl text-slate-600 font-bold"
-            >
-              Batal
-            </Button>
-            <Button
-              type="submit"
-              disabled={saving}
-              className="flex-[2] h-12 rounded-xl bg-[color:var(--primary-700)] hover:bg-[#0f605c] text-white font-black shadow-md"
-            >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-              {initialData ? 'Update Aktivitas' : 'Simpan Aktivitas'}
-            </Button>
-          </div>
+           </div>
         </form>
+
+        {/* Footer */}
+        <div className="p-6 flex gap-3" style={{ borderTop: '1px solid var(--neutral-200)' }}>
+           <Button type="button" onClick={onClose} className="flex-1 h-11 rounded-xl font-semibold text-sm" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-700)' }}>Batal</Button>
+           <Button onClick={handleSubmit} disabled={saving} className="flex-[2] h-11 rounded-xl font-semibold text-sm text-white" style={{ background: 'var(--primary-700)' }}>
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {initialData ? 'Simpan Perubahan' : 'Tambah Aktivitas'}
+           </Button>
+        </div>
       </motion.div>
     </div>
   )

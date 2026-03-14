@@ -14,10 +14,10 @@ export function VisionBanner() {
         
         <div className="relative z-10 p-8 sm:p-12 lg:p-16 max-w-2xl">
           <h2 className="text-4xl sm:text-5xl font-bold text-white leading-tight mb-6 tracking-tight">
-            Analisis Nutrisi<br />Sekali Jepret.
+            Analisis Glycemic<br />Sekali Jepret.
           </h2>
           <p className="text-lg text-white/80 font-medium leading-relaxed mb-8">
-            Bunda ragu dengan kandungan gizi di piring? Gunakan Glunova Vision untuk membedah profil nutrisi molekuler makanan Bunda secara instan berbasis AI.
+            Ragu dengan dampak makanan terhadap gula darah Anda? Gunakan Glunova Vision untuk membedah profil nutrisi molekuler makanan secara instan berbasis AI.
           </p>
           <Link href="/vision">
             <Button className="bg-white hover:bg-slate-100 text-[color:var(--primary-700)] rounded-full px-10 h-14 font-bold text-base shadow-xl group transition-all">

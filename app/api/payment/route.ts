@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSnapToken } from '@/services/midtransService'
+import { createMayarLink } from '@/services/mayarService'
 import { createClient } from '@/lib/supabase-server'
 import { getCurrentUser } from '@/lib/auth-server'
 
@@ -38,9 +38,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Payment already confirmed' }, { status: 409 })
     }
 
-    // Midtrans order_id limit is 50 characters. 
-    // UUID (36) + "GEN-" (4) + timestamp (13) = 53 chars (Too long).
-    // Let's use a shorter prefix and only a part of the UUID or just the timestamp.
+    // Order ID generation
+    // Example: GEN-d97a1e3f-1773236446531
     const shortId = consultation_id.split('-')[0] // Take first part of UUID
     const orderId = `GEN-${shortId}-${Date.now()}`
     
@@ -50,30 +49,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
 
-    // Midtrans item name limit is 50 characters.
     const doctor = consultation.doctor as { full_name?: string; specialization?: string } | null
     const user = consultation.user as { full_name?: string; email?: string } | null
     const doctorName = doctor?.full_name || 'Dokter'
     const itemName = `Konsultasi ${doctorName}`.substring(0, 50)
 
-    const token = await createSnapToken({
-      orderId,
-      grossAmount,
-      customerName: user?.full_name || 'User',
-      customerEmail: user?.email || 'user@glunova.id',
-      itemName,
+    // Mayar implementation
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const redirectUrl = `${appUrl}/payment/${consultation_id}`
+    
+    const { url: paymentUrl, id: paymentId } = await createMayarLink({
+      name: user?.full_name || 'User',
+      email: user?.email || 'user@glunova.id',
+      amount: grossAmount,
+      description: itemName,
+      redirectUrl: redirectUrl,
     })
 
-    // Store the order_id in consultation for tracking
+    // Store the Mayar transaction ID in consultation for tracking
     await supabase
       .from('consultations')
-      .update({ payment_reference: orderId, updated_at: new Date().toISOString() })
+      .update({ 
+        payment_reference: paymentId, // Using Mayar's ID for accurate tracking
+        updated_at: new Date().toISOString() 
+      })
       .eq('id', consultation_id)
 
-    return NextResponse.json({ token, order_id: orderId })
+    return NextResponse.json({ url: paymentUrl, order_id: orderId })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to create payment token'
-    console.error('Midtrans token error:', err)
+    const message = err instanceof Error ? err.message : 'Failed to create payment link'
+    console.error('Mayar link error:', err)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

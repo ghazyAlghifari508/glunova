@@ -35,16 +35,6 @@ export function PersonalInfoStep({ formData, setFormData }: PersonalInfoStepProp
 
   return (
     <div className="space-y-4">
-      <div>
-        <Label htmlFor="fullName" className="text-slate-700  transition-colors">Nama Lengkap *</Label>
-        <Input
-          id="fullName"
-          value={formData.fullName}
-          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-          placeholder="Dr. Nama Lengkap"
-          className="mt-1    transition-colors"
-        />
-      </div>
 
       <div>
         <Label htmlFor="phone" className="text-slate-700  transition-colors">Nomor Telepon *</Label>

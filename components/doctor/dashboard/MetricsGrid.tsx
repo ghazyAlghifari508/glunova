@@ -11,7 +11,7 @@ import {
 import type { DoctorStats } from '@/types/doctor'
 
 // Mock Data for Bars
-const MockBars = () => (
+const MockBars = React.memo(() => (
   <div className="flex items-end gap-[2px] h-10 w-full mt-2">
     {[35, 60, 45, 70, 50, 65, 40, 55, 75, 50, 60, 45, 35, 60, 45, 70, 50, 65, 40, 55, 75, 50, 60].map((h, i) => (
       <div 
@@ -21,9 +21,9 @@ const MockBars = () => (
       />
     ))}
   </div>
-)
+))
 
-const MockLines = () => (
+const MockLines = React.memo(() => (
   <div className="flex items-end gap-[2px] h-10 w-full mt-2">
     {[20, 40, 30, 50, 35, 55, 25, 45, 60, 40, 50, 35, 20, 40, 30, 50, 35, 55, 25, 45, 60, 40, 50].map((h, i) => (
       <div 
@@ -33,13 +33,13 @@ const MockLines = () => (
       />
     ))}
   </div>
-)
+))
 
 interface MetricsGridProps {
   stats: DoctorStats | null
 }
 
-export const MetricsGrid = ({ stats }: MetricsGridProps) => {
+export const MetricsGrid = React.memo(({ stats }: MetricsGridProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
       {/* 1. Total Patients */}
@@ -106,4 +106,4 @@ export const MetricsGrid = ({ stats }: MetricsGridProps) => {
       />
     </div>
   )
-}
+})

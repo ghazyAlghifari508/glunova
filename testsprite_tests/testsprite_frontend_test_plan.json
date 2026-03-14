@@ -1,0 +1,2070 @@
+[
+  {
+    "id": "TC001",
+    "title": "Patient login with valid credentials redirects to Dashboard",
+    "description": "Verifies a patient can log in using valid email/password and is redirected to the protected dashboard.",
+    "category": "User Authentication",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Dashboard\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Patient login with incorrect password shows authentication error",
+    "description": "Verifies login fails with an incorrect password and an authentication error is shown on the login page.",
+    "category": "User Authentication",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"valid.user@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"wrong-password-123\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"error\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Patient registration creates account and lands on Dashboard",
+    "description": "Verifies a new patient can register and is redirected to the protected dashboard after successful registration.",
+    "category": "User Authentication",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/register\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"new.patient+e2e@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"StrongPass!234\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Register\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Dashboard\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Doctor registration shows success message",
+    "description": "Verifies a doctor can submit the doctor registration form and sees a registration success message.",
+    "category": "User Authentication",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register-doctor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/register-doctor\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"Dr Test\" into the full name field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"doctor.e2e@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Register\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"success\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Login form validation: submit with empty fields shows required indicators",
+    "description": "Verifies the login form blocks submission and shows required-field feedback when submitted empty.",
+    "category": "User Authentication",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Registration form validation: submit with missing required fields shows errors",
+    "description": "Verifies the patient registration form shows validation errors when required fields are missing.",
+    "category": "User Authentication",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/register\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Register\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/register\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Login with non-existent user shows authentication error",
+    "description": "Verifies login fails for an unrecognized email and an authentication error is displayed.",
+    "category": "User Authentication",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"no.such.user+e2e@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"SomePass!234\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"error\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Authenticated navigation: after login, user can reach Booking page from Dashboard UI",
+    "description": "Verifies that after successful login, the user can access another protected area (Booking) via in-app navigation.",
+    "category": "User Authentication",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Booking\" in the main navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/booking\""
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Save health profile with valid inputs and see risk assessment summary",
+    "description": "Verifies a user can update baseline health metrics and receives a visible risk assessment summary after saving.",
+    "category": "Personalized Onboarding (Health Profile & Risk Assessment)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Profile\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/profile"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Edit Health Profile\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"170\" into the height field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"70\" into the weight field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"5.6\" into the HbA1c field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Save\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Risk Assessment\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"BMI\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Cancel edit does not change displayed health profile summary",
+    "description": "Verifies exiting the edit flow without saving leaves the visible profile summary unchanged.",
+    "category": "Personalized Onboarding (Health Profile & Risk Assessment)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Profile\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Height\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Weight\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Edit Health Profile\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"165\" into the height field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Cancel\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Risk Assessment\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Reject non-numeric height input",
+    "description": "Verifies the form shows a visible error or blocks saving when height contains non-numeric characters.",
+    "category": "Personalized Onboarding (Health Profile & Risk Assessment)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Profile\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/profile"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Edit Health Profile\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"abc\" into the height field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"70\" into the weight field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"5.6\" into the HbA1c field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Save\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Height\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"invalid\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Reject zero or negative weight input",
+    "description": "Verifies the form prevents saving and shows a visible validation message when weight is not a positive value.",
+    "category": "Personalized Onboarding (Health Profile & Risk Assessment)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Profile\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/profile"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Edit Health Profile\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"170\" into the height field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"0\" into the weight field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"5.6\" into the HbA1c field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Save\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Weight\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"must be\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Risk assessment updates after changing HbA1c to a higher value",
+    "description": "Verifies the risk assessment summary visibly changes after saving a significantly different HbA1c value.",
+    "category": "Personalized Onboarding (Health Profile & Risk Assessment)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Profile\" in the main navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Risk Assessment\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Edit Health Profile\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"8.5\" into the HbA1c field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Save\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Risk Assessment\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"High\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Dashboard loads and displays health summary charts",
+    "description": "Verifies an authenticated user can open the dashboard and see the health summary charts/metrics overview.",
+    "category": "Health Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Dashboard\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"health summary charts\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Open weight metric details from the dashboard",
+    "description": "Verifies the user can click the weight metric on the dashboard and reach a visible weight history/details view.",
+    "category": "Health Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Weight\" metric card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Weight\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"History\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Dashboard provides navigation to the Health Roadmap",
+    "description": "Verifies the user can navigate from the dashboard to the roadmap using an in-page navigation control.",
+    "category": "Health Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation link/button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/roadmap\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Roadmap\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Dashboard charts render after initial load",
+    "description": "Verifies charts are not stuck in a loading state and render visible chart content for the authenticated user.",
+    "category": "Health Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Wait for element \"health summary charts\" to be visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"health summary charts\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"No data\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Dashboard shows weight and height metrics in the metrics grid",
+    "description": "Verifies key metric tiles (weight and height) are visible on the dashboard metrics grid.",
+    "category": "Health Dashboard",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Weight\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Height\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "NutriScan guardrail: Analyze button blocked when no image is uploaded",
+    "description": "Verifies the user cannot run analysis until an image is provided.",
+    "category": "NutriScan (AI Vision)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Vision\" or \"NutriScan\" navigation item"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Analyze\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text prompting to upload an image is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "View article details from the Educational Hub list",
+    "description": "Verifies a logged-in user can open an article from the Education list and see full content.",
+    "category": "Educational Hub",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Education\" in the main navigation/menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on an article in the article list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify full article content is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Educational Hub shows a browsable article list",
+    "description": "Verifies the Educational Hub renders an article list that the user can browse/scroll.",
+    "category": "Educational Hub",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Education\" in the main navigation/menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an article list is visible"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the article list"
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Handle article load failure with error and retry",
+    "description": "Verifies that if an article fails to load, the user sees an error message and a retry option.",
+    "category": "Educational Hub",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Education\" in the main navigation/menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on an article in the article list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Failed to load\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Retry\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify full article content is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "Save an article to Favorites from the article view",
+    "description": "Verifies a user can save an opened article to Favorites and sees a confirmation message.",
+    "category": "Educational Hub",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Education\" in the main navigation/menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on an article in the article list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save to Favorites\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Saved\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "Prevent duplicate saves (Save to Favorites twice)",
+    "description": "Verifies clicking Save to Favorites repeatedly does not create a confusing or contradictory UI state.",
+    "category": "Educational Hub",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Education\" in the main navigation/menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on an article in the article list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save to Favorites\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Saved\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save to Favorites\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Already in favorites\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC025",
+    "title": "Article view displays key reading UI elements",
+    "description": "Verifies an opened article shows a readable title and body content area.",
+    "category": "Educational Hub",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Education\" in the main navigation/menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on an article in the article list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an article title is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify full article content is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC026",
+    "title": "Send a message to the floating AI chat and receive a response (Dashboard)",
+    "description": "Verifies a logged-in user can open the floating AI chat on the dashboard, send a message, and see an AI response appear.",
+    "category": "AI Chat Assistant (Floating)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the floating chat icon"
+      },
+      {
+        "type": "action",
+        "description": "Type \"What are healthy snack options for prediabetes?\" into the chat message input"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Send\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an AI response message is visible in the chat conversation"
+      }
+    ]
+  },
+  {
+    "id": "TC027",
+    "title": "Floating chat icon is available on key authenticated pages (smoke coverage)",
+    "description": "Verifies the floating chat entry point is visible on multiple key authenticated pages.",
+    "category": "AI Chat Assistant (Floating)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Education\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/education\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the floating chat icon is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/roadmap\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the floating chat icon is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC028",
+    "title": "Chat can be opened and closed without sending a message",
+    "description": "Verifies the user can open the floating chat, see the conversation UI, and close it without side effects.",
+    "category": "AI Chat Assistant (Floating)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the floating chat icon"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the chat panel is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the chat close button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the chat panel is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC029",
+    "title": "Send with empty input is prevented and shows a visible validation hint",
+    "description": "Verifies the chat does not send an empty message and shows a visible hint or keeps Send disabled.",
+    "category": "AI Chat Assistant (Floating)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the floating chat icon"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Send\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Type a message\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC030",
+    "title": "Complete online consultation booking and payment from Doctor Discovery",
+    "description": "Verifies a patient can find a doctor, book an appointment time, proceed to payment, and see a booking confirmation.",
+    "category": "Online Consultation (Doctor Discovery, Booking, Payment)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Doctors\" navigation link/menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/doctors\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Doctors\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC031",
+    "title": "Search for doctors and open a doctor detail/selection view",
+    "description": "Verifies doctor search filters the list and a doctor can be selected to begin booking.",
+    "category": "Online Consultation (Doctor Discovery, Booking, Payment)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Doctors\" navigation link/menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/doctors\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"Diabetes\" into the doctor search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"doctor results list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC032",
+    "title": "Start booking from a selected doctor and reach the Booking page",
+    "description": "Verifies the user can select a doctor and click book to reach the booking flow.",
+    "category": "Online Consultation (Doctor Discovery, Booking, Payment)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Doctors\" navigation link/menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first doctor card in the results"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Book appointment\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/booking\""
+      }
+    ]
+  },
+  {
+    "id": "TC033",
+    "title": "Select appointment time and proceed to Payment page",
+    "description": "Verifies selecting a time slot allows proceeding to the payment step.",
+    "category": "Online Consultation (Doctor Discovery, Booking, Payment)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Booking\" navigation link/menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/booking\""
+      },
+      {
+        "type": "action",
+        "description": "Click on an available appointment time slot"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Proceed to payment\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC034",
+    "title": "Payment page loads and shows payment UI for consultation",
+    "description": "Verifies the payment page is reachable from booking and shows payment controls.",
+    "category": "Online Consultation (Doctor Discovery, Booking, Payment)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Booking\" navigation link/menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Proceed to payment\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/payment\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Payment\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC035",
+    "title": "Unavailable time slot shows an error and user can choose another time",
+    "description": "Verifies the booking flow handles a time slot that becomes unavailable and allows selecting an alternate slot.",
+    "category": "Online Consultation (Doctor Discovery, Booking, Payment)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Doctors\" navigation link/menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on a doctor from the results"
+      },
+      {
+        "type": "action",
+        "description": "Click on an appointment time slot that is shown as available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"unavailable\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC036",
+    "title": "Attach image entry point is present on Booking page",
+    "description": "Verifies the booking page offers an attach-image action for adding context.",
+    "category": "Online Consultation (Doctor Discovery, Booking, Payment)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Sign in\" or \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Booking\" navigation link/menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/booking\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Attach image\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC037",
+    "title": "Complete a roadmap task and see progress update with milestone unlock",
+    "description": "Verifies a user can complete a task from the Roadmap and that the UI reflects updated progress and any milestone unlock state.",
+    "category": "Interactive Roadmap",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/roadmap\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Roadmap\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC038",
+    "title": "Roadmap shows a visible task list on load",
+    "description": "Verifies the Roadmap page loads and displays a task list section the user can interact with.",
+    "category": "Interactive Roadmap",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/roadmap\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Task list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC039",
+    "title": "Open a task from the Roadmap task list to view its details",
+    "description": "Verifies a task in the Roadmap can be opened, showing task detail content and completion controls.",
+    "category": "Interactive Roadmap",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/roadmap\""
+      },
+      {
+        "type": "action",
+        "description": "Click a visible task item in the task list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Task details\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC040",
+    "title": "Mark a task complete from the task details view",
+    "description": "Verifies completing a task from its detail view updates the task’s status to completed.",
+    "category": "Interactive Roadmap",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation item"
+      },
+      {
+        "type": "action",
+        "description": "Click a visible task item in the task list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Mark complete\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Mark complete\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC041",
+    "title": "Progress visualization updates after completing a task",
+    "description": "Verifies that the Roadmap progress indicator (percent/bar/ring) updates after a task is marked complete.",
+    "category": "Interactive Roadmap",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Progress\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click a visible task item in the task list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Mark complete\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC042",
+    "title": "Milestone unlock is shown after progress threshold is reached",
+    "description": "Verifies that after completing a task, the UI can show a milestone unlock indication when applicable.",
+    "category": "Interactive Roadmap",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Log in\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Roadmap\" navigation item"
+      },
+      {
+        "type": "action",
+        "description": "Click a visible task item in the task list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Mark complete\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Milestone unlocked\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC043",
+    "title": "View transaction history list with existing transactions",
+    "description": "Verifies that an authenticated user can open Transaction History and see a visible list of past transactions.",
+    "category": "Transaction History",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Transaction History\" / \"Riwayat Transaksi\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/riwayat-transaksi\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Transaction History\" or \"Riwayat Transaksi\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC044",
+    "title": "Open a transaction to view details and receipt",
+    "description": "Verifies that a user can select a transaction from the list and view its details including receipt information.",
+    "category": "Transaction History",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Transaction History\" / \"Riwayat Transaksi\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/riwayat-transaksi\""
+      },
+      {
+        "type": "action",
+        "description": "Click the first transaction item in the transactions list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Receipt\" or \"Struk\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC045",
+    "title": "Transaction details show key fields after selecting a transaction",
+    "description": "Verifies that transaction detail view presents key information (status, amount, date) visibly to the user.",
+    "category": "Transaction History",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Transaction History\" / \"Riwayat Transaksi\" navigation item"
+      },
+      {
+        "type": "action",
+        "description": "Click a transaction item that appears in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Status\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC046",
+    "title": "Empty state shown when user has no transactions",
+    "description": "Verifies that Transaction History shows an empty state message with guidance when no transactions exist.",
+    "category": "Transaction History",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Transaction History\" / \"Riwayat Transaksi\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/riwayat-transaksi\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message indicating no transactions is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC047",
+    "title": "Empty state provides guidance to book a consultation",
+    "description": "Verifies that the empty state includes visible guidance that points the user to booking consultations.",
+    "category": "Transaction History",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Transaction History\" / \"Riwayat Transaksi\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/riwayat-transaksi\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"book\" or \"booking\" or \"konsultasi\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC048",
+    "title": "Navigate from empty state guidance to Booking page (if link/button is provided)",
+    "description": "Verifies that a user can follow the empty-state call-to-action to reach the Booking page.",
+    "category": "Transaction History",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/dashboard\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Transaction History\" / \"Riwayat Transaksi\" navigation item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/riwayat-transaksi\""
+      },
+      {
+        "type": "action",
+        "description": "Click the empty-state button or link that mentions booking a consultation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/booking\""
+      }
+    ]
+  }
+]

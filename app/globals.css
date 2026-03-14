@@ -9,6 +9,7 @@
 
 :root {
   /* ---- Primary Blue ---- */
+  --primary-950: #071333;
   --primary-900: #0D2B6B;
   --primary-800: #1E429F;
   --primary-700: #1A56DB;
@@ -18,6 +19,7 @@
   --primary-50:  #EBF5FF;
 
   /* ---- Neutral ---- */
+  --neutral-950: #0A0F1A;
   --neutral-900: #111928;
   --neutral-700: #374151;
   --neutral-500: #6B7280;
@@ -114,6 +116,7 @@
   --color-warning-foreground: rgb(var(--warning-shade-foreground));
 
   /* Glunova palette — usable as Tailwind classes e.g. bg-glunova-primary-700 */
+  --color-glunova-primary-950: var(--primary-950);
   --color-glunova-primary-900: var(--primary-900);
   --color-glunova-primary-800: var(--primary-800);
   --color-glunova-primary-700: var(--primary-700);
@@ -122,6 +125,7 @@
   --color-glunova-primary-100: var(--primary-100);
   --color-glunova-primary-50:  var(--primary-50);
 
+  --color-glunova-neutral-950: var(--neutral-950);
   --color-glunova-neutral-900: var(--neutral-900);
   --color-glunova-neutral-700: var(--neutral-700);
   --color-glunova-neutral-500: var(--neutral-500);

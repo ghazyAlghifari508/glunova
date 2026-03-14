@@ -1,0 +1,122 @@
+version: "2"
+type: frontend
+tech_stack:
+  - language: TypeScript
+  - framework: Next.js (App Router)
+  - ui_library: Radix UI, Lucide React, Framer Motion, Recharts
+  - styling: Tailwind CSS
+  - database: Supabase
+routes:
+  - path: /
+    file: app/page.tsx
+    auth_required: false
+    description: Landing page
+  - path: /login
+    file: app/(auth)/login/page.tsx
+    auth_required: false
+    description: Login page
+  - path: /register
+    file: app/(auth)/register/page.tsx
+    auth_required: false
+    description: User registration page
+  - path: /register-doctor
+    file: app/(auth)/register-doctor/page.tsx
+    auth_required: false
+    description: Doctor registration page
+  - path: /dashboard
+    file: app/(user)/dashboard/page.tsx
+    auth_required: true
+    description: User dashboard
+  - path: /doctors
+    file: app/(user)/doctors/page.tsx
+    auth_required: true
+    description: Doctor discovery page
+  - path: /booking
+    file: app/(user)/booking/page.tsx
+    auth_required: true
+    description: Consultation booking
+  - path: /payment
+    file: app/(user)/payment/page.tsx
+    auth_required: true
+    description: Payment gateway integration
+  - path: /roadmap
+    file: app/(user)/roadmap/page.tsx
+    auth_required: true
+    description: Health roadmap
+  - path: /vision
+    file: app/(user)/vision/page.tsx
+    auth_required: true
+    description: AI NutriScan food analysis
+  - path: /education
+    file: app/(user)/education/page.tsx
+    auth_required: true
+    description: Educational Hub
+  - path: /profile
+    file: app/(user)/profile/page.tsx
+    auth_required: true
+    description: User profile settings
+  - path: /riwayat-transaksi
+    file: app/(user)/riwayat-transaksi/page.tsx
+    auth_required: true
+    description: Transaction history
+  - path: /admin
+    file: app/(admin)/page.tsx
+    auth_required: true
+    description: Admin panel
+features:
+  - name: User Authentication
+    description: Login and Registration for users and doctors
+    files:
+      - app/(auth)/login/page.tsx
+      - app/(auth)/register/page.tsx
+    entry_route: /login
+    user_interactions:
+      - Fill email and password
+      - Click login button
+  - name: Health Dashboard
+    description: Overview of user health metrics and roadmap
+    files:
+      - app/(user)/dashboard/page.tsx
+      - components/dashboard/metrics-grid.tsx
+    entry_route: /dashboard
+    user_interactions:
+      - View health summary charts
+      - View weight/height metrics
+      - Navigate to health roadmap
+  - name: NutriScan (AI Vision)
+    description: scan food photos and get nutritional analysis
+    files:
+      - app/(user)/vision/page.tsx
+    entry_route: /vision
+    user_interactions:
+      - Upload image file
+      - Click Analyze button
+      - See nutritional breakdown and verdict
+  - name: Educational Hub
+    description: Read curated health articles
+    files:
+      - app/(user)/education/page.tsx
+    entry_route: /education
+    user_interactions:
+      - Browse article list
+      - Click on an article to read full content
+  - name: AI Chat Assistant
+    description: Floating AI chat for health assistance
+    files:
+      - components/ai-chat-floating.tsx
+    entry_route: /dashboard
+    user_interactions:
+      - Click floating chat icon
+      - Type message to AI
+      - See AI response
+  - name: Online Consultation
+    description: Remote consultation booking and interaction
+    files:
+      - app/(user)/doctors/page.tsx
+      - app/(user)/booking/page.tsx
+    entry_route: /doctors
+    user_interactions:
+      - Search for doctors
+      - Select appointment time
+      - Proceed to payment
+known_limitations: []

@@ -43,9 +43,9 @@ async function seed() {
       {
         email: "user@glunova.id",
         password: userPassword,
-        name: "Bunda Glunova",
+        name: "Anda Glunova",
         role: "user",
-        username: "bunda_glunova"
+        username: "user_glunova"
       }
     ];
 
@@ -110,7 +110,7 @@ async function seed() {
           full_name: u.name,
           role: u.role,
           onboarding_completed: true,
-          pregnancy_week: u.role === 'user' ? 12 : 0
+          monitoring_week: u.role === 'user' ? 12 : 0
         }, { onConflict: 'id' });
       
       if (profileError) {

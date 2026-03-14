@@ -3,60 +3,25 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import {
-  BookOpen,
-  Plus,
-  Search,
-  Pencil,
-  Trash2,
-  Loader2
-} from 'lucide-react'
+import { BookOpen, Plus, Search, Pencil, Trash2, Tag, Calendar, Layers, ChevronRight } from 'lucide-react'
 import { deleteEducationContent } from '@/services/adminService'
 import { useAdminContext } from '@/components/providers/Providers'
 import { EducationModal } from '@/components/admin/EducationModal'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Category, Phase } from '@/types/education'
-
-import { AdminTopHeader } from '@/components/admin/AdminTopHeader'
+import { cn } from '@/lib/utils'
 
 interface EducationContent {
-  id: string
-  day: number
-  phase: Phase
-  month: number
-  title: string
-  description: string
-  content: string
-  tips: string[] | string
-  category: Category
-  thumbnail_url?: string
-  created_at: string
+  id: string; day: number; phase: Phase; month: number; title: string
+  description: string; content: string; tips: string[] | string
+  category: Category; thumbnail_url?: string; created_at: string
 }
 
 const phaseLabels: Record<string, string> = {
-  kehamilan: 'Kehamilan',
-  bayi_0_3: 'Bayi 0-3 Bulan',
-  bayi_3_12: 'Bayi 3-12 Bulan',
-  anak_1_2: 'Anak 1-2 Tahun',
+  kesehatan: 'Kesehatan Umum', fase_2: 'Prediabetes', fase_3: 'Diabetes Tipe 1', fase_4: 'Diabetes Tipe 2',
 }
-
 const categoryLabels: Record<string, string> = {
-  nutrisi: 'Nutrisi',
-  kesehatan: 'Kesehatan',
-  stimulasi: 'Stimulasi',
-  perkembangan: 'Perkembangan',
-  aktivitas: 'Aktivitas',
-  imunisasi: 'Imunisasi',
-}
-
-const categoryColors: Record<string, string> = {
-  nutrisi: 'bg-[color:var(--primary-50)] text-[color:var(--primary-700)]',
-  kesehatan: 'bg-[color:var(--primary-50)] text-[color:var(--primary-700)]',
-  stimulasi: 'bg-grapefruit/10 text-grapefruit',
-  perkembangan: 'bg-purple-100 text-purple-600',
-  aktivitas: 'bg-apricot/10 text-[color:var(--warning)]-600',
-  imunisasi: 'bg-sky-100 text-sky-600',
+  nutrisi: 'Nutrisi', kesehatan: 'Kesehatan', stimulasi: 'Stimulasi', perkembangan: 'Perkembangan', aktivitas: 'Aktivitas', imunisasi: 'Imunisasi',
 }
 
 export default function EducationManagementPage() {
@@ -68,267 +33,162 @@ export default function EducationManagementPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [phaseFilter, setPhaseFilter] = useState('')
-  
-  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedContent, setSelectedContent] = useState<EducationContent | null>(null)
 
-  // Sync with context if it changes and we are not filtering/searching
   useEffect(() => {
-    if (!searchQuery && !categoryFilter && !phaseFilter && adminContext?.educationContents) {
-      setContents(adminContext.educationContents as EducationContent[])
-    }
+    if (!searchQuery && !categoryFilter && !phaseFilter && adminContext?.educationContents) setContents(adminContext.educationContents as EducationContent[])
   }, [adminContext?.educationContents, searchQuery, categoryFilter, phaseFilter])
 
   const loadData = useCallback(async () => {
-    // If we have data in context and it's the first load (no filters), just use it
-    if (!searchQuery && !categoryFilter && !phaseFilter && adminContext?.educationContents?.length) {
-      setContents(adminContext.educationContents as EducationContent[])
-      return
-    }
-
+    if (!searchQuery && !categoryFilter && !phaseFilter && adminContext?.educationContents?.length) { setContents(adminContext.educationContents as EducationContent[]); return }
     try {
       const { fetchEducationContents } = await import('@/services/adminService')
-      const data = await fetchEducationContents({
-        search: searchQuery || undefined,
-        category: categoryFilter || undefined,
-        phase: phaseFilter || undefined,
-      })
+      const data = await fetchEducationContents({ search: searchQuery || undefined, category: categoryFilter || undefined, phase: phaseFilter || undefined })
       setContents(data as EducationContent[])
-    } catch (error) {
-      console.error('Error loading education:', error)
-    }
+    } catch (error) {}
   }, [searchQuery, categoryFilter, phaseFilter, adminContext?.educationContents])
 
-  useEffect(() => {
-    loadData()
-  }, [categoryFilter, phaseFilter, loadData])
+  useEffect(() => { loadData() }, [categoryFilter, phaseFilter, loadData])
 
   const handleDelete = async () => {
     if (!deleteId) return
-    try {
-      setDeleting(true)
-      await deleteEducationContent(deleteId)
-      await adminContext?.loadAdminData(true)
-      setDeleteId(null)
-    } catch (error) {
-      console.error('Error deleting education:', error)
-    } finally {
-      setDeleting(false)
-    }
+    try { setDeleting(true); await deleteEducationContent(deleteId); await adminContext?.loadAdminData(true); setDeleteId(null) }
+    catch (error) {} finally { setDeleting(false) }
   }
-
-  const handleSuccess = async () => {
-    await adminContext?.loadAdminData(true)
-    setIsModalOpen(false)
-  }
-
-  const handleCreate = () => {
-    setSelectedContent(null)
-    setIsModalOpen(true)
-  }
-
-  const handleEdit = (content: EducationContent) => {
-    setSelectedContent(content)
-    setIsModalOpen(true)
-  }
+  const handleSuccess = async () => { await adminContext?.loadAdminData(true); setIsModalOpen(false) }
+  const handleCreate = () => { setSelectedContent(null); setIsModalOpen(true) }
 
   if (loading && contents.length === 0) {
-    return (
-      <div className="p-8 max-w-[1600px] mx-auto min-h-screen">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-          <div>
-            <Skeleton className="h-8 w-64 mb-2" />
-            <Skeleton className="h-4 w-48" />
-          </div>
-          <Skeleton className="h-12 w-48 rounded-full" />
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <Skeleton className="h-10 w-full sm:max-w-md rounded-xl" />
-          <Skeleton className="h-10 w-full sm:w-40 rounded-xl" />
-          <Skeleton className="h-10 w-full sm:w-40 rounded-xl" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="flex flex-col p-4 rounded-[2rem] bg-white  border border-slate-100/50  shadow-sm h-[320px] transition-colors">
-              <Skeleton className="w-full h-40 rounded-2xl mb-4" />
-              <Skeleton className="h-4 w-20 mb-3 rounded-full" />
-              <Skeleton className="h-5 w-full mb-2" />
-              <Skeleton className="h-5 w-3/4 mb-4" />
-              <div className="mt-auto flex justify-between items-center">
-                 <Skeleton className="h-8 w-8 rounded-full" />
-                 <Skeleton className="h-8 w-8 rounded-full" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
+    return <div className="p-8 min-h-screen"><Skeleton className="w-full h-[600px] rounded-2xl" style={{ background: 'var(--neutral-200)' }} /></div>
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-[1600px] mx-auto min-h-screen">
-      <AdminTopHeader title="Manage Edukasi" showSearch={false} />
-
-      {/* Top Header Row with Actions */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-        <div>
-          <p className="text-sm text-slate-500">{contents.length} artikel edukasi aktif</p>
+    <div className="p-6 md:p-8 min-h-screen font-sans">
+      <div className="max-w-[1400px] mx-auto space-y-6">
+        
+        {/* Header */}
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+           <div>
+              <h1 className="text-2xl font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>Kelola Edukasi</h1>
+              <p className="text-sm font-body mt-1" style={{ color: 'var(--neutral-500)' }}>Atur konten edukasi kesehatan untuk pasien.</p>
+           </div>
+           <div className="flex flex-col md:flex-row items-center gap-3 w-full xl:w-auto">
+              <div className="relative flex-1 md:w-80 rounded-xl" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--neutral-400)' }} />
+                 <input type="text" placeholder="Cari konten..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-11 bg-transparent pl-10 pr-4 text-sm font-body focus:outline-none" style={{ color: 'var(--neutral-900)' }} />
+              </div>
+              <Button onClick={handleCreate} className="h-11 px-6 rounded-xl text-white font-bold text-sm w-full md:w-auto" style={{ background: 'var(--primary-700)' }}>
+                <Plus className="w-4 h-4 mr-2" /> Tambah Konten
+              </Button>
+           </div>
         </div>
-        <Button 
-          onClick={handleCreate}
-          className="rounded-full bg-[color:var(--primary-700)] hover:bg-[#0f605c] text-white px-6 h-12 font-bold shadow-md"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          <span>Tambah Edukasi</span>
-        </Button>
-      </div>
 
-      <div className="space-y-4">
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Cari judul artikel..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200  bg-white  text-sm text-slate-900  focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] font-medium transition-all transition-colors"
-            />
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scrollbar">
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2.5 rounded-xl border border-slate-200  bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] appearance-none cursor-pointer font-bold text-slate-600  min-w-[140px] shadow-sm transition-colors"
-            >
-              <option value="">Semua Kategori</option>
-              {Object.entries(categoryLabels).map(([key, label]) => (
-                <option key={key} value={key}>{label}</option>
-              ))}
-            </select>
-            <select
-              value={phaseFilter}
-              onChange={(e) => setPhaseFilter(e.target.value)}
-              className="px-4 py-2.5 rounded-xl border border-slate-200  bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-200)] appearance-none cursor-pointer font-bold text-slate-600  min-w-[140px] shadow-sm transition-colors"
-            >
-              <option value="">Semua Fase</option>
-              {Object.entries(phaseLabels).map(([key, label]) => (
-                <option key={key} value={key}>{label}</option>
-              ))}
-            </select>
-          </div>
+        <div className="flex flex-wrap gap-3">
+           <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+              <Tag className="w-3.5 h-3.5" style={{ color: 'var(--neutral-400)' }} />
+              <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
+                 className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer font-body" style={{ color: 'var(--neutral-700)' }}>
+                 <option value="">Semua Kategori</option>
+                 {Object.entries(categoryLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              </select>
+           </div>
+           <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+              <Layers className="w-3.5 h-3.5" style={{ color: 'var(--neutral-400)' }} />
+              <select value={phaseFilter} onChange={(e) => setPhaseFilter(e.target.value)}
+                 className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer font-body" style={{ color: 'var(--neutral-700)' }}>
+                 <option value="">Semua Fase</option>
+                 {Object.entries(phaseLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              </select>
+           </div>
+           <div className="ml-auto hidden xl:flex items-center gap-2">
+              <span className="text-xs font-semibold font-body" style={{ color: 'var(--neutral-500)' }}>Total: {contents.length} konten</span>
+           </div>
         </div>
 
-        {/* Content List */}
-        {contents.length === 0 ? (
-          <Card className="p-12 rounded-2xl border-0 shadow-sm bg-white  text-center mt-6 transition-colors">
-            <BookOpen className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-            <p className="font-bold text-slate-800 text-lg transition-colors">Belum ada artikel edukasi</p>
-            <p className="text-sm text-slate-500 font-medium mt-1">Klik &quot;Tambah Edukasi&quot; untuk mulai mengedukasi Bunda-bunda.</p>
-          </Card>
-        ) : (
-          <div className="space-y-3 mt-6">
-            {contents.map((content, index) => (
-              <motion.div
-                key={content.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.03 }}
-              >
-                <Card className="p-4 rounded-2xl border-0 shadow-sm bg-white  hover:shadow-md transition-all group transition-colors">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <div className="w-14 h-14 rounded-2xl bg-[color:var(--primary-50)] flex flex-col items-center justify-center shrink-0 border border-[color:var(--primary-50)] group-hover:scale-105 transition-transform">
-                        <span className="text-[10px] font-black text-[color:var(--primary-700)] uppercase opacity-60">Hari</span>
-                        <span className="text-lg font-black text-[color:var(--primary-700)] -mt-1">{content.day}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-900  truncate text-base transition-colors">{content.title}</p>
-                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${categoryColors[content.category] || 'bg-slate-100 text-slate-600'}`}>
-                            {categoryLabels[content.category] || content.category}
-                          </span>
-                          <div className="h-1 w-1 rounded-full bg-slate-200" />
-                          <span className="text-xs text-slate-500 font-medium">
-                            {phaseLabels[content.phase] || content.phase}
-                          </span>
-                          <div className="h-1 w-1 rounded-full bg-slate-200" />
-                          <span className="text-xs text-slate-400 font-medium italic">
-                            Bulan {content.month}
-                          </span>
-                        </div>
-                      </div>
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+           <AnimatePresence mode="popLayout">
+              {contents.map((content, idx) => (
+                 <motion.div key={content.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ delay: idx * 0.02 }}
+                    className="rounded-xl p-5 group transition-all flex flex-col shadow-sm"
+                    style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}
+                 >
+                    <div className="flex justify-between items-start mb-4">
+                       <div className="w-12 h-12 rounded-xl flex flex-col items-center justify-center" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)' }}>
+                          <span className="text-[9px] font-bold font-heading" style={{ color: 'var(--primary-500)' }}>Hari</span>
+                          <span className="text-lg font-bold leading-none font-heading" style={{ color: 'var(--primary-700)' }}>{content.day}</span>
+                       </div>
+                       <div className="flex items-center gap-1">
+                          <button onClick={() => { setSelectedContent(content); setIsModalOpen(true) }}
+                             className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
+                             <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => setDeleteId(content.id)}
+                             className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
+                             <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                       </div>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleEdit(content)}
-                        className="rounded-xl h-10 w-10 text-slate-400 hover:bg-[color:var(--primary-50)] hover:text-[color:var(--primary-700)] transition-colors"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDeleteId(content.id)}
-                        className="rounded-xl h-10 w-10 text-slate-400 hover:bg-grapefruit/10 hover:text-grapefruit transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                    <div className="flex-1 space-y-3">
+                       <div>
+                          <p className="text-[10px] font-bold uppercase tracking-wider mb-1 font-heading" style={{ color: 'var(--primary-700)' }}>{categoryLabels[content.category] || content.category}</p>
+                          <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] font-heading" style={{ color: 'var(--neutral-900)' }}>{content.title}</h3>
+                       </div>
+                       <div className="flex items-center gap-3 pt-3" style={{ borderTop: '1px solid var(--neutral-100)' }}>
+                          <div className="flex items-center gap-1.5">
+                             <Layers className="w-3 h-3" style={{ color: 'var(--neutral-400)' }} />
+                             <span className="text-[10px] font-semibold font-body" style={{ color: 'var(--neutral-500)' }}>{phaseLabels[content.phase] || content.phase}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 ml-auto">
+                             <Calendar className="w-3 h-3" style={{ color: 'var(--neutral-400)' }} />
+                             <span className="text-[10px] font-semibold font-body" style={{ color: 'var(--neutral-500)' }}>Bulan {content.month}</span>
+                          </div>
+                       </div>
                     </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                 </motion.div>
+              ))}
+           </AnimatePresence>
+        </div>
+
+        {/* Empty */}
+        {contents.length === 0 && (
+           <div className="rounded-2xl p-16 text-center" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+              <BookOpen className="w-16 h-16 mx-auto mb-6" style={{ color: 'var(--neutral-300)' }} />
+              <h2 className="text-xl font-bold font-heading mb-2" style={{ color: 'var(--neutral-900)' }}>Belum Ada Konten</h2>
+              <p className="text-sm font-body max-w-sm mx-auto" style={{ color: 'var(--neutral-500)' }}>Tambahkan konten edukasi pertama untuk memulai.</p>
+           </div>
         )}
 
-        {/* Modals */}
+        {/* Modal */}
         <AnimatePresence>
-          {isModalOpen && (
-            <EducationModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              onSuccess={handleSuccess}
-              initialData={selectedContent}
-            />
-          )}
+          {isModalOpen && <EducationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={handleSuccess} initialData={selectedContent} />}
         </AnimatePresence>
 
-        {/* Delete Confirmation Modal */}
-        {deleteId && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setDeleteId(null)} />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="relative bg-white  rounded-[2rem] p-6 w-full max-w-sm shadow-2xl transition-colors"
-            >
-              <h3 className="text-lg font-black text-slate-800  mb-2 transition-colors">Hapus Artikel?</h3>
-              <p className="text-sm border-l-2 pl-3 border-[color:var(--primary-50)]0 text-slate-600  mb-6 font-medium leading-relaxed transition-colors">
-                Artikel yang dihapus tidak dapat dikembalikan. Yakin ingin menghapus edukasi ini?
-              </p>
-              <div className="flex gap-3">
-                <Button variant="ghost" onClick={() => setDeleteId(null)} className="flex-1 rounded-xl font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">
-                  Batal
-                </Button>
-                <Button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="flex-1 rounded-xl bg-grapefruit hover:bg-red-600 text-white font-bold shadow-lg shadow-grapefruit/20"
-                >
-                  {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Trash2 className="w-4 h-4 mr-1" />}
-                  Hapus
-                </Button>
+        {/* Delete confirm */}
+        <AnimatePresence>
+           {deleteId && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm">
+                 <motion.div initial={{ opacity:0, scale: 0.95 }} animate={{ opacity:1, scale: 1 }} exit={{ opacity:0, scale: 0.95 }}
+                    className="rounded-2xl p-8 max-w-sm w-full text-center shadow-xl" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+                    <div className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(239,68,68,0.08)' }}>
+                       <Trash2 className="w-7 h-7" style={{ color: 'var(--danger)' }} />
+                    </div>
+                    <h3 className="text-lg font-bold font-heading mb-2" style={{ color: 'var(--neutral-900)' }}>Hapus Konten?</h3>
+                    <p className="text-sm font-body mb-6" style={{ color: 'var(--neutral-500)' }}>Konten edukasi akan dihapus secara permanen.</p>
+                    <div className="grid grid-cols-2 gap-3">
+                       <Button onClick={() => setDeleteId(null)} className="h-11 rounded-xl font-semibold text-sm" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-700)' }}>Batal</Button>
+                       <Button onClick={handleDelete} className="h-11 rounded-xl font-semibold text-sm text-white" style={{ background: 'var(--danger)' }}>
+                          {deleting ? 'Menghapus...' : 'Ya, Hapus'}
+                       </Button>
+                    </div>
+                 </motion.div>
               </div>
-            </motion.div>
-          </div>
-        )}
+           )}
+        </AnimatePresence>
+
       </div>
     </div>
   )

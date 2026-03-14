@@ -71,7 +71,7 @@ export default function NotFound() {
             Halaman Tidak Ditemukan
           </h2>
           <p className="text-base sm:text-lg text-white/50 font-medium leading-relaxed max-w-sm mx-auto">
-            Maaf Bunda, halaman yang dicari tidak tersedia. Mungkin sudah dipindahkan atau alamatnya salah.
+            Maaf Anda, halaman yang dicari tidak tersedia. Mungkin sudah dipindahkan atau alamatnya salah.
           </p>
         </motion.div>
 

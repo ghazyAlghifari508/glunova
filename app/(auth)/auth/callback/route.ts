@@ -30,8 +30,8 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/doctor`)
       }
 
-      if (userRole === 'user' && !onboardingCompleted) {
-        return NextResponse.redirect(`${origin}/onboarding`)
+      if (userRole === 'user') {
+        return NextResponse.redirect(`${origin}${next}`)
       }
       
       return NextResponse.redirect(`${origin}${next}`)

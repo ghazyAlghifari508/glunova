@@ -5,8 +5,7 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { assertAuthenticated, handleServiceError } from '@/lib/service-helper'
 import type { UserProfile } from '@/types/education'
 
-// We need to define UserProfile type if not available or import it.
-// Assuming it matches the table structure.
+
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   const supabase = await createClient()
@@ -32,7 +31,7 @@ export async function upsertUserProfile(profile: Partial<UserProfile> & { id: st
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('profiles')
-    .upsert(profile)
+    .upsert({ ...profile, onboarding_completed: true })
     .select()
     .single()
 

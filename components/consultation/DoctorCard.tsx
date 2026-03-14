@@ -3,8 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Stethoscope, ShieldCheck, PlusCircle, Clock, Sparkles, ArrowRight } from 'lucide-react'
+import { Star, ShieldCheck, User, ArrowRight } from 'lucide-react'
 import type { Doctor } from '@/types/doctor'
+import { cn } from '@/lib/utils'
 
 interface DoctorCardProps {
   doctor: Doctor
@@ -14,74 +15,80 @@ interface DoctorCardProps {
 export function DoctorCard({ doctor, index }: DoctorCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ delay: index * 0.05 }}
-      className="w-full"
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ delay: index * 0.05, duration: 0.3, ease: "easeOut" }}
+      className="group bg-white rounded-[1.5rem] p-5 md:p-6 flex flex-col md:flex-row items-center md:items-stretch gap-5 md:gap-6 border border-[color:var(--neutral-200)] hover:border-[color:var(--primary-300)] shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-md transition-all duration-200 relative overflow-hidden"
     >
-      <div className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500 hover:-translate-y-1.5 overflow-hidden flex flex-col h-full">
-        {/* Interactive Shine Effect */}
-        <div className="absolute top-0 -left-full w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-25deg] group-hover:left-[150%] transition-all duration-[1.5s] pointer-events-none" />
+      {/* Subtle Background Elements */}
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[color:var(--primary-50)] to-transparent rounded-bl-3xl opacity-0 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500 pointer-events-none" />
+
+      {/* Avatar Container */}
+      <div className="relative shrink-0 flex justify-center sm:block">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[1.25rem] overflow-hidden bg-[color:var(--neutral-50)] border-2 border-white shadow-sm relative z-10">
+          {doctor.profile_picture_url ? (
+            <Image 
+              src={doctor.profile_picture_url} 
+              alt={doctor.full_name} 
+              fill 
+              sizes="(max-width: 640px) 80px, 96px"
+              className="object-cover transition-transform duration-500 group-hover:scale-105" 
+              unoptimized
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[color:var(--neutral-300)]">
+              <User className="w-8 h-8" />
+            </div>
+          )}
+        </div>
         
-        <div className="flex flex-col gap-6 p-4 sm:p-5 md:flex-row md:items-center relative z-10">
-          <div className="flex flex-1 items-center gap-4 sm:gap-6">
-            <div className="relative h-20 w-20 sm:h-28 sm:w-28 shrink-0 overflow-hidden rounded-2xl sm:rounded-3xl bg-slate-50  ring-4 ring-slate-50  shadow-sm transition-transform group-hover:scale-105 group-hover:-rotate-3 duration-500">
-              {doctor.profile_picture_url ? (
-                <Image src={doctor.profile_picture_url} alt={doctor.full_name} fill unoptimized className="object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-300">
-                  <Stethoscope className="h-8 w-8 sm:h-10 sm:w-10" />
-                </div>
-              )}
-              {/* Trust Overlapping Item */}
-              <div className="absolute bottom-1 right-1 bg-emerald-500 text-white rounded-lg p-1 animate-pulse">
-                 <ShieldCheck size={12} />
-              </div>
-            </div>
+        {/* Verified Badge */}
+        <div className="absolute -bottom-2 -right-2 sm:-bottom-1 sm:-right-1 w-7 h-7 rounded-full bg-[color:var(--primary-50)] border-2 border-white flex items-center justify-center shadow-sm z-20 tooltip" data-tip="Dokter Terverifikasi">
+            <ShieldCheck className="w-3.5 h-3.5 text-[color:var(--primary-600)]" />
+        </div>
+      </div>
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                 <PlusCircle className="h-3 w-3 text-[color:var(--primary-700)]" fill="currentColor" />
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[color:var(--primary-700)]">Dokter Terverifikasi</span>
-              </div>
-              <h3 className="mt-1 truncate text-2xl font-black text-slate-900  leading-tight tracking-tight">{doctor.full_name}</h3>
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mt-1">{doctor.specialization}</p>
-              
-              <div className="mt-5 flex items-center gap-4">
-                 <div className="flex items-center gap-2 rounded-xl bg-slate-50  px-3 py-1.5 border border-slate-100  shadow-sm">
-                    <Clock className="h-4 w-4 text-slate-400" />
-                    <span className="text-[11px] font-black text-slate-700 ">{doctor.years_of_experience || 5} Thn Pengalaman</span>
-                 </div>
-                 <div className="flex items-center gap-2 rounded-xl bg-amber-50  px-3 py-1.5 border border-amber-100  shadow-sm">
-                    <Sparkles className="h-4 w-4 text-amber-500" />
-                    <span className="text-[11px] font-black text-amber-700">4.9/5 Rating</span>
-                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 border-t border-slate-50 pt-6 md:flex-col md:items-end md:border-t-0 md:pt-0">
-            <div className="text-left md:text-right">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Fee Konsultasi</p>
-              <div className="flex items-baseline md:justify-end gap-1">
-                <p className="text-2xl sm:text-3xl font-black text-slate-900  tracking-tighter">
-                  Rp {doctor.hourly_rate.toLocaleString('id-ID')}
-                </p>
-                <span className="text-xs font-bold text-slate-400">/Sesi</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Link href={`/doctors/${doctor.id}`} className="w-full sm:w-auto">
-                <button className="flex h-12 sm:h-14 w-full items-center justify-center gap-3 rounded-2xl bg-slate-900  px-6 sm:px-8 text-sm font-black text-white  transition-all hover:bg-black  hover:px-10 active:scale-95 shadow-lg">
-                  Booking Sekarang
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </Link>
-            </div>
+      {/* Main Info */}
+      <div className="flex-1 min-w-0 font-body relative z-10 text-center md:text-left flex flex-col justify-center">
+        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
+          <span className="px-2.5 py-1 bg-[color:var(--primary-50)] text-[color:var(--primary-700)] text-[10px] font-bold uppercase tracking-wide rounded-md border border-[color:var(--primary-100)/50]">
+            {doctor.specialization}
+          </span>
+          <div className="flex items-center gap-1 text-[color:var(--neutral-600)] bg-[color:var(--neutral-50)] border border-[color:var(--neutral-200)] px-2 py-1 rounded-md text-[11px] font-bold">
+            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            4.9
           </div>
         </div>
+        
+        <h3 className="text-lg sm:text-xl font-bold text-[color:var(--neutral-900)] mb-1 line-clamp-1 group-hover:text-[color:var(--primary-700)] transition-colors">
+          {doctor.full_name}
+        </h3>
+        
+        <p className="text-[12px] font-medium text-[color:var(--neutral-500)]">
+          {doctor.years_of_experience || 5} Tahun Pengalaman Klinis
+        </p>
+      </div>
+
+      {/* Pricing & CTA - Full Desktop Right Column */}
+      <div className="w-full md:w-auto md:min-w-[180px] flex flex-col items-center md:items-end justify-center gap-3 md:border-l md:border-[color:var(--neutral-200)] md:pl-6 pt-4 md:pt-0 border-t border-[color:var(--neutral-100)] md:border-t-0 mt-3 md:mt-0 relative z-10 shrink-0">
+          <div className="text-center md:text-right w-full mb-4">
+            <p className="text-sm font-bold text-[color:var(--neutral-500)] uppercase tracking-wider mb-2">Biaya Konsultasi</p>
+            <div className="flex items-baseline justify-center md:justify-end gap-1.5">
+              <span className="text-base font-bold text-[color:var(--primary-600)]">Rp</span>
+              <span className="text-4xl font-black text-[color:var(--neutral-900)] leading-none">
+                {(doctor.hourly_rate / 1000).toFixed(0)}K
+              </span>
+              <span className="text-sm font-medium text-[color:var(--neutral-500)] ml-1">/ 30 Menit</span>
+            </div>
+          </div>
+          
+          <Link href={`/booking/${doctor.id}`} className="w-full">
+            <button className="w-full h-10 px-4 bg-[color:var(--primary-700)] text-white rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 hover:bg-[color:var(--primary-800)] transition-all active:scale-95 group/btn shadow-[0_2px_10px_rgb(26,86,219,0.2)]">
+              Jadwalkan
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+          </Link>
       </div>
     </motion.div>
   )

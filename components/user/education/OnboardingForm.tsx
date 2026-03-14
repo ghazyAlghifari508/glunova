@@ -1,31 +1,22 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { ArrowRight, ArrowLeft, Baby, Heart, CalendarIcon, Check, Users, Mail } from 'lucide-react'
-import { format, addDays } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
-import { UserStatus, calculateCurrentDay } from '@/types/education'
+import { Activity, Heart, CheckCircle2, ArrowRight, ArrowLeft, Target, Scale, ShieldCheck } from 'lucide-react'
+import { UserStatus } from '@/types/education'
 import { cn } from '@/lib/utils'
 
 export interface OnboardingFormData {
   status: UserStatus
-  pregnancyMonth?: number
-  pregnancyWeek?: number
-  dueDate?: Date
+  monitoringMonth?: number
+  monitoringWeek?: number
+  monitoringTargetDate?: Date
   weight?: number
   height?: number
-  childName?: string
-  childBirthDate?: Date
-  childWeight?: number
-  childHeight?: number
   currentDay: number
 }
 
@@ -36,39 +27,17 @@ interface OnboardingFormProps {
 export function OnboardingForm({ onComplete }: OnboardingFormProps) {
   const [step, setStep] = useState(1)
   const [status, setStatus] = useState<UserStatus | null>(null)
-  const [pregnancyMonth, setPregnancyMonth] = useState<number | undefined>()
-  const [pregnancyWeek, setPregnancyWeek] = useState<string>('')
-  const [dueDate, setDueDate] = useState<Date | undefined>()
   const [weight, setWeight] = useState<string>('')
   const [height, setHeight] = useState<string>('')
-  const [childName, setChildName] = useState<string>('')
-  const [childBirthDate, setChildBirthDate] = useState<Date | undefined>()
-  const [childWeight, setChildWeight] = useState<string>('')
-  const [childHeight, setChildHeight] = useState<string>('')
-
-  // Auto-calculate HPL based on month and week
-  useEffect(() => {
-    if (status === 'hamil') {
-      const month = pregnancyMonth ?? -1
-      const week = pregnancyWeek ? parseInt(pregnancyWeek) : 0
-      
-      if (month !== -1 && week > 0) {
-        const currentDay = (month * 4 + (week - 1)) * 7 + 1
-        const daysRemaining = 280 - currentDay
-        
-        if (daysRemaining >= 0) {
-          setDueDate(addDays(new Date(), daysRemaining))
-        }
-      }
-    }
-  }, [pregnancyMonth, pregnancyWeek, status])
+  // targetHba1c is visual only for the wizard step
+  const [targetHba1c, setTargetHba1c] = useState<string>('')
 
   const totalSteps = 3
 
   const steps = useMemo(() => ([
-    { id: 1, title: 'Data Bunda', desc: 'Profil kehamilan atau si kecil', icon: Heart },
-    { id: 2, title: 'Lengkapi Detail', desc: 'Isi data penting untuk rekomendasi', icon: Baby },
-    { id: 3, title: 'Selesai', desc: 'Mulai perjalanan 1000 HPK', icon: Check }
+    { id: 1, title: 'Kondisi Kesehatan', desc: 'Pilih tipe perjalanan Anda', icon: ShieldCheck },
+    { id: 2, title: 'Metrik Fisik', desc: 'Berat & tinggi badan', icon: Scale },
+    { id: 3, title: 'Target Personal', desc: 'Tentukan tujuan Anda', icon: Target }
   ]), [])
 
   const handleNext = () => {
@@ -82,20 +51,11 @@ export function OnboardingForm({ onComplete }: OnboardingFormProps) {
   const handleComplete = () => {
     if (!status) return
 
-    const currentDay = calculateCurrentDay(status, pregnancyMonth, childBirthDate, pregnancyWeek ? parseInt(pregnancyWeek) : undefined)
-
     onComplete({
-      status,
-      pregnancyMonth,
-      pregnancyWeek: pregnancyWeek ? parseInt(pregnancyWeek) : undefined,
-      dueDate,
+      status, // 'berisiko' maps to Prediabetes, 'terdiagnosis' maps to Diabetes for DB constraints
       weight: weight ? parseFloat(weight) : undefined,
       height: height ? parseFloat(height) : undefined,
-      childName,
-      childBirthDate,
-      childWeight: childWeight ? parseFloat(childWeight) : undefined,
-      childHeight: childHeight ? parseFloat(childHeight) : undefined,
-      currentDay
+      currentDay: 1 // Default start day
     })
   }
 
@@ -104,374 +64,267 @@ export function OnboardingForm({ onComplete }: OnboardingFormProps) {
       case 1:
         return status !== null
       case 2:
-        if (status === 'hamil') {
-          return pregnancyMonth !== undefined && pregnancyWeek !== '' && dueDate !== undefined
-        }
-        if (status === 'punya_anak') {
-          return childName !== '' && childBirthDate !== undefined
-        }
-        return false
+        return weight.trim() !== '' && height.trim() !== ''
       case 3:
-        return true
+        return targetHba1c.trim() !== ''
       default:
         return false
     }
   }
 
-  const getCurrentDay = () => {
-    if (!status) return 1
-    return calculateCurrentDay(status, pregnancyMonth, childBirthDate, pregnancyWeek ? parseInt(pregnancyWeek) : undefined)
-  }
-
   return (
-    <div className="w-full max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] min-h-[640px]">
-        {/* Sidebar */}
-        <aside className="bg-slate-50 px-6 py-8 border-r border-slate-100 relative">
-          <div className="flex items-center gap-2 mb-10">
-            <div className="flex items-center justify-center h-12 overflow-visible">
-              <Image 
-                src="/images/unsplash/logo-glunova.png" 
-                alt="Glunova Logo" 
-                width={100} 
-                height={100} 
-                className="w-[80px] h-[80px] scale-[1.3] object-contain drop-shadow-md" 
+    <div className="w-full flex min-h-screen bg-white">
+      {/* LEFT: CONTENT & FORM PANEL */}
+      <div className="w-full lg:w-1/2 flex flex-col relative z-10 px-6 sm:px-12 md:px-20 py-12 justify-between overflow-y-auto">
+        
+        {/* Top Logo & Standard Header */}
+        <div className="flex items-center gap-3 mb-10 shrink-0">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[color:var(--primary-700)] shadow-md">
+            <Activity className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-xl font-heading font-bold text-[color:var(--neutral-900)]">
+            Glunova
+          </span>
+        </div>
+
+        <div className="w-full max-w-md mx-auto flex-1 flex flex-col justify-center">
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div className="mb-10">
+                  <h2 className="text-3xl lg:text-4xl font-extrabold text-[color:var(--neutral-900)] mb-3 tracking-tight">Kondisi Kesehatan</h2>
+                  <p className="text-[color:var(--neutral-500)] text-base">Pilih profil yang paling sesuai agar Glunova dapat memberikan rekomendasi yang akurat.</p>
+                </div>
+
+                <RadioGroup
+                  value={status || ''}
+                  onValueChange={(value: string) => setStatus(value as UserStatus)}
+                  className="space-y-4"
+                >
+                  <label
+                    htmlFor="berisiko"
+                    className={cn(
+                      'flex items-center gap-5 p-6 rounded-2xl border-2 cursor-pointer transition-all hover:scale-[1.01]',
+                      status === 'berisiko' ? 'border-[color:var(--primary-700)] bg-[color:var(--primary-50)]' : 'border-[color:var(--neutral-200)] hover:border-[color:var(--neutral-300)]'
+                    )}
+                  >
+                    <RadioGroupItem value="berisiko" id="berisiko" className="sr-only" />
+                    <div className={cn(
+                      'w-14 h-14 rounded-full flex items-center justify-center shrink-0 transition-colors',
+                      status === 'berisiko' ? 'bg-[color:var(--primary-700)] text-white' : 'bg-[color:var(--neutral-100)] text-[color:var(--neutral-400)]'
+                    )}>
+                      <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-bold text-lg text-[color:var(--neutral-900)]">Prediabetes & Pencegahan</p>
+                      <p className="text-sm text-[color:var(--neutral-500)] mt-1">Fokus pada nutrisi dan olahraga untuk mencegah diabetes tipe 2.</p>
+                    </div>
+                  </label>
+
+                  <label
+                    htmlFor="terdiagnosis"
+                    className={cn(
+                      'flex items-center gap-5 p-6 rounded-2xl border-2 cursor-pointer transition-all hover:scale-[1.01]',
+                      status === 'terdiagnosis' ? 'border-[color:var(--primary-700)] bg-[color:var(--primary-50)]' : 'border-[color:var(--neutral-200)] hover:border-[color:var(--neutral-300)]'
+                    )}
+                  >
+                    <RadioGroupItem value="terdiagnosis" id="terdiagnosis" className="sr-only" />
+                    <div className={cn(
+                      'w-14 h-14 rounded-full flex items-center justify-center shrink-0 transition-colors',
+                      status === 'terdiagnosis' ? 'bg-[color:var(--primary-700)] text-white' : 'bg-[color:var(--neutral-100)] text-[color:var(--neutral-400)]'
+                    )}>
+                      <Activity className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-bold text-lg text-[color:var(--neutral-900)]">Pengelolaan Diabetes</p>
+                      <p className="text-sm text-[color:var(--neutral-500)] mt-1">Pantau HbA1c, gula darah harian, dan kontrol nutrisi yang presisi.</p>
+                    </div>
+                  </label>
+                </RadioGroup>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div className="mb-10">
+                  <h2 className="text-3xl lg:text-4xl font-extrabold text-[color:var(--neutral-900)] mb-3 tracking-tight">Metrik Fisik</h2>
+                  <p className="text-[color:var(--neutral-500)] text-base">Digunakan oleh AI Glunova untuk menghitung target kalori dan BMI Anda secara real-time.</p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-bold text-[color:var(--neutral-700)]">Berat Badan (kg)</Label>
+                    <div className="relative">
+                      <Scale className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[color:var(--neutral-400)]" />
+                      <input
+                        type="number"
+                        step="0.1"
+                        placeholder="Contoh: 65.5"
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-[color:var(--neutral-200)] focus:border-[color:var(--primary-500)] outline-none bg-[color:var(--neutral-50)] focus:bg-white transition-all font-medium text-[color:var(--neutral-900)]"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-sm font-bold text-[color:var(--neutral-700)]">Tinggi Badan (cm)</Label>
+                    <div className="relative">
+                      <Activity className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[color:var(--neutral-400)]" />
+                      <input
+                        type="number"
+                        placeholder="Contoh: 168"
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-[color:var(--neutral-200)] focus:border-[color:var(--primary-500)] outline-none bg-[color:var(--neutral-50)] focus:bg-white transition-all font-medium text-[color:var(--neutral-900)]"
+                        value={height}
+                        onChange={(e) => setHeight(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 rounded-xl bg-[color:var(--warning-bg)] border border-[color:var(--warning)]/20 flex gap-3 mt-4">
+                    <CheckCircle2 className="w-5 h-5 text-[color:var(--warning)] shrink-0 mt-0.5" />
+                    <p className="text-sm text-[color:var(--neutral-700)]">Data ini dijaga privasinya dan hanya digunakan untuk perhitungan kesehatan medis dasar (BMI & BMR).</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div className="mb-10">
+                  <h2 className="text-3xl lg:text-4xl font-extrabold text-[color:var(--neutral-900)] mb-3 tracking-tight">Target Personal</h2>
+                  <p className="text-[color:var(--neutral-500)] text-base">Satu langkah lagi! Tentukan target kesehatan Anda bersama Glunova.</p>
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-bold text-[color:var(--neutral-700)]">Target Level HbA1c (%)</Label>
+                    <div className="relative">
+                      <Target className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[color:var(--neutral-400)]" />
+                      <input
+                        type="number"
+                        step="0.1"
+                        placeholder="Contoh: 5.8 (Normal) atau <7.0"
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-[color:var(--neutral-200)] focus:border-[color:var(--primary-500)] outline-none bg-[color:var(--neutral-50)] focus:bg-white transition-all font-medium text-[color:var(--neutral-900)]"
+                        value={targetHba1c}
+                        onChange={(e) => setTargetHba1c(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 rounded-2xl border border-[color:var(--neutral-100)] shadow-sm bg-gradient-to-br from-[color:var(--primary-50)] to-white mt-8 text-center">
+                    <div className="w-16 h-16 bg-[color:var(--primary-700)] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[color:var(--primary-700)]/30">
+                      <Heart className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-lg text-[color:var(--neutral-900)] mb-2">Semua Sudah Siap!</h3>
+                    <p className="text-[color:var(--neutral-500)] text-sm">Ketuk selesaikan untuk memulai monitoring dashboard Anda sekarang.</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Footer Navigation */}
+        <div className="w-full max-w-md mx-auto shrink-0 mt-12">
+          {/* Progress Bar */}
+          <div className="flex gap-2 mb-8">
+            {steps.map((s) => (
+              <div
+                key={s.id}
+                className={cn(
+                  'h-2 flex-1 rounded-full transition-colors duration-300',
+                  step >= s.id ? 'bg-[color:var(--primary-700)]' : 'bg-[color:var(--neutral-200)]'
+                )}
               />
-            </div>
+            ))}
           </div>
 
-          <div className="space-y-6">
+          <div className="flex gap-4">
+            {step > 1 && (
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                className="w-1/3 h-14 rounded-2xl border-2 border-[color:var(--neutral-200)] font-bold text-[color:var(--neutral-700)] hover:bg-[color:var(--neutral-50)] transition-all"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Kembali
+              </Button>
+            )}
+
+            <Button
+              onClick={step < totalSteps ? handleNext : handleComplete}
+              disabled={!canProceed()}
+              className={cn(
+                "h-14 rounded-2xl font-bold text-white shadow-lg shadow-[color:var(--primary-700)]/20 transition-all hover:scale-[1.02] disabled:opacity-70 disabled:hover:scale-100",
+                step > 1 ? "w-2/3" : "w-full",
+                step === totalSteps ? "bg-[color:var(--primary-900)] hover:bg-[color:var(--primary-950)]" : "bg-[color:var(--primary-700)] hover:bg-[color:var(--primary-800)]"
+              )}
+            >
+              {step < totalSteps ? 'Lanjutkan' : 'Selesaikan'}
+              {step < totalSteps && <ArrowRight className="w-5 h-5 ml-2" />}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT: PHOTO PANEL (SPLIT SCREEN) */}
+      <div className="hidden lg:flex w-1/2 relative bg-[color:var(--neutral-900)] overflow-hidden items-end p-16">
+        <Image 
+          src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=1200"
+          alt="Healthy lifestyle medical"
+          fill
+          className="object-cover opacity-70 mix-blend-luminosity"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+        
+        <div className="relative z-10 w-full max-w-lg mb-12">
+          {/* Animated Steps visualizer on right panel */}
+          <div className="space-y-8">
             {steps.map((s) => {
               const Icon = s.icon
               const isActive = step === s.id
-              const isDone = step > s.id
+              const isPast = step > s.id
+              
               return (
-                <div key={s.id} className="flex items-start gap-3">
+                <div key={s.id} className={cn(
+                  "flex items-center gap-6 transition-all duration-500",
+                  isActive ? "opacity-100 translate-x-4" : (isPast ? "opacity-60" : "opacity-30")
+                )}>
                   <div className={cn(
-                    'w-8 h-8 rounded-lg flex items-center justify-center border',
-                    isActive ? 'bg-[color:var(--primary-700)] text-white border-[color:var(--primary-700)]' :
-                    isDone ? 'bg-[color:var(--success)] text-[color:var(--primary-700)] border-[color:var(--success)]' :
-                    'bg-white text-slate-400 border-slate-200'
+                    "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 backdrop-blur-md border",
+                    isActive ? "bg-[color:var(--primary-700)] border-[color:var(--primary-500)] text-white shadow-lg shadow-[color:var(--primary-700)]/50 scale-110" : "bg-white/10 border-white/20 text-white"
                   )}>
-                    <Icon className="w-4 h-4" />
+                    {isPast ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                   </div>
                   <div>
-                    <p className={cn('text-sm font-semibold', isActive ? 'text-slate-900' : 'text-slate-500')}>{s.title}</p>
-                    <p className="text-xs text-slate-400">{s.desc}</p>
+                    <h3 className="text-white font-bold text-xl">{s.title}</h3>
+                    <p className="text-white/60 text-sm mt-1">{s.desc}</p>
                   </div>
                 </div>
               )
             })}
-          </div>
-
-          <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-xs text-slate-400">
-            <button type="button" className="hover:text-slate-600">Kembali ke beranda</button>
-            <button type="button" className="hover:text-slate-600">Masuk</button>
-          </div>
-        </aside>
-
-        {/* Content */}
-        <div className="px-8 md:px-12 py-10 flex flex-col">
-          <div className="flex-1">
-            <AnimatePresence mode="wait">
-              {step === 1 && (
-                <motion.div
-                  key="step1"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="max-w-xl mx-auto"
-                >
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Profil Awal</h2>
-                    <p className="text-sm text-slate-500 mt-2">Pilih kondisi untuk menyesuaikan panduan Glunova.</p>
-                  </div>
-
-                  <RadioGroup
-                    value={status || ''}
-                    onValueChange={(value: string) => setStatus(value as UserStatus)}
-                    className="grid grid-cols-1 gap-4"
-                  >
-                    <label
-                      htmlFor="hamil"
-                      className={cn(
-                        'flex items-center gap-4 p-5 rounded-2xl border cursor-pointer transition-all',
-                        status === 'hamil' ? 'border-[color:var(--primary-700)] bg-[color:var(--primary-700)]/5' : 'border-slate-200 hover:border-slate-300'
-                      )}
-                    >
-                      <RadioGroupItem value="hamil" id="hamil" className="sr-only" />
-                      <div className="w-12 h-12 rounded-xl bg-[color:var(--primary-700)]/10 text-[color:var(--primary-700)] flex items-center justify-center">
-                        <Heart className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-slate-900">Sedang Hamil</p>
-                        <p className="text-xs text-slate-500">Mulai pendampingan 1000 HPK sejak awal</p>
-                      </div>
-                    </label>
-
-                    <label
-                      htmlFor="punya_anak"
-                      className={cn(
-                        'flex items-center gap-4 p-5 rounded-2xl border cursor-pointer transition-all',
-                        status === 'punya_anak' ? 'border-[color:var(--primary-700)] bg-[color:var(--primary-50)]' : 'border-slate-200 hover:border-slate-300'
-                      )}
-                    >
-                      <RadioGroupItem value="punya_anak" id="punya_anak" className="sr-only" />
-                      <div className="w-12 h-12 rounded-xl bg-[color:var(--primary-700)]/10 text-[color:var(--primary-700)] flex items-center justify-center">
-                        <Baby className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-slate-900">Punya Balita</p>
-                        <p className="text-xs text-slate-500">Pantau tumbuh kembang anak secara berkala</p>
-                      </div>
-                    </label>
-                  </RadioGroup>
-                </motion.div>
-              )}
-
-              {step === 2 && (
-                <motion.div
-                  key="step2"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="max-w-xl mx-auto"
-                >
-                  {status === 'hamil' ? (
-                    <div className="space-y-5">
-                      <div className="text-center mb-6">
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Detail Kehamilan</h2>
-                        <p className="text-sm text-slate-500 mt-2">Isi data untuk rekomendasi nutrisi dan kontrol.</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-xs font-semibold text-slate-500">Bulan Kehamilan</Label>
-                          <Select
-                            value={pregnancyMonth?.toString() || ""}
-                            onValueChange={(value: string) => setPregnancyMonth(parseInt(value))}
-                          >
-                            <SelectTrigger className="w-full h-11 rounded-xl border-slate-200">
-                              <SelectValue placeholder="Pilih bulan" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-xl border-slate-100">
-                              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((month) => (
-                                <SelectItem key={month} value={month.toString()} className="rounded-lg">
-                                  Bulan {month}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-xs font-semibold text-slate-500">Minggu (wajib)</Label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="4"
-                            placeholder="Contoh: 1"
-                            className="w-full h-11 rounded-xl border border-slate-200 px-3"
-                            value={pregnancyWeek}
-                            onChange={(e) => setPregnancyWeek(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-xs font-semibold text-slate-500">Perkiraan Lahir (HPL)</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                'w-full h-11 rounded-xl border-slate-200 justify-start',
-                                !dueDate && 'text-slate-400'
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4 text-[color:var(--primary-700)]" />
-                              {dueDate ? format(dueDate, 'PPP', { locale: idLocale }) : 'Pilih tanggal'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0 border-none shadow-2xl rounded-2xl" align="center">
-                            <Calendar
-                              mode="single"
-                              selected={dueDate}
-                              onSelect={setDueDate}
-                              disabled={(date) => date < new Date()}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-xs font-semibold text-slate-500">Berat Badan (kg)</Label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            placeholder="Contoh: 60"
-                            className="w-full h-11 rounded-xl border border-slate-200 px-3"
-                            value={weight}
-                            onChange={(e) => setWeight(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-xs font-semibold text-slate-500">Tinggi (cm)</Label>
-                          <input
-                            type="number"
-                            placeholder="160"
-                            className="w-full h-11 rounded-xl border border-slate-200 px-3"
-                            value={height}
-                            onChange={(e) => setHeight(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-5">
-                      <div className="text-center mb-6">
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Detail Si Kecil</h2>
-                        <p className="text-sm text-slate-500 mt-2">Isi data untuk pemantauan tumbuh kembang.</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-xs font-semibold text-slate-500">Nama Si Kecil</Label>
-                        <input
-                          type="text"
-                          placeholder="Nama panggilan"
-                          className="w-full h-11 rounded-xl border border-slate-200 px-3"
-                          value={childName}
-                          onChange={(e) => setChildName(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-xs font-semibold text-slate-500">Tanggal Lahir</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                'w-full h-11 rounded-xl border-slate-200 justify-start',
-                                !childBirthDate && 'text-slate-400'
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4 text-[color:var(--primary-700)]" />
-                              {childBirthDate ? format(childBirthDate, 'PPP', { locale: idLocale }) : 'Pilih tanggal'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0 border-none shadow-2xl rounded-2xl" align="center">
-                            <Calendar
-                              mode="single"
-                              selected={childBirthDate}
-                              onSelect={setChildBirthDate}
-                              disabled={(date) => date > new Date() || date < new Date(new Date().setFullYear(new Date().getFullYear() - 2))}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label className="text-xs font-semibold text-slate-500">Berat (kg)</Label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            placeholder="3.2"
-                            className="w-full h-11 rounded-xl border border-slate-200 px-3"
-                            value={childWeight}
-                            onChange={(e) => setChildWeight(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-xs font-semibold text-slate-500">Tinggi (cm)</Label>
-                          <input
-                            type="number"
-                            placeholder="50"
-                            className="w-full h-11 rounded-xl border border-slate-200 px-3"
-                            value={childHeight}
-                            onChange={(e) => setChildHeight(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-
-              {step === 3 && (
-                <motion.div
-                  key="step3"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="max-w-xl mx-auto text-center"
-                >
-                  <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Selamat Datang!</h2>
-                  <p className="text-sm text-slate-500 mt-2">Glunova siap mendampingi perjalanan 1000 HPK.</p>
-
-                  <div className="mt-8 rounded-2xl overflow-hidden border border-slate-100">
-                    <Image
-                      src="/images/unsplash/img_60a01e01.png"
-                      alt="Pendampingan Glunova"
-                      width={1200}
-                      height={224}
-                      className="w-full h-56 object-cover"
-                    />
-                  </div>
-
-                  <div className="mt-6 p-5 rounded-2xl bg-[color:var(--primary-700)] text-white">
-                    <p className="text-xs uppercase tracking-wider text-white/70">Perjalanan Dimulai</p>
-                    <p className="text-3xl font-bold">Hari ke-{getCurrentDay()}</p>
-                    <p className="text-xs text-white/80">Menuju 1000 Hari Generasi Sehat</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div className="mt-10">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex gap-2">
-                {Array.from({ length: totalSteps }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      'h-1.5 w-10 rounded-full',
-                      step === i + 1 ? 'bg-[color:var(--primary-700)]' : 'bg-slate-200'
-                    )}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-slate-400">Langkah {step} dari {totalSteps}</span>
-            </div>
-
-            <div className="flex gap-3">
-              {step > 1 && (
-                <Button
-                  variant="outline"
-                  onClick={handleBack}
-                  className="h-11 px-5 rounded-xl"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Kembali
-                </Button>
-              )}
-
-              <Button
-                onClick={step < totalSteps ? handleNext : handleComplete}
-                disabled={!canProceed()}
-                className="h-11 px-6 rounded-xl bg-[color:var(--primary-700)] hover:bg-[color:var(--primary-700)]/90 text-white"
-              >
-                {step < totalSteps ? 'Lanjutkan' : 'Selesai'}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
           </div>
         </div>
       </div>
     </div>
   )
 }
+

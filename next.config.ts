@@ -16,7 +16,25 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'tqvnqccgakoytdrgjqkv.supabase.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+      },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/booking',
+        destination: '/konsultasi-dokter',
+        permanent: true,
+      },
+      {
+        source: '/doctors',
+        destination: '/konsultasi-dokter',
+        permanent: true,
+      },
+    ]
   },
 };
 

@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import { getUserProfile } from '@/services/userService'
 import { UserProfile } from '@/types/education'
-import { calculatePregnancyWeek, calculateTrimester } from '@/lib/date-utils'
+import { calculateMonitoringWeek, calculateMonitoringLevel } from '@/lib/date-utils'
 import { getRoadmapActivities, getUserRoadmapProgress } from '@/services/roadmapService'
 import { getAllEducationContent, getUserProgress as getEducationProgress, getProgressStats } from '@/services/educationService'
 import { getUserConsultations, getDoctorConsultations, getDoctorEarnings } from '@/services/consultationService'
@@ -96,8 +96,8 @@ interface UserContextType {
   role: string | null
   loading: boolean
   error: string | null
-  weekNumber: number
-  trimester: number
+  monitoring_week: number
+  monitoring_level: number
   refreshProfile: () => Promise<void>
   // Cached Data
   roadmap: { activities: RoadmapActivity[]; progress: UserRoadmapProgress[]; loading: boolean }
@@ -164,8 +164,8 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await getUserProfile(userId)
       if (data) {
-        if (!data.pregnancy_week && data.pregnancy_start_date) {
-          data.pregnancy_week = calculatePregnancyWeek(data.pregnancy_start_date)
+        if (!data.monitoring_week && data.monitoring_start_date) {
+          data.monitoring_week = calculateMonitoringWeek(data.monitoring_start_date)
         }
         setProfile(data)
         lastFetchedId.current = userId
@@ -173,7 +173,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
       // Success Mark: Even if null, we mark it as synced for this user
       fulfillmentMap.current['profile'] = userId || ''
     } catch (err) {
-      console.error('Error loading pregnancy data:', err)
+      console.error('Error loading health data:', err)
       setError('Gagal memuat data profil.')
     } finally {
       setProfileLoading(false)
@@ -287,8 +287,8 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     }
   }, [userId, authLoading, loadData])
 
-  const weekNumber = profile?.pregnancy_week || 0
-  const trimester = profile?.trimester || calculateTrimester(weekNumber)
+  const monitoring_week = profile?.monitoring_week || 0
+  const monitoring_level = Number(profile?.monitoring_level) || calculateMonitoringLevel(monitoring_week)
 
   return (
     <UserContext.Provider value={{ 
@@ -296,8 +296,8 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
       role,
       loading: authLoading || profileLoading, 
       error, 
-      weekNumber, 
-      trimester,
+      monitoring_week, 
+      monitoring_level,
       refreshProfile,
       roadmap,
       education,
