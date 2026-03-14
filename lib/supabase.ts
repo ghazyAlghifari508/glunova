@@ -1,27 +1,20 @@
 import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 
-const getSupabaseConfig = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return { url, anonKey };
-};
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Client for Browser/Client-side use (Cookies) - lazily initialized
-export const getSupabase = () => {
-  const { url, anonKey } = getSupabaseConfig();
-  if (!url || !anonKey) return null; // Safe for build analysis
-  return createBrowserClient(url, anonKey);
-};
+// Export 'supabase' is required by 20+ files. DO NOT REMOVE.
+// Using lazy or empty strings if not available during build.
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
-// Admin client for server-side operations (bypasses RLS)
+// Admin client for server-side operations
 export const getSupabaseAdmin = () => {
-  const { url } = getSupabaseConfig();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
-    throw new Error('Supabase admin config is missing');
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Supabase admin configuration missing');
   }
-  return createClient(url, serviceRoleKey, {
+  return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false

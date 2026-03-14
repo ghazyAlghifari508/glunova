@@ -58,7 +58,7 @@ async def run_test():
         elem = frame.locator('xpath=/html/body/main/div/div/div/div/form/button').nth(0)
         await asyncio.sleep(3); await elem.click()
         
-        # -> Click the profile menu button (top-right 'Bunda' patient menu) to open profile options so the test can navigate to the Profile page and edit the health profile.
+        # -> Click the profile menu button (top-right 'Pasien' patient menu) to open profile options so the test can navigate to the Profile page and edit the health profile.
         frame = context.pages[-1]
         # Click element
         elem = frame.locator('xpath=/html/body/main/div/div/nav/div[3]/div/button').nth(0)
