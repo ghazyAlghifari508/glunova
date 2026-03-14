@@ -1,13 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Activity, Beaker, FileSignature, TrendingUp } from 'lucide-react'
-import { RoadmapProgress } from './roadmap-progress'
+import { FileSignature, TrendingUp, CheckCircle2, Bookmark } from 'lucide-react'
 import { useHealthData } from '@/hooks/useHealthData'
 
 interface RoadmapSidebarProps {
-  monitoringWeek: number
-  timelineWeeks: number[]
   journal: string
   setJournal: (val: string) => void
   handleSaveJournal: () => void
@@ -18,8 +15,6 @@ interface RoadmapSidebarProps {
 }
 
 export default function RoadmapSidebar({
-  monitoringWeek,
-  timelineWeeks,
   journal,
   setJournal,
   handleSaveJournal,
@@ -29,60 +24,31 @@ export default function RoadmapSidebar({
   streakDays
 }: RoadmapSidebarProps) {
   const { education, loading } = useHealthData()
+  
   return (
     <aside className="space-y-8 xl:sticky xl:top-32 xl:self-start">
       
-      {/* TIMELINE CARD */}
+      {/* QUICK STATS CARD */}
       <div className="rounded-[32px] border border-neutral-100 bg-white p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden">
-         <h3 className="text-2xl font-heading font-black text-neutral-900 flex items-center gap-3 relative z-10">
-            <Activity className="h-6 w-6 text-primary-600" />
-            Timeline Medis
+         <h3 className="text-xl font-heading font-black text-neutral-900 flex items-center gap-3 relative z-10">
+            <CheckCircle2 className="h-6 w-6 text-[color:var(--primary-600)]" />
+            Ringkasan Progress
          </h3>
-         <p className="text-neutral-500 font-medium text-sm mt-2 mb-8">Pemantauan Metrik Tiap Minggu</p>
-
-        <div className="relative space-y-2">
-          {/* Vertical Track */}
-          <div className="absolute left-[24px] top-6 bottom-6 w-0.5 bg-neutral-100 rounded-full" />
-          
-          {timelineWeeks.map((week) => {
-            const isCurrent = week === monitoringWeek
-            const isPast = week < monitoringWeek
-            
-            return (
-              <div key={week} className="relative flex items-center gap-6 group/item py-3">
-                {/* Node */}
-                <motion.div
-                  animate={isCurrent ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className={`z-10 h-12 w-12 shrink-0 rounded-full border-4 border-white flex items-center justify-center font-black text-sm transition-colors shadow-sm ${
-                    isCurrent ? 'bg-primary-600 text-white shadow-primary-500/30' : 
-                    isPast ? 'bg-emerald-500 text-white' : 'bg-neutral-100 text-neutral-400'
-                  }`}
-                >
-                   {week}
-                </motion.div>
-                
-                {/* Content */}
-                <div
-                  className={`flex-1 rounded-2xl border px-5 py-4 transition-all ${
-                    isCurrent
-                      ? 'border-primary-200 bg-primary-50/50 text-neutral-900 shadow-sm'
-                      : isPast
-                        ? 'border-emerald-100 bg-emerald-50/30 text-emerald-800'
-                        : 'border-transparent bg-transparent text-neutral-400 group-hover/item:border-neutral-100 group-hover/item:bg-neutral-50'
-                  }`}
-                >
-                   <div className="flex items-center justify-between">
-                      {isCurrent && <span className="bg-primary-600 text-white text-[9px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full">Saat Ini</span>}
-                   </div>
-                  <p className={`text-base font-bold mt-1 ${isCurrent ? 'text-primary-900' : ''}`}>
-                     {isPast ? 'Selesai Dipantau' : isCurrent ? 'Fokus Gula Darah' : 'Menunggu Evaluasi'}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+         
+         <div className="mt-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-neutral-500">Aktivitas Selesai</span>
+              <span className="text-lg font-black text-neutral-900">{completedCount}/{activitiesCount}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-neutral-500">Streak Harian</span>
+              <span className="text-lg font-black text-neutral-900">{streakDays} Hari</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-neutral-500">Artikel Edukasi</span>
+              <span className="text-lg font-black text-neutral-900">{education.progress?.filter(p => p.is_read).length || 0} Dibaca</span>
+            </div>
+         </div>
       </div>
 
       {/* MEDICAL LOGBOOK */}

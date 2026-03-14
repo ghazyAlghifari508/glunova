@@ -37,13 +37,14 @@ export function useCheckDoctorApproval() {
           .single()
 
         if (!error && data?.show_approval_msg === true) {
-          // Check if we are already on the approval page to prevent loop
-          if (window.location.pathname === '/onboarding/doctor-approved') {
+          // Check if we are already on the approval page or a variant to prevent loop
+          const currentPath = window.location.pathname
+          if (currentPath.includes('/approved') || currentPath.includes('/onboarding')) {
             if (mounted) setCheckedUserId(user.id)
             return
           }
 
-          router.replace('/register-doctor/approved')
+          router.replace('/doctor?approved=true')
         } else {
           if (mounted) setCheckedUserId(user.id)
         }

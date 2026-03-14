@@ -64,7 +64,6 @@ export default function RoadmapPage() {
 
   const activities = roadmap.activities
   const progress = roadmap.progress
-  const monitoringWeek = profile?.monitoring_week || 0
 
   const filteredActivities = useMemo(() => {
     return activities.filter((act) => {
@@ -181,10 +180,6 @@ export default function RoadmapPage() {
     nutrition: activitiesToCount.filter(a => a.category === 'nutrition').length
   }
   
-  // Create a 5-week sliding window centered on the current monitoring week
-  const startWeek = Math.max(1, monitoringWeek - 2)
-  const timelineWeeks = Array.from({length: 5}, (_, i) => startWeek + i).filter(w => w <= 40)
-  
   const completedCount = progress.filter(p => p.status === 'completed' && activities.some(a => a.id === p.activity_id)).length
   const maxStreak = progress.length > 0 ? Math.max(...progress.map(p => p.streak_count || 0)) : 0
 
@@ -223,8 +218,6 @@ export default function RoadmapPage() {
         
         <div className="lg:col-span-1">
            <RoadmapSidebar 
-             monitoringWeek={monitoringWeek}
-             timelineWeeks={timelineWeeks}
              journal={journal}
              setJournal={setJournal}
              handleSaveJournal={handleSaveJournal}

@@ -30,9 +30,6 @@ export interface UserProfile {
   hba1c?: number;
   current_day?: number;
   xp_points?: number;
-  monitoring_start_date?: string; // Monitoring start
-  monitoring_target_date?: string; // Target evaluation
-  monitoring_week?: number;
   created_at: string;
   updated_at: string;
 }

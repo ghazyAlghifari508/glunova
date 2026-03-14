@@ -8,8 +8,6 @@ export function useHealthData() {
     profile, 
     loading, 
     error, 
-    monitoring_week, 
-    monitoring_level: activeLevel, // Renamed internally for context
     roadmap,
     education,
     consultations,
@@ -27,8 +25,6 @@ export function useHealthData() {
     profile, 
     loading, 
     error,
-    monitoring_week,
-    activeLevel,
     user: memoizedUser,
     roadmap,
     education,
@@ -40,7 +36,7 @@ export function useHealthData() {
     loadDoctors,
     saveDailyJournal
   }), [
-    profile, loading, error, monitoring_week, activeLevel, memoizedUser,
+    profile, loading, error, memoizedUser,
     roadmap, education, consultations, doctors,
     loadRoadmap, loadEducation, loadConsultations, loadDoctors,
     saveDailyJournal

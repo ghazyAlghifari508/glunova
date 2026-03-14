@@ -8,7 +8,30 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Activity, Users, CalendarCheck, Wallet, ChevronRight, BellRing, Settings } from 'lucide-react'
 import Link from 'next/link'
 
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/use-toast'
+import { clearApprovalFlag } from '@/app/actions/clearApprovalFlag'
+
 export default function DoctorDashboardPage() {
+  const { toast } = useToast()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  React.useEffect(() => {
+    if (searchParams.get('approved') === 'true') {
+      toast({
+        title: '🎉 Selamat! Akun Anda Telah Disetujui',
+        description: 'Anda sekarang dapat mulai memberikan konsultasi dan membantu pasien.',
+      })
+      
+      // Clear flag in DB so it doesn't show again
+      clearApprovalFlag()
+      
+      // Remove param from URL
+      router.replace('/doctor')
+    }
+  }, [searchParams, toast, router])
+
   const doctorContext = useDoctorContext()
   const stats = doctorContext?.stats
   const loading = doctorContext?.loading

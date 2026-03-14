@@ -128,19 +128,17 @@ export default function RoadmapManagementPage() {
                                 <Icon className="w-7 h-7" style={{ color: config.color }} />
                              </div>
                              <div className="flex-1 min-w-0 text-center md:text-left">
-                                <div className="flex lg:flex-row flex-col lg:items-center gap-3 mb-1">
-                                   <h3 className="text-base font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>{activity.activity_name}</h3>
-                                   <div className="flex items-center justify-center lg:justify-start gap-3">
-                                      <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold font-body" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-600)' }}>
-                                         Fase {activity.min_level}-{activity.max_level}
-                                      </span>
-                                      <div className="flex items-center gap-0.5">
-                                         {[1,2,3,4,5].map(s => (
-                                            <div key={s} className="w-1.5 h-1.5 rounded-full" style={{ background: s <= (activity.difficulty_level || 1) ? config.color : 'var(--neutral-200)' }} />
-                                         ))}
-                                      </div>
-                                   </div>
-                                </div>
+                                    <div className="flex lg:flex-row flex-col lg:items-center gap-3 mb-1">
+                                       <h3 className="text-base font-bold font-heading" style={{ color: 'var(--neutral-900)' }}>{activity.activity_name}</h3>
+                                       <div className="flex items-center justify-center lg:justify-start gap-2">
+                                          <div className="flex items-center gap-0.5">
+                                             {[1,2,3,4,5].map(s => (
+                                                <div key={s} className="w-1.5 h-1.5 rounded-full" style={{ background: s <= (activity.difficulty_level || 1) ? config.color : 'var(--neutral-200)' }} />
+                                             ))}
+                                          </div>
+                                          <span className="text-[10px] font-bold font-body" style={{ color: config.color }}>Lv {activity.difficulty_level || 1}</span>
+                                       </div>
+                                    </div>
                                 <p className="text-sm font-body line-clamp-2 max-w-2xl" style={{ color: 'var(--neutral-500)' }}>{activity.description || 'Deskripsi belum tersedia.'}</p>
                              </div>
                              <div className="flex flex-row md:flex-col items-center gap-2 shrink-0" style={{ borderLeft: '1px solid var(--neutral-100)', paddingLeft: '1rem' }}>

@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Save, Loader2, X, Route, Info, Layers } from 'lucide-react'
+import { Save, Loader2, X, Route, Info } from 'lucide-react'
 import { createRoadmapActivity, updateRoadmapActivity } from '@/services/adminService'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { RoadmapActivity } from '@/types/roadmap'
 
-interface RoadmapActivity {
-  id: string; activity_name: string; category: 'exercise' | 'nutrition' | 'sleep' | 'mental' | 'checkup' | 'bonding'
-  description: string; difficulty_level: number
-  duration_minutes: number; frequency_per_week: number; benefits: string[]; instructions: string[]; tips: string | null; warnings: string | null
+interface RoadmapModalProps { 
+  isOpen: boolean 
+  onClose: () => void 
+  onSuccess: () => void 
+  initialData?: RoadmapActivity | null 
 }
-
-interface RoadmapModalProps { isOpen: boolean; onClose: () => void; onSuccess: () => void; initialData?: RoadmapActivity | null }
 
 const inputStyle = { background: 'var(--neutral-50)', border: '1px solid var(--neutral-200)', color: 'var(--neutral-900)' }
 const labelStyle = { color: 'var(--neutral-500)' }
@@ -22,39 +22,83 @@ export function RoadmapModal({ isOpen, onClose, onSuccess, initialData }: Roadma
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
-    activity_name: '', category: 'exercise' as RoadmapActivity['category'], description: '', difficulty_level: 1,
-    duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '',
+    activity_name: '', 
+    category: 'exercise' as RoadmapActivity['category'], 
+    description: '', 
+    difficulty_level: 1,
+    duration_minutes: 15, 
+    frequency_per_week: 3, 
+    benefits: '', 
+    instructions: '', 
+    tips: '', 
+    warnings: '',
   })
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        activity_name: initialData.activity_name, category: initialData.category, description: initialData.description || '',
+        activity_name: initialData.activity_name, 
+        category: initialData.category, 
+        description: initialData.description || '',
         difficulty_level: initialData.difficulty_level,
-        duration_minutes: initialData.duration_minutes || 0, frequency_per_week: initialData.frequency_per_week || 0,
+        duration_minutes: initialData.duration_minutes || 0, 
+        frequency_per_week: initialData.frequency_per_week || 0,
         benefits: Array.isArray(initialData.benefits) ? initialData.benefits.join('\n') : '',
         instructions: Array.isArray(initialData.instructions) ? initialData.instructions.join('\n') : '',
-        tips: initialData.tips || '', warnings: initialData.warnings || '',
+        tips: initialData.tips || '', 
+        warnings: initialData.warnings || '',
       })
     } else {
-      setForm({ activity_name: '', category: 'exercise', description: '', difficulty_level: 1, duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '' })
+      setForm({ 
+        activity_name: '', 
+        category: 'exercise', 
+        description: '', 
+        difficulty_level: 1, 
+        duration_minutes: 15, 
+        frequency_per_week: 3, 
+        benefits: '', 
+        instructions: '', 
+        tips: '', 
+        warnings: '' 
+      })
     }
   }, [initialData, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setError('')
-    if (!form.activity_name.trim()) { setError('Nama aktivitas wajib diisi.'); return }
+    e.preventDefault(); 
+    setError('')
+    if (!form.activity_name.trim()) { 
+      setError('Nama aktivitas wajib diisi.')
+      return 
+    }
+    
     try {
       setSaving(true)
       const payload = {
-        activity_name: form.activity_name, category: form.category, description: form.description, difficulty_level: form.difficulty_level,
-        duration_minutes: form.duration_minutes, frequency_per_week: form.frequency_per_week,
-        benefits: form.benefits.split('\n').filter(b => b.trim()), instructions: form.instructions.split('\n').filter(i => i.trim()),
-        tips: form.tips || null, warnings: form.warnings || null,
+        activity_name: form.activity_name, 
+        category: form.category, 
+        description: form.description, 
+        difficulty_level: form.difficulty_level,
+        duration_minutes: form.duration_minutes, 
+        frequency_per_week: form.frequency_per_week,
+        benefits: form.benefits.split('\n').filter(b => b.trim()), 
+        instructions: form.instructions.split('\n').filter(i => i.trim()),
+        tips: form.tips || null, 
+        warnings: form.warnings || null,
       }
-      if (initialData?.id) { await updateRoadmapActivity(initialData.id, payload) } else { await createRoadmapActivity(payload) }
-      onSuccess(); onClose()
-    } catch (err: any) { setError(err?.message || 'Gagal menyimpan.') } finally { setSaving(false) }
+      
+      if (initialData?.id) { 
+        await updateRoadmapActivity(initialData.id, payload) 
+      } else { 
+        await createRoadmapActivity(payload) 
+      }
+      onSuccess()
+      onClose()
+    } catch (err: any) { 
+      setError(err?.message || 'Gagal menyimpan.') 
+    } finally { 
+      setSaving(false) 
+    }
   }
 
   if (!isOpen) return null
@@ -62,9 +106,13 @@ export function RoadmapModal({ isOpen, onClose, onSuccess, initialData }: Roadma
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <motion.div initial={{ opacity: 0, scale: 0.97, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 20 }}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.97, y: 20 }} 
+        animate={{ opacity: 1, scale: 1, y: 0 }} 
+        exit={{ opacity: 0, scale: 0.97, y: 20 }}
         className="relative rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl flex flex-col"
-        style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+        style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}
+      >
         
         {/* Header */}
         <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid var(--neutral-200)' }}>
@@ -124,33 +172,21 @@ export function RoadmapModal({ isOpen, onClose, onSuccess, initialData }: Roadma
                     </div>
                  </div>
                  <div className="grid grid-cols-2 gap-3">
-                     <div className="space-y-1.5">
-                        <label className="text-xs font-semibold font-body" style={labelStyle}>Fase Monitoring (Min - Max)</label>
-                       <div className="flex gap-2">
-                           <select value={form.min_level} onChange={(e) => setForm(p => ({...p, min_level: Number(e.target.value)}))} className="flex-1 h-11 rounded-xl px-3 text-sm font-body appearance-none cursor-pointer" style={inputStyle}>
-                             {[1,2,3].map(t => <option key={t} value={t}>Fase {t}</option>)}
-                           </select>
-                           <select value={form.max_level} onChange={(e) => setForm(p => ({...p, max_level: Number(e.target.value)}))} className="flex-1 h-11 rounded-xl px-3 text-sm font-body appearance-none cursor-pointer" style={inputStyle}>
-                             {[1,2,3].map(t => <option key={t} value={t}>Fase {t}</option>)}
-                           </select>
-                       </div>
+                    <div className="space-y-1.5 flex-1">
+                      <label className="text-xs font-semibold font-body" style={labelStyle}>Durasi (menit)</label>
+                      <input type="number" value={form.duration_minutes} onChange={(e) => setForm(p => ({...p, duration_minutes: Number(e.target.value)}))} className="w-full h-11 rounded-xl px-3 text-sm font-body" style={inputStyle} />
                     </div>
-                    <div className="flex gap-2">
-                       <div className="flex-1 space-y-1.5">
-                          <label className="text-xs font-semibold font-body" style={labelStyle}>Durasi (m)</label>
-                       </div>
-                       <div className="flex-1 space-y-1.5">
-                          <label className="text-xs font-semibold font-body" style={labelStyle}>Freq/week</label>
-                          <input type="number" value={form.frequency_per_week} onChange={(e) => setForm(p => ({...p, frequency_per_week: Number(e.target.value)}))} className="w-full h-11 rounded-xl px-3 text-sm font-body" style={inputStyle} />
-                       </div>
+                    <div className="space-y-1.5 flex-1">
+                      <label className="text-xs font-semibold font-body" style={labelStyle}>Frekuensi / Minggu</label>
+                      <input type="number" value={form.frequency_per_week} onChange={(e) => setForm(p => ({...p, frequency_per_week: Number(e.target.value)}))} className="w-full h-11 rounded-xl px-3 text-sm font-body" style={inputStyle} />
                     </div>
                  </div>
                  <div className="p-4 rounded-xl" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)' }}>
                     <div className="flex items-center gap-2 mb-2">
                        <Info className="w-3.5 h-3.5" style={{ color: 'var(--primary-700)' }} />
-                       <span className="text-xs font-bold font-heading" style={{ color: 'var(--primary-700)' }}>Catatan</span>
+                       <span className="text-xs font-bold font-heading" style={{ color: 'var(--primary-700)' }}>Informasi</span>
                     </div>
-                     <p className="text-xs font-body leading-relaxed" style={{ color: 'var(--primary-600)' }}>Pastikan aktivitas sesuai dengan panduan medis untuk rentang fase pemantauan yang dipilih.</p>
+                    <p className="text-xs font-body leading-relaxed" style={{ color: 'var(--primary-600)' }}>Pastikan aktivitas ini sesuai dengan pedoman kesehatan Glunova untuk membantu pasien secara optimal.</p>
                  </div>
               </div>
               <div className="space-y-5">

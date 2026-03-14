@@ -12,7 +12,7 @@ interface RoadmapHeaderProps {
 }
 
 export function RoadmapHeader({ progress, activities }: RoadmapHeaderProps) {
-  const { monitoring_week } = useHealthData()
+  const { profile } = useHealthData()
   const completedCount = progress.filter(p => p.status === 'completed' && activities.some(a => a.id === p.activity_id)).length
   const totalCount = activities.length
   const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
@@ -38,9 +38,6 @@ export function RoadmapHeader({ progress, activities }: RoadmapHeaderProps) {
              </div>
 
              <div className="flex flex-wrap items-center gap-3">
-                <Badge className="rounded-full bg-[color:var(--neutral-100)] text-[color:var(--neutral-700)] border border-[color:var(--neutral-200)] font-black uppercase tracking-[0.2em] px-5 py-2 text-xs">
-                  Minggu Monitoring: {monitoring_week}
-                </Badge>
              </div>
              
              <p className="text-lg font-medium text-[color:var(--neutral-500)] max-w-xl leading-relaxed">

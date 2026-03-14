@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { toast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
-import { calculateMonitoringLevel } from '@/lib/date-utils'
 import { upsertUserProfile, deleteFullAccount } from '@/services/userService'
 import { UserProfile } from '@/types/education'
 import { useHealthData } from '@/hooks/useHealthData'
@@ -31,19 +30,7 @@ export default function ProfilePage() {
     if (profile) setFormData(profile)
   }, [profile])
 
-  const deriveMonitoringData = (start?: string) => {
-    if (!start) return { week: undefined, targetDate: '' }
-    const st = new Date(start)
-    if (isNaN(st.getTime())) return { week: undefined, targetDate: '' }
-    const today = new Date()
-    const diffDays = Math.floor((today.getTime() - st.getTime()) / (1000 * 60 * 60 * 24))
-    const week = Math.max(1, Math.floor(diffDays / 7) + 1)
-    const target = new Date(st)
-    target.setDate(target.getDate() + 90) // 90 days cycle for HbA1c monitoring
-    return { week, targetDate: target.toISOString().slice(0, 10) }
-  }
-
-  const derivedMonitoring = useMemo(() => deriveMonitoringData(formData.monitoring_start_date), [formData.monitoring_start_date])
+  
   
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,8 +41,7 @@ export default function ProfilePage() {
         ...(profile || {}),
         ...formData,
         id: user.id,
-        monitoring_target_date: derivedMonitoring.targetDate || formData.monitoring_target_date,
-        monitoring_week: derivedMonitoring.week || formData.monitoring_week,
+        
         updated_at: new Date().toISOString(),
       }
       await upsertUserProfile(payload)
@@ -277,19 +263,8 @@ export default function ProfilePage() {
                            <p className="text-[13px] text-[color:var(--neutral-500)] mt-1">Data klinis dasar untuk mengatur perhitungan siklus dan panduan nutrisi Anda.</p>
                         </div>
 
-                        <div className="bg-[color:var(--neutral-50)] rounded-xl p-4 sm:p-5 flex items-start gap-4 border border-[color:var(--neutral-200)]">
-                           <div className="w-10 h-10 bg-white rounded-lg border border-[color:var(--neutral-200)] flex items-center justify-center shrink-0">
-                              <Sparkles className="w-5 h-5 text-[color:var(--primary-600)]" />
-                           </div>
-                           <div>
-                               <p className="text-[13px] font-bold text-[color:var(--neutral-900)]">Estimasi Level Otomatis</p>
-                              <p className="text-[12px] text-neutral-700 mt-1">Sistem akan secara otomatis menghitung usia pemantauan dan target evaluasi menggunakan tanggal mulai program.</p>
-                           </div>
-                        </div>
 
                         <div className="grid sm:grid-cols-2 gap-6">
-                           <Field type="date" label="Tanggal Mulai Pemantauan / Diagnosis" value={formData.monitoring_start_date} onChange={(v:string) => setFormData({...formData, monitoring_start_date: v})} />
-                           <Field type="date" label="Target Evaluasi Berikutnya" value={derivedMonitoring.targetDate || formData.monitoring_target_date} disabled={!!derivedMonitoring.targetDate} onChange={(v:string) => setFormData({...formData, monitoring_target_date: v})} />
                            
                            <div className="sm:col-span-2 grid grid-cols-2 gap-6 pt-6 border-t border-[color:var(--neutral-200)]">
                              <Field id="weight" data-testid="input-weight" type="number" step="0.1" icon={Scale} label="Berat Awal (Kg)" value={formData.current_weight} onChange={(v:string) => setFormData({...formData, current_weight: Number(v)})} />

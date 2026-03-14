@@ -17,23 +17,12 @@ export async function GET(request: Request) {
         .eq('id', session.user.id)
         .maybeSingle()
 
-      // If profile doesn't exist yet (trigger delay) or onboarding is incomplete
-      // we redirect to onboarding if it's a standard user
       const userRole = profile?.role || session.user.user_metadata?.role || 'user'
-      const onboardingCompleted = profile?.onboarding_completed ?? false
 
       if (userRole === 'admin') {
         return NextResponse.redirect(`${origin}/admin/dashboard`)
       }
 
-      if (userRole === 'doctor') {
-        return NextResponse.redirect(`${origin}/doctor`)
-      }
-
-      if (userRole === 'user') {
-        return NextResponse.redirect(`${origin}${next}`)
-      }
-      
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, CheckCircle2, Calendar as CalendarIcon, Star
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { EducationContent, getPhaseFromDay, getPhaseInfo } from '@/types/education';
+import { EducationContent } from '@/types/education';
 
 interface EducationCalendarViewProps {
   contents: EducationContent[];
@@ -37,16 +37,8 @@ export function EducationCalendarView({
     );
   }, [monthStartDay, monthEndDay]);
 
-  const currentMonthPhase = getPhaseFromDay(monthStartDay);
-  const phaseInfo = getPhaseInfo(currentMonthPhase);
-  const phaseTone =
-    currentMonthPhase === 'kesehatan'
-      ? 'bg-[color:var(--primary-700)]'
-      : currentMonthPhase === 'fase_2'
-        ? 'bg-sky-500'
-        : currentMonthPhase === 'fase_3'
-          ? 'bg-emerald-500'
-          : 'bg-slate-700';
+  // Tone for the education badge removed as part of fase cleanup
+  const phaseTone = 'bg-[color:var(--primary-700)]';
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-100/80 bg-white/95 shadow-[0_10px_26px_rgba(15,23,42,0.06)]">
@@ -96,7 +88,7 @@ export function EducationCalendarView({
               "mb-2 rounded-xl px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em]",
               phaseTone
             )}>
-              {phaseInfo?.label}
+              Kesehatan Glunova
             </Badge>
          </div>
 

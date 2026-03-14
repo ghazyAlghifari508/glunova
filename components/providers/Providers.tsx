@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import { getUserProfile } from '@/services/userService'
 import { UserProfile } from '@/types/education'
-import { calculateMonitoringWeek, calculateMonitoringLevel } from '@/lib/date-utils'
 import { getRoadmapActivities, getUserRoadmapProgress } from '@/services/roadmapService'
 import { getAllEducationContent, getUserProgress as getEducationProgress, getProgressStats } from '@/services/educationService'
 import { getUserConsultations, getDoctorConsultations, getDoctorEarnings } from '@/services/consultationService'
@@ -96,8 +95,6 @@ interface UserContextType {
   role: string | null
   loading: boolean
   error: string | null
-  monitoring_week: number
-  monitoring_level: number
   refreshProfile: () => Promise<void>
   // Cached Data
   roadmap: { activities: RoadmapActivity[]; progress: UserRoadmapProgress[]; loading: boolean }
@@ -164,9 +161,6 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await getUserProfile(userId)
       if (data) {
-        if (!data.monitoring_week && data.monitoring_start_date) {
-          data.monitoring_week = calculateMonitoringWeek(data.monitoring_start_date)
-        }
         setProfile(data)
         lastFetchedId.current = userId
       }
@@ -287,17 +281,12 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     }
   }, [userId, authLoading, loadData])
 
-  const monitoring_week = profile?.monitoring_week || 0
-  const monitoring_level = Number(profile?.monitoring_level) || calculateMonitoringLevel(monitoring_week)
-
   return (
     <UserContext.Provider value={{ 
       profile, 
       role,
       loading: authLoading || profileLoading, 
       error, 
-      monitoring_week, 
-      monitoring_level,
       refreshProfile,
       roadmap,
       education,

@@ -17,7 +17,7 @@ import {
   toggleFavoriteStatus,
   getUserProgress,
 } from '@/services/educationService'
-import { EducationContent, getPhaseInfo, UserProgress } from '@/types/education'
+import { EducationContent, UserProgress } from '@/types/education'
 import { useHealthData } from '@/hooks/useHealthData'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
