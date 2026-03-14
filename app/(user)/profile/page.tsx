@@ -32,15 +32,15 @@ export default function ProfilePage() {
   }, [profile])
 
   const deriveMonitoringData = (start?: string) => {
-    if (!start) return { week: undefined, level: undefined, targetDate: '' }
+    if (!start) return { week: undefined, targetDate: '' }
     const st = new Date(start)
-    if (isNaN(st.getTime())) return { week: undefined, level: undefined, targetDate: '' }
+    if (isNaN(st.getTime())) return { week: undefined, targetDate: '' }
     const today = new Date()
     const diffDays = Math.floor((today.getTime() - st.getTime()) / (1000 * 60 * 60 * 24))
     const week = Math.max(1, Math.floor(diffDays / 7) + 1)
     const target = new Date(st)
     target.setDate(target.getDate() + 90) // 90 days cycle for HbA1c monitoring
-    return { week, level: calculateMonitoringLevel(week), targetDate: target.toISOString().slice(0, 10) }
+    return { week, targetDate: target.toISOString().slice(0, 10) }
   }
 
   const derivedMonitoring = useMemo(() => deriveMonitoringData(formData.monitoring_start_date), [formData.monitoring_start_date])
@@ -56,7 +56,6 @@ export default function ProfilePage() {
         id: user.id,
         monitoring_target_date: derivedMonitoring.targetDate || formData.monitoring_target_date,
         monitoring_week: derivedMonitoring.week || formData.monitoring_week,
-        monitoring_level: derivedMonitoring.level || formData.monitoring_level,
         updated_at: new Date().toISOString(),
       }
       await upsertUserProfile(payload)
@@ -106,7 +105,7 @@ export default function ProfilePage() {
     <div className="flex flex-col gap-1.5 w-full">
       <label className="text-[13px] font-semibold text-[color:var(--neutral-700)] ml-1">{label}</label>
       <div className="relative">
-        {Icon && <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[color:var(--neutral-400)] transition-colors pointer-events-none" />}
+        {Icon && <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-neutral-600 transition-colors pointer-events-none" />}
         <input 
           id={id}
           data-testid={testId}
@@ -121,7 +120,7 @@ export default function ProfilePage() {
             Icon ? "pl-11 pr-4" : "px-4",
             disabled 
               ? "bg-[color:var(--neutral-50)] border-[color:var(--neutral-200)] text-[color:var(--neutral-500)] cursor-not-allowed" 
-              : "bg-white border-[color:var(--neutral-200)] focus:border-[color:var(--primary-500)] focus:ring-4 focus:ring-[color:var(--primary-100)] text-[color:var(--neutral-900)] placeholder:text-[color:var(--neutral-400)]"
+              : "bg-white border-[color:var(--neutral-200)] focus:border-[color:var(--primary-500)] focus:ring-4 focus:ring-[color:var(--primary-100)] text-[color:var(--neutral-900)] placeholder:text-neutral-600"
           )}
         />
       </div>
@@ -190,7 +189,7 @@ export default function ProfilePage() {
             </nav>
             
             <div className="pt-6 border-t border-[color:var(--neutral-200)]">
-               <button onClick={async () => { await supabase.auth.signOut(); window.location.href='/' }} className="w-full flex items-center justify-center gap-2 p-3 text-[13px] font-semibold text-[color:var(--neutral-600)] hover:text-rose-600 transition-colors rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100">
+               <button onClick={async () => { await supabase.auth.signOut(); window.location.href='/' }} className="w-full flex items-center justify-center gap-2 p-3 text-[13px] font-semibold text-neutral-700 hover:text-rose-600 transition-colors rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100">
                   <LogOut className="w-4 h-4" /> Keluar dari Akun
                </button>
             </div>
@@ -251,6 +250,23 @@ export default function ProfilePage() {
                             ))}
                           </div>
                         </div>
+
+                        {/* Save Button for Personal Tab */}
+                        <div className="mt-10 pt-6 border-t border-[color:var(--neutral-200)] flex justify-end">
+                          <button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className="h-12 px-10 rounded-xl bg-[#2563EB] text-[#FFFFFF] font-bold text-sm transition-all hover:bg-[#1D4ED8] active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+                            style={{ 
+                              backgroundColor: '#2563EB', 
+                              color: '#FFFFFF',
+                              opacity: isSubmitting ? 0.6 : 1,
+                              cursor: isSubmitting ? 'not-allowed' : 'pointer'
+                            }}
+                          >
+                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Simpan Profil'}
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -267,7 +283,7 @@ export default function ProfilePage() {
                            </div>
                            <div>
                                <p className="text-[13px] font-bold text-[color:var(--neutral-900)]">Estimasi Level Otomatis</p>
-                              <p className="text-[12px] text-[color:var(--neutral-600)] mt-1">Sistem akan secara otomatis menghitung usia pemantauan dan target evaluasi menggunakan tanggal mulai program.</p>
+                              <p className="text-[12px] text-neutral-700 mt-1">Sistem akan secara otomatis menghitung usia pemantauan dan target evaluasi menggunakan tanggal mulai program.</p>
                            </div>
                         </div>
 
@@ -282,6 +298,18 @@ export default function ProfilePage() {
                                 <Field id="hba1c" data-testid="input-hba1c" type="number" step="0.01" icon={Activity} label="Kadar HbA1c Terakhir (%)" value={formData.hba1c} onChange={(v:string) => setFormData({...formData, hba1c: Number(v)})} desc="Parameter penting untuk evaluasi risiko diabetes jangka panjang." />
                              </div>
                            </div>
+                        </div>
+
+                        {/* Save Button for Health Tab */}
+                        <div className="mt-10 pt-6 border-t border-[color:var(--neutral-200)] flex justify-end">
+                          <button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className="h-12 px-10 rounded-xl bg-primary-600 text-white font-bold text-sm transition-all hover:bg-primary-700 active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2 shadow-lg shadow-primary-600/20"
+                            style={{ backgroundColor: '#2563EB', color: '#FFFFFF' }}
+                          >
+                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Simpan Profil'}
+                          </button>
                         </div>
                       </div>
                     )}
@@ -328,18 +356,6 @@ export default function ProfilePage() {
                     )}
                   </motion.div>
                 </AnimatePresence>
-
-                {activeTab !== 'security' && (
-                  <div className="mt-10 pt-6 border-t border-[color:var(--neutral-200)] flex justify-end">
-                    <button 
-                      type="submit" 
-                      disabled={isSubmitting}
-                      className="h-11 px-8 rounded-xl bg-[color:var(--primary-600)] font-bold text-[14px] text-white transition-all hover:bg-[color:var(--primary-700)] disabled:opacity-60 flex items-center justify-center gap-2"
-                    >
-                       {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Simpan Profil'}
-                    </button>
-                  </div>
-                )}
               </form>
             </div>
           </main>

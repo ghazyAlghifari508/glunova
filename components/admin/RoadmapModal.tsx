@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 
 interface RoadmapActivity {
   id: string; activity_name: string; category: 'exercise' | 'nutrition' | 'sleep' | 'mental' | 'checkup' | 'bonding'
-  description: string; difficulty_level: number; min_level: number; max_level: number
+  description: string; difficulty_level: number
   duration_minutes: number; frequency_per_week: number; benefits: string[]; instructions: string[]; tips: string | null; warnings: string | null
 }
 
@@ -23,21 +23,21 @@ export function RoadmapModal({ isOpen, onClose, onSuccess, initialData }: Roadma
   const [error, setError] = useState('')
   const [form, setForm] = useState({
     activity_name: '', category: 'exercise' as RoadmapActivity['category'], description: '', difficulty_level: 1,
-    min_level: 1, max_level: 3, duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '',
+    duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '',
   })
 
   useEffect(() => {
     if (initialData) {
       setForm({
         activity_name: initialData.activity_name, category: initialData.category, description: initialData.description || '',
-        difficulty_level: initialData.difficulty_level, min_level: initialData.min_level || 1, max_level: initialData.max_level || 3,
+        difficulty_level: initialData.difficulty_level,
         duration_minutes: initialData.duration_minutes || 0, frequency_per_week: initialData.frequency_per_week || 0,
         benefits: Array.isArray(initialData.benefits) ? initialData.benefits.join('\n') : '',
         instructions: Array.isArray(initialData.instructions) ? initialData.instructions.join('\n') : '',
         tips: initialData.tips || '', warnings: initialData.warnings || '',
       })
     } else {
-      setForm({ activity_name: '', category: 'exercise', description: '', difficulty_level: 1, min_level: 1, max_level: 3, duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '' })
+      setForm({ activity_name: '', category: 'exercise', description: '', difficulty_level: 1, duration_minutes: 15, frequency_per_week: 3, benefits: '', instructions: '', tips: '', warnings: '' })
     }
   }, [initialData, isOpen])
 
@@ -48,7 +48,7 @@ export function RoadmapModal({ isOpen, onClose, onSuccess, initialData }: Roadma
       setSaving(true)
       const payload = {
         activity_name: form.activity_name, category: form.category, description: form.description, difficulty_level: form.difficulty_level,
-        min_level: form.min_level, max_level: form.max_level, duration_minutes: form.duration_minutes, frequency_per_week: form.frequency_per_week,
+        duration_minutes: form.duration_minutes, frequency_per_week: form.frequency_per_week,
         benefits: form.benefits.split('\n').filter(b => b.trim()), instructions: form.instructions.split('\n').filter(i => i.trim()),
         tips: form.tips || null, warnings: form.warnings || null,
       }

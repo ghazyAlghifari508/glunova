@@ -245,14 +245,12 @@ async function deleteItem(table: string, id: string) {
 export async function fetchEducationContents(filters?: {
   search?: string
   category?: string
-  phase?: string
 }): Promise<EducationContent[]> {
   await checkAdmin()
   const supabase = await createClient()
   let query = supabase.from('education_contents').select('*')
 
   if (filters?.category) query = query.eq('category', filters.category)
-  if (filters?.phase) query = query.eq('phase', filters.phase)
   if (filters?.search) query = query.ilike('title', `%${filters.search}%`)
 
   const { data, error } = await query.order('day', { ascending: true })
@@ -297,11 +295,11 @@ export async function fetchRoadmapById(id: string) {
   return fetchById('roadmap_activities', id)
 }
 
-export async function createRoadmapActivity(activity: CreateRoadmapActivityInput) {
+export async function createRoadmapActivity(activity: Omit<RoadmapActivity, 'id' | 'created_at' | 'updated_at'>) {
   return createItem('roadmap_activities', activity)
 }
 
-export async function updateRoadmapActivity(id: string, activity: UpdateRoadmapActivityInput) {
+export async function updateRoadmapActivity(id: string, activity: Partial<Omit<RoadmapActivity, 'id' | 'created_at' | 'updated_at'>>) {
   return updateItem('roadmap_activities', id, activity)
 }
 

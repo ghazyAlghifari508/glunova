@@ -39,9 +39,8 @@ const difficultyConfig: Record<number, { label: string; color: string; bg: strin
 const defaultDifficulty = { label: 'Standar', color: 'text-neutral-700', bg: 'bg-neutral-50' }
 
 export default function RoadmapPage() {
-  const { profile, loading, activeLevel, monitoring_week, roadmap, education, loadRoadmap, loadEducation } = useHealthData()
+  const { profile, loading, roadmap, education, loadRoadmap, loadEducation } = useHealthData()
   const [category, setCategory] = useState<CategoryFilter>('all')
-  const [currentLevel, setCurrentLevel] = useState<number>(Number(profile?.monitoring_level) || 1)
   const [journal, setJournal] = useState('')
   const [journalSaved, setJournalSaved] = useState<string | null>(null)
   const [selectedActivity, setSelectedActivity] = useState<any>(null)
@@ -49,17 +48,13 @@ export default function RoadmapPage() {
 
   useEffect(() => {
     if (profile) {
-      if (!currentLevel && profile.monitoring_level) {
-        const lv = Number(profile.monitoring_level);
-        setTimeout(() => setCurrentLevel(lv), 0)
-      }
       const key = `roadmap_journal_${profile.id}_${new Date().toISOString().slice(0, 10)}`
       const savedJournal = localStorage.getItem(key)
       if (savedJournal) {
         setTimeout(() => setJournal(savedJournal), 0)
       }
     }
-  }, [profile, currentLevel])
+  }, [profile])
 
   useEffect(() => {
     if (profile && !loading && !roadmap.loading) {
@@ -73,11 +68,10 @@ export default function RoadmapPage() {
 
   const filteredActivities = useMemo(() => {
     return activities.filter((act) => {
-      const matchLevel = act.min_level <= currentLevel && act.max_level >= currentLevel
       const matchCategory = category === 'all' || act.category === category
-      return matchLevel && matchCategory
+      return matchCategory
     })
-  }, [activities, currentLevel, category])
+  }, [activities, category])
 
   const getActivityStatus = useCallback((id: string) => {
     const actProgress = progress.find((p) => p.activity_id === id)
@@ -180,27 +174,25 @@ export default function RoadmapPage() {
   }
 
   const todayLabel = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })
-  const currentLevelActivities = activities.filter(a => 
-    a.min_level <= currentLevel && a.max_level >= currentLevel
-  )
+  const activitiesToCount = activities
   const categoryCounts = {
-    all: currentLevelActivities.length,
-    exercise: currentLevelActivities.filter(a => a.category === 'exercise').length,
-    nutrition: currentLevelActivities.filter(a => a.category === 'nutrition').length
+    all: activitiesToCount.length,
+    exercise: activitiesToCount.filter(a => a.category === 'exercise').length,
+    nutrition: activitiesToCount.filter(a => a.category === 'nutrition').length
   }
   
   // Create a 5-week sliding window centered on the current monitoring week
   const startWeek = Math.max(1, monitoringWeek - 2)
   const timelineWeeks = Array.from({length: 5}, (_, i) => startWeek + i).filter(w => w <= 40)
   
-  const completedCount = progress.filter(p => p.status === 'completed' && currentLevelActivities.some(a => a.id === p.activity_id)).length
+  const completedCount = progress.filter(p => p.status === 'completed' && activities.some(a => a.id === p.activity_id)).length
   const maxStreak = progress.length > 0 ? Math.max(...progress.map(p => p.streak_count || 0)) : 0
 
   return (
     <div className="min-h-screen pb-32 font-sans selection:bg-[color:var(--primary-200)] text-[color:var(--neutral-900)] selection:text-[color:var(--primary-900)] overflow-x-hidden">
       <RoadmapHeader 
         progress={progress} 
-        activities={currentLevelActivities}
+        activities={activities}
       />
       
       <CategoryFilters 
@@ -212,8 +204,6 @@ export default function RoadmapPage() {
           { key: 'nutrition', label: 'Diet & Nutrisi' }
         ]}
         categoryCounts={categoryCounts}
-        level={currentLevel}
-        setLevel={setCurrentLevel}
       />
 
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-4 gap-10">
@@ -225,7 +215,6 @@ export default function RoadmapPage() {
               statusConfig={statusConfig}
               difficultyConfig={difficultyConfig}
               defaultDifficulty={defaultDifficulty}
-              level={currentLevel}
               setSelectedActivity={setSelectedActivity}
               setIsModalOpen={setIsModalOpen}
               handleComplete={handleComplete}
@@ -241,9 +230,8 @@ export default function RoadmapPage() {
              handleSaveJournal={handleSaveJournal}
              journalSaved={journalSaved}
              completedCount={completedCount}
-             activitiesCount={currentLevelActivities.length}
+             activitiesCount={activities.length}
              streakDays={maxStreak}
-             level={currentLevel}
            />
         </div>
       </div>

@@ -12,7 +12,7 @@ interface RoadmapHeaderProps {
 }
 
 export function RoadmapHeader({ progress, activities }: RoadmapHeaderProps) {
-  const { monitoring_week, activeLevel } = useHealthData()
+  const { monitoring_week } = useHealthData()
   const completedCount = progress.filter(p => p.status === 'completed' && activities.some(a => a.id === p.activity_id)).length
   const totalCount = activities.length
   const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
@@ -38,16 +38,13 @@ export function RoadmapHeader({ progress, activities }: RoadmapHeaderProps) {
              </div>
 
              <div className="flex flex-wrap items-center gap-3">
-               <Badge className="rounded-full bg-[color:var(--neutral-100)] text-[color:var(--neutral-700)] border border-[color:var(--neutral-200)] font-black uppercase tracking-[0.2em] px-5 py-2 text-xs">
-                 Minggu Monitoring: {monitoring_week}
-               </Badge>
-               <Badge className="rounded-full bg-[color:var(--warning)]/10 text-[color:var(--warning)] border border-[color:var(--warning)]/20 font-black uppercase tracking-[0.2em] px-5 py-2 text-xs">
-                 Fase Monitoring {activeLevel}
-               </Badge>
+                <Badge className="rounded-full bg-[color:var(--neutral-100)] text-[color:var(--neutral-700)] border border-[color:var(--neutral-200)] font-black uppercase tracking-[0.2em] px-5 py-2 text-xs">
+                  Minggu Monitoring: {monitoring_week}
+                </Badge>
              </div>
              
              <p className="text-lg font-medium text-[color:var(--neutral-500)] max-w-xl leading-relaxed">
-               Peta jalan harian adaptif untuk mengontrol gula darah, nutrisi, dan target kesehatan secara presisi.
+                Peta jalan harian adaptif untuk mengontrol gula darah, nutrisi, dan target kesehatan secara presisi.
              </p>
           </motion.div>
 
@@ -61,7 +58,7 @@ export function RoadmapHeader({ progress, activities }: RoadmapHeaderProps) {
              <div className="bg-white border border-[color:var(--neutral-200)] rounded-[2rem] p-6 md:p-8 shadow-sm flex items-center justify-between lg:justify-start gap-8 lg:gap-10 w-full">
                 <div>
                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[color:var(--neutral-400)] mb-2 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-[color:var(--warning)]" /> Pencapaian Fase
+                      <Target className="w-4 h-4 text-[color:var(--warning)]" /> Pencapaian
                    </p>
                    <div className="flex items-baseline gap-1">
                       <span className="text-3xl md:text-4xl font-heading font-black text-[color:var(--neutral-900)]">{percentage}</span>
@@ -77,7 +74,6 @@ export function RoadmapHeader({ progress, activities }: RoadmapHeaderProps) {
                    </p>
                    <div className="flex items-baseline gap-1">
                       <span className="text-2xl md:text-3xl font-heading font-black text-[color:var(--neutral-900)]">{completedCount}</span>
-                      <span className="text-sm font-black" style={{ color: 'var(--primary-700)' }}>Fase {activeLevel}</span>
                    </div>
                 </div>
              </div>

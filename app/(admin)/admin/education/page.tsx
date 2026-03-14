@@ -3,23 +3,20 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Plus, Search, Pencil, Trash2, Tag, Calendar, Layers, ChevronRight } from 'lucide-react'
+import { BookOpen, Plus, Search, Pencil, Trash2, Tag, Calendar, ChevronRight } from 'lucide-react'
 import { deleteEducationContent } from '@/services/adminService'
 import { useAdminContext } from '@/components/providers/Providers'
 import { EducationModal } from '@/components/admin/EducationModal'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { Category, Phase } from '@/types/education'
+import type { Category } from '@/types/education'
 import { cn } from '@/lib/utils'
 
 interface EducationContent {
-  id: string; day: number; phase: Phase; month: number; title: string
+  id: string; day: number; month: number; title: string
   description: string; content: string; tips: string[] | string
   category: Category; thumbnail_url?: string; created_at: string
 }
 
-const phaseLabels: Record<string, string> = {
-  kesehatan: 'Kesehatan Umum', fase_2: 'Prediabetes', fase_3: 'Diabetes Tipe 1', fase_4: 'Diabetes Tipe 2',
-}
 const categoryLabels: Record<string, string> = {
   nutrisi: 'Nutrisi', kesehatan: 'Kesehatan', stimulasi: 'Stimulasi', perkembangan: 'Perkembangan', aktivitas: 'Aktivitas', imunisasi: 'Imunisasi',
 }
@@ -32,24 +29,23 @@ export default function EducationManagementPage() {
   const [deleting, setDeleting] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
-  const [phaseFilter, setPhaseFilter] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedContent, setSelectedContent] = useState<EducationContent | null>(null)
 
   useEffect(() => {
-    if (!searchQuery && !categoryFilter && !phaseFilter && adminContext?.educationContents) setContents(adminContext.educationContents as EducationContent[])
-  }, [adminContext?.educationContents, searchQuery, categoryFilter, phaseFilter])
+    if (!searchQuery && !categoryFilter && adminContext?.educationContents) setContents(adminContext.educationContents as EducationContent[])
+  }, [adminContext?.educationContents, searchQuery, categoryFilter])
 
   const loadData = useCallback(async () => {
-    if (!searchQuery && !categoryFilter && !phaseFilter && adminContext?.educationContents?.length) { setContents(adminContext.educationContents as EducationContent[]); return }
+    if (!searchQuery && !categoryFilter && adminContext?.educationContents?.length) { setContents(adminContext.educationContents as EducationContent[]); return }
     try {
       const { fetchEducationContents } = await import('@/services/adminService')
-      const data = await fetchEducationContents({ search: searchQuery || undefined, category: categoryFilter || undefined, phase: phaseFilter || undefined })
+      const data = await fetchEducationContents({ search: searchQuery || undefined, category: categoryFilter || undefined })
       setContents(data as EducationContent[])
     } catch (error) {}
-  }, [searchQuery, categoryFilter, phaseFilter, adminContext?.educationContents])
+  }, [searchQuery, categoryFilter, adminContext?.educationContents])
 
-  useEffect(() => { loadData() }, [categoryFilter, phaseFilter, loadData])
+  useEffect(() => { loadData() }, [categoryFilter, loadData])
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -86,27 +82,17 @@ export default function EducationManagementPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3">
-           <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
               <Tag className="w-3.5 h-3.5" style={{ color: 'var(--neutral-400)' }} />
               <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}
                  className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer font-body" style={{ color: 'var(--neutral-700)' }}>
                  <option value="">Semua Kategori</option>
                  {Object.entries(categoryLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
               </select>
-           </div>
-           <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}>
-              <Layers className="w-3.5 h-3.5" style={{ color: 'var(--neutral-400)' }} />
-              <select value={phaseFilter} onChange={(e) => setPhaseFilter(e.target.value)}
-                 className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer font-body" style={{ color: 'var(--neutral-700)' }}>
-                 <option value="">Semua Fase</option>
-                 {Object.entries(phaseLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-              </select>
-           </div>
-           <div className="ml-auto hidden xl:flex items-center gap-2">
+            </div>
+            <div className="ml-auto hidden xl:flex items-center gap-2">
               <span className="text-xs font-semibold font-body" style={{ color: 'var(--neutral-500)' }}>Total: {contents.length} konten</span>
-           </div>
-        </div>
+            </div>
 
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -132,22 +118,18 @@ export default function EducationManagementPage() {
                           </button>
                        </div>
                     </div>
-                    <div className="flex-1 space-y-3">
-                       <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider mb-1 font-heading" style={{ color: 'var(--primary-700)' }}>{categoryLabels[content.category] || content.category}</p>
-                          <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] font-heading" style={{ color: 'var(--neutral-900)' }}>{content.title}</h3>
-                       </div>
-                       <div className="flex items-center gap-3 pt-3" style={{ borderTop: '1px solid var(--neutral-100)' }}>
-                          <div className="flex items-center gap-1.5">
-                             <Layers className="w-3 h-3" style={{ color: 'var(--neutral-400)' }} />
-                             <span className="text-[10px] font-semibold font-body" style={{ color: 'var(--neutral-500)' }}>{phaseLabels[content.phase] || content.phase}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 ml-auto">
-                             <Calendar className="w-3 h-3" style={{ color: 'var(--neutral-400)' }} />
-                             <span className="text-[10px] font-semibold font-body" style={{ color: 'var(--neutral-500)' }}>Bulan {content.month}</span>
-                          </div>
-                       </div>
-                    </div>
+                     <div className="flex-1 space-y-3">
+                        <div>
+                           <p className="text-[10px] font-bold uppercase tracking-wider mb-1 font-heading" style={{ color: 'var(--primary-700)' }}>{categoryLabels[content.category] || content.category}</p>
+                           <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] font-heading" style={{ color: 'var(--neutral-900)' }}>{content.title}</h3>
+                        </div>
+                        <div className="flex items-center gap-3 pt-3" style={{ borderTop: '1px solid var(--neutral-100)' }}>
+                           <div className="flex items-center gap-1.5 ml-auto">
+                              <Calendar className="w-3 h-3" style={{ color: 'var(--neutral-400)' }} />
+                              <span className="text-[10px] font-semibold font-body" style={{ color: 'var(--neutral-500)' }}>Bulan {content.month}</span>
+                           </div>
+                        </div>
+                     </div>
                  </motion.div>
               ))}
            </AnimatePresence>

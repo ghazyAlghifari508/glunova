@@ -10,17 +10,13 @@ interface CategoryFiltersProps {
   setCategory: (val: CategoryFilter) => void
   categoryTabs: Array<{ key: CategoryFilter; label: string }>
   categoryCounts: Record<CategoryFilter, number>
-  level: number
-  setLevel: (val: number) => void
 }
 
 export function CategoryFilters({
   category,
   setCategory,
   categoryTabs,
-  categoryCounts,
-  level,
-  setLevel
+  categoryCounts
 }: CategoryFiltersProps) {
   return (
     <section className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 relative z-30 -mt-8 mb-12">
@@ -60,28 +56,7 @@ export function CategoryFilters({
           </div>
 
           <div className="flex items-center gap-4 lg:pl-6 lg:border-l border-neutral-200">
-             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 hidden sm:block">Perawatan</p>
-             <div className="inline-flex items-center gap-1 rounded-2xl bg-neutral-100 p-1.5 shadow-inner">
-               {[1, 2, 3].map((l) => {
-                 const isActive = level === l
-                 return (
-                   <button
-                     key={l}
-                     onClick={() => setLevel(l)}
-                     className={`relative rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-[0.1em] transition-all duration-300 ${
-                       isActive
-                         ? 'bg-white text-primary-600 shadow-md'
-                         : 'text-neutral-400 hover:text-neutral-600'
-                     }`}
-                   >
-                     {isActive && (
-                        <motion.div layoutId="active-fase" className="absolute inset-0 bg-white rounded-xl shadow-sm border border-neutral-200/50" />
-                     )}
-                     <span className="relative z-10">Fase {l}</span>
-                   </button>
-                 )
-               })}
-             </div>
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400">Glunova Care Roadmap</p>
           </div>
           
         </div>

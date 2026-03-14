@@ -5,29 +5,20 @@ import { Button } from '@/components/ui/button'
 import { Save, Loader2, X, BookOpen, Layers, Tag, Info } from 'lucide-react'
 import { createEducationContent, updateEducationContent } from '@/services/adminService'
 import { motion } from 'framer-motion'
-import type { Category, Phase } from '@/types/education'
+import type { Category } from '@/types/education'
 
 interface EducationContent {
-  id: string; day: number; phase: Phase; month: number; title: string; description: string
+  id: string; day: number; month: number; title: string; description: string
   content: string; tips: string[] | string; category: Category; thumbnail_url?: string
 }
 
 interface EducationModalProps { isOpen: boolean; onClose: () => void; onSuccess: () => void; initialData?: EducationContent | null }
 
-const phases = [
-  { value: 'kesehatan', label: 'Kesehatan Umum' }, { value: 'fase_2', label: 'Prediabetes' },
-  { value: 'fase_3', label: 'Diabetes Tipe 1' }, { value: 'fase_4', label: 'Diabetes Tipe 2' },
-]
 const categories = [
   { value: 'nutrisi', label: 'Nutrisi' }, { value: 'kesehatan', label: 'Kesehatan' },
   { value: 'stimulasi', label: 'Stimulasi' }, { value: 'perkembangan', label: 'Perkembangan' },
   { value: 'aktivitas', label: 'Aktivitas' }, { value: 'imunisasi', label: 'Imunisasi' },
 ]
-
-function getPhaseFromDay(day: number): Phase {
-  if (day <= 270) return 'kesehatan'; if (day <= 365) return 'fase_2'
-  if (day <= 635) return 'fase_3'; return 'fase_4'
-}
 
 const inputStyle = { background: 'var(--neutral-50)', border: '1px solid var(--neutral-200)', color: 'var(--neutral-900)' }
 const labelStyle: React.CSSProperties = { color: 'var(--neutral-500)' }
@@ -36,25 +27,25 @@ export function EducationModal({ isOpen, onClose, onSuccess, initialData }: Educ
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
-    day: 1, phase: 'kesehatan' as Phase, month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi' as Category, thumbnail_url: '',
+    day: 1, month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi' as Category, thumbnail_url: '',
   })
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        day: initialData.day, phase: initialData.phase, month: initialData.month, title: initialData.title,
+        day: initialData.day, month: initialData.month, title: initialData.title,
         description: initialData.description || '', content: initialData.content || '',
         tips: Array.isArray(initialData.tips) ? initialData.tips.join('\n') : initialData.tips || '',
         category: initialData.category, thumbnail_url: initialData.thumbnail_url || '',
       })
     } else {
-      setForm({ day: 1, phase: 'kesehatan', month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi', thumbnail_url: '' })
+      setForm({ day: 1, month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi', thumbnail_url: '' })
     }
   }, [initialData, isOpen])
 
   const handleDayChange = (day: number) => {
-    const phase = getPhaseFromDay(day); const month = Math.ceil(day / 30)
-    setForm(p => ({ ...p, day, phase, month }))
+    const month = Math.ceil(day / 30)
+    setForm(p => ({ ...p, day, month }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,7 +54,7 @@ export function EducationModal({ isOpen, onClose, onSuccess, initialData }: Educ
     try {
       setSaving(true)
       const tipsArray = form.tips.split('\n').map(t => t.trim()).filter(t => t.length > 0)
-      const payload = { day: form.day, phase: form.phase, month: form.month, title: form.title, description: form.description, content: form.content, tips: tipsArray, category: form.category, thumbnail_url: form.thumbnail_url || undefined }
+      const payload = { day: form.day, month: form.month, title: form.title, description: form.description, content: form.content, tips: tipsArray, category: form.category, thumbnail_url: form.thumbnail_url || undefined }
       if (initialData?.id) { await updateEducationContent(initialData.id, payload) } else { await createEducationContent(payload) }
       onSuccess(); onClose()
     } catch (err: any) { setError(err?.message || 'Gagal menyimpan konten.') } finally { setSaving(false) }
@@ -120,14 +111,7 @@ export function EducationModal({ isOpen, onClose, onSuccess, initialData }: Educ
                     className="w-full h-11 rounded-xl px-4 text-sm font-body focus:outline-none" style={inputStyle} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold font-body" style={labelStyle}>Fase</label>
-                  <select value={form.phase} onChange={(e) => setForm(p => ({ ...p, phase: e.target.value as Phase }))}
-                    className="w-full h-11 rounded-xl px-4 text-sm font-body focus:outline-none appearance-none cursor-pointer" style={inputStyle}>
-                    {phases.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-                  </select>
-                </div>
+              <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold font-body" style={labelStyle}>Kategori</label>
                   <select value={form.category} onChange={(e) => setForm(p => ({ ...p, category: e.target.value as Category }))}

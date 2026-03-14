@@ -15,7 +15,6 @@ interface RoadmapSidebarProps {
   completedCount: number
   activitiesCount: number
   streakDays: number
-  level: number
 }
 
 export default function RoadmapSidebar({
@@ -27,10 +26,9 @@ export default function RoadmapSidebar({
   journalSaved,
   completedCount,
   activitiesCount,
-  streakDays,
-  level
+  streakDays
 }: RoadmapSidebarProps) {
-  const { education, loading, activeLevel } = useHealthData()
+  const { education, loading } = useHealthData()
   return (
     <aside className="space-y-8 xl:sticky xl:top-32 xl:self-start">
       
@@ -75,7 +73,6 @@ export default function RoadmapSidebar({
                   }`}
                 >
                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-[color:var(--primary-700)] uppercase tracking-wider block mb-1">Fase {activeLevel}</span>
                       {isCurrent && <span className="bg-primary-600 text-white text-[9px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full">Saat Ini</span>}
                    </div>
                   <p className={`text-base font-bold mt-1 ${isCurrent ? 'text-primary-900' : ''}`}>

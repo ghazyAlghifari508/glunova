@@ -18,7 +18,6 @@ interface ActivityCardProps {
   difficulty: { label: string; color: string; bg: string }
   onClick: () => void
   onComplete: () => void
-  level: number
 }
 
 const categoryConfig: Record<string, { label: string; icon: LucideIcon; bg: string; text: string; shadow: string }> = {
@@ -75,7 +74,6 @@ export const ActivityCard = React.memo(({
   difficulty,
   onClick,
   onComplete,
-  level,
 }: ActivityCardProps) => {
   const isCompleted = status === 'completed'
   const category = categoryConfig[activity.category] || defaultCategory
@@ -111,12 +109,12 @@ export const ActivityCard = React.memo(({
                           {category.label}
                        </span>
                        <span className="w-1 h-1 rounded-full bg-neutral-300" />
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-600">
                           {activity.frequency_per_week > 0 ? `${activity.frequency_per_week}X Seminggu` : 'Sesi Harian'}
                        </span>
                     </div>
                     <h3 className={`text-xl md:text-2xl font-heading font-black text-neutral-900 leading-tight transition-all
-                       ${isCompleted ? 'text-neutral-400 line-through decoration-neutral-300' : 'group-hover:text-primary-700'}
+                       ${isCompleted ? 'text-neutral-600 line-through decoration-neutral-300' : 'group-hover:text-primary-700'}
                     `}>
                        {activity.activity_name}
                     </h3>
@@ -132,7 +130,7 @@ export const ActivityCard = React.memo(({
                  className={`shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all active:scale-95
                     ${isCompleted 
                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
-                       : 'bg-transparent border-neutral-200 text-neutral-300 hover:border-emerald-500 hover:text-emerald-500 hover:bg-emerald-50'
+                       : 'bg-transparent border-neutral-200 text-neutral-700 hover:border-emerald-500 hover:text-emerald-500 hover:bg-emerald-50'
                     }
                  `}
               >
@@ -142,7 +140,7 @@ export const ActivityCard = React.memo(({
            
            {/* Description */}
            <p className={`text-sm md:text-base font-medium leading-relaxed mb-8 line-clamp-2
-              ${isCompleted ? 'text-neutral-400' : 'text-neutral-500'}
+              ${isCompleted ? 'text-neutral-600' : 'text-neutral-700'}
            `}>
               {activity.description}
            </p>
@@ -158,14 +156,14 @@ export const ActivityCard = React.memo(({
                  </div>
                  
                  {activity.duration_minutes > 0 && (
-                    <div className="px-3 py-1.5 rounded-lg bg-neutral-50 border border-neutral-200 text-[10px] font-bold uppercase tracking-widest text-neutral-500 flex items-center gap-1.5">
+                    <div className="px-3 py-1.5 rounded-lg bg-neutral-50 border border-neutral-200 text-[10px] font-bold uppercase tracking-widest text-neutral-700 flex items-center gap-1.5">
                        <Clock className="w-3 h-3" />
                        {activity.duration_minutes} Menit
                     </div>
                  )}
               </div>
               
-              <div className="w-8 h-8 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-600 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                  <ArrowRight className="w-4 h-4 ml-0.5 group-hover:translate-x-0.5 transition-transform" />
               </div>
            </div>

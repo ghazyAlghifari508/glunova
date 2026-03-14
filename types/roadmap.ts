@@ -6,8 +6,6 @@ export interface RoadmapActivity {
   difficulty_level: number
   icon_name?: string | null
   xp_reward?: number
-  min_level: number
-  max_level: number
   duration_minutes: number
   frequency_per_week: number
   benefits: string[]
