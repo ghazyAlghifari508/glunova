@@ -3,10 +3,7 @@ import { generateText } from 'ai'
 import { z } from 'zod'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+export const dynamic = 'force-dynamic'
 
 const FoodAnalysisSchema = z.object({
   foodName: z.string().describe('Nama makanan yang terdeteksi dalam bahasa Indonesia'),
@@ -21,10 +18,14 @@ const FoodAnalysisSchema = z.object({
   vitaminA: z.number().describe('Perkiraan vitamin A dalam mcg'),
   healthNutritionScore: z.number().min(0).max(100).describe('Skor nutrisi diabetes care 0-100, berdasarkan kandungan protein, zat besi, zinc, dan nutrisi penting lainnya'),
   tip: z.string().describe('Tips singkat dalam bahasa Indonesia tentang makanan ini untuk manajemen diabetes, maksimal 2 kalimat'),
-  isHealthy: z.boolean().describe('Apakah makanan ini baik untuk ibu berisiko'),
+  isHealthy: z.boolean().describe('Apakah makanan ini baik untuk pasien diabetes'),
 })
 
 export async function POST(req: Request) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   try {
     const formData = await req.formData()
     const image = formData.get('image') as File
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
     const base64 = Buffer.from(bytes).toString('base64')
     const mimeType = image.type || 'image/jpeg'
 
-    const prompt = `Kamu adalah ahli gizi Indonesia. Analisis foto makanan ini untuk ibu berisiko yang ingin mengontrol diabetes.
+    const prompt = `Kamu adalah ahli gizi Indonesia. Analisis foto makanan ini untuk pasien yang ingin mengontrol diabetes.
 
 PENTING: Semua jawaban WAJIB dalam BAHASA INDONESIA. Nama makanan HARUS dalam bahasa Indonesia (contoh: "Bubur Ayam", "Nasi Goreng", "Soto Betawi", bukan nama Inggris).
 

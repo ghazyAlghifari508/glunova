@@ -1,19 +1,27 @@
 import { createBrowserClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const getSupabaseConfig = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return { url, anonKey };
+};
 
-// Client for Browser/Client-side use (Cookies)
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+// Client for Browser/Client-side use (Cookies) - lazily initialized
+export const getSupabase = () => {
+  const { url, anonKey } = getSupabaseConfig();
+  if (!url || !anonKey) return null; // Safe for build analysis
+  return createBrowserClient(url, anonKey);
+};
 
 // Admin client for server-side operations (bypasses RLS)
 export const getSupabaseAdmin = () => {
+  const { url } = getSupabaseConfig();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceRoleKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not defined');
+  if (!url || !serviceRoleKey) {
+    throw new Error('Supabase admin config is missing');
   }
-  return createClient(supabaseUrl, serviceRoleKey, {
+  return createClient(url, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
