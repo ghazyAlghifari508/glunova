@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 interface EducationContent {
   id: string; day: number; month: number; title: string
   description: string; content: string; tips: string[] | string
-  category: Category; thumbnail_url?: string; created_at: string
+  category: Category; phase: string; thumbnail_url?: string; created_at: string
 }
 
 const categoryLabels: Record<string, string> = {
@@ -102,21 +102,15 @@ export default function EducationManagementPage() {
                     className="rounded-xl p-5 group transition-all flex flex-col shadow-sm"
                     style={{ background: 'var(--white)', border: '1px solid var(--neutral-200)' }}
                  >
-                    <div className="flex justify-between items-start mb-4">
-                       <div className="w-12 h-12 rounded-xl flex flex-col items-center justify-center" style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)' }}>
-                          <span className="text-[9px] font-bold font-heading" style={{ color: 'var(--primary-500)' }}>Hari</span>
-                          <span className="text-lg font-bold leading-none font-heading" style={{ color: 'var(--primary-700)' }}>{content.day}</span>
-                       </div>
-                       <div className="flex items-center gap-1">
-                          <button onClick={() => { setSelectedContent(content); setIsModalOpen(true) }}
-                             className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
-                             <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button onClick={() => setDeleteId(content.id)}
-                             className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
-                             <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                       </div>
+                    <div className="flex justify-end items-center gap-1 mb-4">
+                        <button onClick={() => { setSelectedContent(content); setIsModalOpen(true) }}
+                           className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
+                           <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => setDeleteId(content.id)}
+                           className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-500)' }}>
+                           <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                     </div>
                      <div className="flex-1 space-y-3">
                         <div>

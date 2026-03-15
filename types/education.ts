@@ -10,6 +10,7 @@ export interface EducationContent {
   content: string;
   tips: string[];
   category: Category;
+  phase: string;
   thumbnail_url?: string;
   tags?: string[];
   related_days?: number[];

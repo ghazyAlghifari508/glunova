@@ -9,7 +9,7 @@ import type { Category } from '@/types/education'
 
 interface EducationContent {
   id: string; day: number; month: number; title: string; description: string
-  content: string; tips: string[] | string; category: Category; thumbnail_url?: string
+  content: string; tips: string[] | string; category: Category; phase: string; thumbnail_url?: string
 }
 
 interface EducationModalProps { isOpen: boolean; onClose: () => void; onSuccess: () => void; initialData?: EducationContent | null }
@@ -27,7 +27,7 @@ export function EducationModal({ isOpen, onClose, onSuccess, initialData }: Educ
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
-    day: 1, month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi' as Category, thumbnail_url: '',
+    day: 1, month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi' as Category, phase: 'general', thumbnail_url: '',
   })
 
   useEffect(() => {
@@ -36,10 +36,10 @@ export function EducationModal({ isOpen, onClose, onSuccess, initialData }: Educ
         day: initialData.day, month: initialData.month, title: initialData.title,
         description: initialData.description || '', content: initialData.content || '',
         tips: Array.isArray(initialData.tips) ? initialData.tips.join('\n') : initialData.tips || '',
-        category: initialData.category, thumbnail_url: initialData.thumbnail_url || '',
+        category: initialData.category, phase: initialData.phase || 'general', thumbnail_url: initialData.thumbnail_url || '',
       })
     } else {
-      setForm({ day: 1, month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi', thumbnail_url: '' })
+      setForm({ day: 0, month: 1, title: '', description: '', content: '', tips: '', category: 'nutrisi', phase: 'general', thumbnail_url: '' })
     }
   }, [initialData, isOpen])
 
@@ -54,7 +54,24 @@ export function EducationModal({ isOpen, onClose, onSuccess, initialData }: Educ
     try {
       setSaving(true)
       const tipsArray = form.tips.split('\n').map(t => t.trim()).filter(t => t.length > 0)
-      const payload = { day: form.day, month: form.month, title: form.title, description: form.description, content: form.content, tips: tipsArray, category: form.category, thumbnail_url: form.thumbnail_url || undefined }
+      
+      // If new, try to get a unique day if it's 0
+      let finalDay = form.day
+      if (!initialData && finalDay === 0) {
+        finalDay = Date.now() % 1000000 // Temporary fallback for uniqueness
+      }
+
+      const payload = { 
+        day: finalDay, 
+        month: form.month, 
+        title: form.title, 
+        description: form.description, 
+        content: form.content, 
+        tips: tipsArray, 
+        category: form.category, 
+        phase: form.phase,
+        thumbnail_url: form.thumbnail_url || undefined 
+      }
       if (initialData?.id) { await updateEducationContent(initialData.id, payload) } else { await createEducationContent(payload) }
       onSuccess(); onClose()
     } catch (err: any) { setError(err?.message || 'Gagal menyimpan konten.') } finally { setSaving(false) }
@@ -99,16 +116,16 @@ export function EducationModal({ isOpen, onClose, onSuccess, initialData }: Educ
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-5">
               <h3 className="text-xs font-bold uppercase tracking-wider font-heading" style={labelStyle}>Klasifikasi</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold font-body" style={labelStyle}>Hari</label>
-                  <input type="number" value={form.day} onChange={(e) => handleDayChange(Number(e.target.value))}
-                    className="w-full h-11 rounded-xl px-4 text-sm font-body focus:outline-none" style={inputStyle} />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold font-body" style={labelStyle}>Bulan</label>
-                  <input type="number" value={form.month} onChange={(e) => setForm(p => ({ ...p, month: Number(e.target.value) }))}
-                    className="w-full h-11 rounded-xl px-4 text-sm font-body focus:outline-none" style={inputStyle} />
+                  <label className="text-xs font-semibold font-body" style={labelStyle}>Phase (Status Pasien)</label>
+                  <select value={form.phase} onChange={(e) => setForm(p => ({ ...p, phase: e.target.value }))}
+                    className="w-full h-11 rounded-xl px-4 text-sm font-body focus:outline-none appearance-none cursor-pointer" style={inputStyle}>
+                    <option value="general">Umum (General)</option>
+                    <option value="prediabetes">Prediabetes</option>
+                    <option value="diabetes">Diabetes</option>
+                    <option value="berisiko">Berisiko</option>
+                  </select>
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-3">

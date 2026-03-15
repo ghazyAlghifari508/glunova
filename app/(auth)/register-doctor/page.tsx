@@ -18,10 +18,12 @@ import Image from 'next/image'
 
 import { AccountInfoStep } from '@/components/doctor/registration/AccountInfoStep'
 import { useUserRole } from '@/hooks/useUserRole'
+import { useUserContext } from '@/components/providers/Providers'
 
 export default function RegisterDoctorPage() {
   const { user: initialUser, loading: authLoading } = useAuth()
   const { role, loading: roleLoading } = useUserRole()
+  const { profile } = useUserContext()
   const router = useRouter()
   const { toast } = useToast()
 
@@ -58,6 +60,13 @@ export default function RegisterDoctorPage() {
     certification: null,
     acceptTerms: false
   })
+
+  // Pre-fill name from profile if available
+  React.useEffect(() => {
+    if (profile?.full_name && !formData.fullName) {
+      setFormData(prev => ({ ...prev, fullName: profile.full_name || '' }))
+    }
+  }, [profile, formData.fullName])
 
   // Always show 3 steps for consistency
   const totalSteps = 3
@@ -146,14 +155,23 @@ export default function RegisterDoctorPage() {
 
   const renderStep = () => {
     // 1=Account, 2=Personal, 3=Professional
-    if (step === 1) return <AccountInfoStep formData={accountData} setFormData={setAccountData} />
+    if (step === 1) return (
+      <AccountInfoStep 
+        formData={{ ...accountData, fullName: formData.fullName }} 
+        setFormData={(data: any) => {
+          const { fullName, ...rest } = data
+          setAccountData(rest)
+          if (fullName !== undefined) setFormData(prev => ({ ...prev, fullName }))
+        }} 
+      />
+    )
     if (step === 2) return <PersonalInfoStep formData={formData} setFormData={setFormData} />
     if (step === 3) return <ProfessionalInfoStep formData={formData} setFormData={setFormData} />
     return null
   }
 
   const canContinue = () => {
-    if (step === 1) return accountData.email && accountData.username && accountData.password && accountData.password.length >= 6
+    if (step === 1) return accountData.email && accountData.username && accountData.password && accountData.password.length >= 6 && formData.fullName
     if (step === 2) return formData.fullName && formData.phone
     return true
   }
