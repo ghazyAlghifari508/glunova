@@ -18,8 +18,11 @@
   --primary-900: #0D2B6B;
   --primary-800: #1E429F;
   --primary-700: #1A56DB;
+  --primary-600: #2563EB;
   --primary-500: #3F83F8;
+  --primary-400: #60A5FA;
   --primary-300: #76A9FA;
+  --primary-200: #BFDBFE;
   --primary-100: #C3DDFD;
   --primary-50:  #EBF5FF;
 
@@ -104,6 +107,17 @@
   --color-popover-foreground: rgb(var(--popover-foreground));
   --color-primary: rgb(var(--primary));
   --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
   --color-secondary: rgb(var(--secondary));
   --color-secondary-foreground: rgb(var(--secondary-foreground));
   --color-accent: rgb(var(--accent));
@@ -125,8 +139,11 @@
   --color-glunova-primary-900: var(--primary-900);
   --color-glunova-primary-800: var(--primary-800);
   --color-glunova-primary-700: var(--primary-700);
+  --color-glunova-primary-600: var(--primary-600);
   --color-glunova-primary-500: var(--primary-500);
+  --color-glunova-primary-400: var(--primary-400);
   --color-glunova-primary-300: var(--primary-300);
+  --color-glunova-primary-200: var(--primary-200);
   --color-glunova-primary-100: var(--primary-100);
   --color-glunova-primary-50:  var(--primary-50);
 
