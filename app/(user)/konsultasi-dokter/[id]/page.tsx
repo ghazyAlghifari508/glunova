@@ -55,7 +55,7 @@ export default function UserConsultationRoomPage() {
     if (!id) return
     const channel = supabase.channel(`consultation_status:${id}`)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'consultations', filter: `id=eq.${id}` }, (payload) => {
-          if (payload.new) setConsultation(payload.new as Consultation)
+          if (payload.new) setConsultation(prev => prev ? { ...prev, ...(payload.new as Consultation) } : (payload.new as Consultation))
       }).subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [id])

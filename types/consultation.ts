@@ -24,6 +24,7 @@ export interface Consultation {
   reviewed_at?: string
   created_at: string
   updated_at: string
+  doctor_archived?: boolean
   // Joined fields
   doctor?: {
     full_name: string

@@ -49,7 +49,9 @@ export default function RoadmapManagementPage() {
       const { fetchRoadmapActivities } = await import('@/services/adminService')
       const data = await fetchRoadmapActivities({ search: searchQuery || undefined, category: categoryFilter || undefined })
       setActivities(data as RoadmapActivity[])
-    } catch (error) {}
+    } catch (error) {
+      console.error('Gagal memuat data roadmap:', error)
+    }
   }, [searchQuery, categoryFilter, adminContext?.roadmapActivities])
 
   useEffect(() => { loadData() }, [categoryFilter, loadData])
@@ -57,7 +59,9 @@ export default function RoadmapManagementPage() {
   const handleDelete = async () => {
     if (!deleteId) return
     try { setDeleting(true); await deleteRoadmapActivity(deleteId); await adminContext?.loadAdminData(true); setDeleteId(null) }
-    catch (error) {} finally { setDeleting(false) }
+    catch (error) {
+      console.error('Gagal menghapus aktivitas:', error)
+    } finally { setDeleting(false) }
   }
 
   const handleSuccess = async () => { await adminContext?.loadAdminData(true); setIsModalOpen(false) }

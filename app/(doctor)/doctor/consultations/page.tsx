@@ -8,9 +8,12 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ConsultationStatusBadge } from '@/components/shared/ConsultationStatus'
 import { RatingStars } from '@/components/shared/RatingStars'
-import { Search, Users, Clock, ChevronRight, Filter, Settings2, Download } from 'lucide-react'
+import { Search, Users, Clock, ChevronRight, Filter, Settings2, Download, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { archiveConsultation } from '@/services/consultationService'
+import { toast } from '@/components/ui/use-toast'
+import { Consultation } from '@/types/consultation'
 
 const STATUS_TABS = [
   { label: 'Semua Pasien', value: 'all' },
@@ -25,10 +28,33 @@ export default function DoctorConsultationsPage() {
   const doctorContext = useDoctorContext()
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
+  const [localConsultations, setLocalConsultations] = useState<Consultation[]>([])
   const consultations = doctorContext?.consultations || []
   const loading = doctorContext?.loading
 
-  const filtered = consultations.filter((c) => {
+  // Sinkronisasi context ke local state untuk mendukung optimistic update (hiding)
+  useState(() => {
+    if (consultations.length > 0) setLocalConsultations(consultations.filter(c => !c.doctor_archived))
+  })
+
+  // Re-sync saat context berubah
+  useState(() => {
+    setLocalConsultations(consultations.filter(c => !c.doctor_archived))
+  })
+
+  const handleArchive = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    try {
+      // Optimistic update
+      setLocalConsultations(prev => prev.filter(c => c.id !== id))
+      await archiveConsultation(id, true)
+      toast({ title: 'Konsultasi Diarsipkan', description: 'Daftar kini lebih bersih.' })
+    } catch (error) {
+      toast({ title: 'Gagal Mengarsipkan', variant: 'destructive' })
+    }
+  }
+
+  const filtered = localConsultations.filter((c) => {
     const matchesSearch = !search || c.user?.full_name?.toLowerCase().includes(search.toLowerCase())
     const matchesFilter = filter === 'all' || c.status === filter
     return matchesSearch && matchesFilter
@@ -168,7 +194,16 @@ export default function DoctorConsultationsPage() {
                           </div>
 
                           {/* Col 5: Action */}
-                          <div className="col-span-1 flex justify-end md:justify-center">
+                          <div className="col-span-1 flex justify-end md:justify-center items-center gap-2">
+                             {(c.status === 'completed' || c.status === 'cancelled') && (
+                                <button 
+                                   onClick={(e) => handleArchive(e, c.id)}
+                                   className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                   title="Hapus dari daftar"
+                                >
+                                   <Trash2 className="w-4 h-4" />
+                                </button>
+                             )}
                              <div className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all">
                                 <ChevronRight className="w-5 h-5" />
                              </div>

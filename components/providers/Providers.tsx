@@ -392,6 +392,7 @@ export function DoctorDataProvider({ children }: { children: React.ReactNode }) 
 
 export const useDoctorContext = () => {
   const context = useContext(DoctorContext)
+  if (context === undefined) throw new Error('useDoctorContext must be used within a DoctorDataProvider')
   return context
 }
 
@@ -474,6 +475,7 @@ export function AdminDataProvider({ children }: { children: React.ReactNode }) {
 
 export const useAdminContext = () => {
   const context = useContext(AdminContext)
+  if (context === undefined) throw new Error('useAdminContext must be used within an AdminDataProvider')
   return context
 }
 

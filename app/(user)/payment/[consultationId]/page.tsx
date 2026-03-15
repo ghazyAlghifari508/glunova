@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getConsultationById } from '@/services/consultationService'
+import { Consultation } from '@/types/consultation'
 import { toast } from '@/components/ui/use-toast'
 import { 
   Lock, CheckCircle2, Clock, Calendar as CalendarIcon, 
@@ -16,7 +17,7 @@ import { cn } from "@/lib/utils"
 export default function PaymentPage() {
   const { consultationId } = useParams<{ consultationId: string }>()
   const router = useRouter()
-  const [consultation, setConsultation] = useState<any>(null)
+  const [consultation, setConsultation] = useState<Consultation | null>(null)
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -111,9 +112,10 @@ export default function PaymentPage() {
       // 2. Buka link pembayaran di tab baru agar tab ini tetap bisa polling status
       window.open(data.url, '_blank')
       setPaying(false) // Reset loading state so they can click again if needed
-    } catch (error: any) {
-      console.error(error)
-      toast({ title: 'Error', description: error.message || 'Terjadi kesalahan sistem', variant: 'destructive' })
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Terjadi kesalahan sistem'
+      console.error('[handlePay] Error:', error)
+      toast({ title: 'Error', description: message, variant: 'destructive' })
       setPaying(false)
     }
   }

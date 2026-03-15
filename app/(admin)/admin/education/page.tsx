@@ -42,7 +42,9 @@ export default function EducationManagementPage() {
       const { fetchEducationContents } = await import('@/services/adminService')
       const data = await fetchEducationContents({ search: searchQuery || undefined, category: categoryFilter || undefined })
       setContents(data as EducationContent[])
-    } catch (error) {}
+    } catch (error) {
+      console.error('Gagal memuat konten edukasi:', error)
+    }
   }, [searchQuery, categoryFilter, adminContext?.educationContents])
 
   useEffect(() => { loadData() }, [categoryFilter, loadData])
@@ -50,7 +52,9 @@ export default function EducationManagementPage() {
   const handleDelete = async () => {
     if (!deleteId) return
     try { setDeleting(true); await deleteEducationContent(deleteId); await adminContext?.loadAdminData(true); setDeleteId(null) }
-    catch (error) {} finally { setDeleting(false) }
+    catch (error) {
+      console.error('Gagal menghapus konten:', error)
+    } finally { setDeleting(false) }
   }
   const handleSuccess = async () => { await adminContext?.loadAdminData(true); setIsModalOpen(false) }
   const handleCreate = () => { setSelectedContent(null); setIsModalOpen(true) }

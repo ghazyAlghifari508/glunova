@@ -111,6 +111,19 @@ export async function getConsultationById(id: string): Promise<Consultation | nu
     handleServiceError(error, 'Gagal mengambil data konsultasi')
   }
 
+  // Normalize joined data in case it returns as array (PostgREST artifact)
+  if (data) {
+    if (data.user && Array.isArray(data.user)) {
+      data.user = data.user[0]
+    }
+    if (data.doctor && Array.isArray(data.doctor)) {
+      data.doctor = data.doctor[0]
+      if (data.doctor.user && Array.isArray(data.doctor.user)) {
+        data.doctor.user = data.doctor.user[0]
+      }
+    }
+  }
+
   return data as Consultation
 }
 
@@ -154,7 +167,7 @@ export async function getConsultationMessages(consultationId: string): Promise<C
     .eq('consultation_id', consultationId)
     .order('created_at', { ascending: true })
 
-  if (error) throw error
+  if (error) handleServiceError(error, 'Gagal mengambil pesan konsultasi')
   return (data ?? []) as ConsultationMessage[]
 }
 
@@ -176,7 +189,7 @@ export async function sendConsultationMessage(
     .select()
     .single()
 
-  if (error) throw error
+  if (error) handleServiceError(error, 'Gagal mengirim pesan')
   return data as ConsultationMessage
 }
 
@@ -248,6 +261,7 @@ export async function getDoctorConsultations(doctorId: string, filters?: { statu
       user:profiles(full_name, avatar_url)
     `)
     .eq('doctor_id', doctorId)
+    .eq('doctor_archived', false)
 
   if (filters?.status && filters.status !== 'all') {
     query = query.eq('status', filters.status)
@@ -255,7 +269,7 @@ export async function getDoctorConsultations(doctorId: string, filters?: { statu
 
   const { data, error } = await query.order('scheduled_at', { ascending: filters?.order === 'asc' ? true : false })
 
-  if (error) throw error
+  if (error) handleServiceError(error, 'Gagal mengambil daftar konsultasi dokter')
   return (data || []) as Consultation[]
 }
 
@@ -302,7 +316,7 @@ export async function getDoctorConversations(doctorId: string): Promise<Consulta
     .select('id, user_id, user:profiles(full_name, avatar_url)')
     .eq('doctor_id', doctorId)
 
-  if (cError) throw cError
+  if (cError) handleServiceError(cError, 'Gagal mengambil data konsultasi dokter')
   if (!consultations || consultations.length === 0) return []
 
   const consultationIds = consultations.map(c => c.id)
@@ -314,7 +328,7 @@ export async function getDoctorConversations(doctorId: string): Promise<Consulta
     .in('consultation_id', consultationIds)
     .order('created_at', { ascending: false })
 
-  if (mError) throw mError
+  if (mError) handleServiceError(mError, 'Gagal mengambil pesan percakapan')
 
   // 3. Map to conversations by picking the latest message for each consultation
   const messageMap = new Map<string, ConsultationMessage>()
@@ -352,7 +366,7 @@ export async function getDoctorEarnings(doctorId: string): Promise<DoctorEarning
     .eq('payment_status', 'confirmed')
     .order('ended_at', { ascending: false })
 
-  if (error) throw error
+  if (error) handleServiceError(error, 'Gagal mengambil riwayat penghasilan dokter')
   return (data ?? []).map((item) => ({
     ...item,
     user: Array.isArray(item.user) ? item.user[0] ?? null : item.user,
@@ -412,4 +426,14 @@ export async function syncMayarPaymentStatus(consultationId: string): Promise<st
     console.error('Error syncing Mayar status for consultation:', consultationId, err)
     return 'pending'
   }
+}
+
+export async function archiveConsultation(id: string, archived: boolean = true): Promise<void> {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('consultations')
+    .update({ doctor_archived: archived, updated_at: new Date().toISOString() })
+    .eq('id', id)
+
+  if (error) handleServiceError(error, 'Gagal mengarsipkan data konsultasi')
 }

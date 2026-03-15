@@ -41,7 +41,9 @@ export default function DoctorConsultationRoomPage() {
               setNotes(data.notes || '')
               await markMessagesAsRead(id, 'doctor')
            }
-        } catch (error) {} finally { setLoading(false) }
+        } catch (error) {
+           console.error('Gagal memuat data konsultasi:', error)
+        } finally { setLoading(false) }
      }
      load()
   }, [id, router, user, authLoading])
@@ -51,7 +53,7 @@ export default function DoctorConsultationRoomPage() {
      const channel = supabase.channel(`consultation_status_doctor:${id}`)
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'consultations', filter: `id=eq.${id}` }, (payload) => {
            if (payload.new) {
-              setConsultation(payload.new as Consultation)
+              setConsultation(prev => prev ? { ...prev, ...(payload.new as Consultation) } : (payload.new as Consultation))
               if (payload.new.notes) setNotes(payload.new.notes)
            }
         }).subscribe()
@@ -78,7 +80,7 @@ export default function DoctorConsultationRoomPage() {
   const startConsultation = async () => {
      try {
         const updated = await updateConsultation(id, { status: 'ongoing', started_at: new Date().toISOString() })
-        if (updated) setConsultation(updated)
+        if (updated) setConsultation(prev => prev ? { ...prev, ...updated } : updated)
         toast({ title: 'Sesi Dimulai' })
      } catch (error) {}
   }
@@ -88,7 +90,7 @@ export default function DoctorConsultationRoomPage() {
         const ended = new Date().toISOString()
         const duration = consultation?.started_at ? Math.ceil((new Date(ended).getTime() - new Date(consultation.started_at).getTime()) / 60000) : 0
         const updated = await updateConsultation(id, { status: 'completed', ended_at: ended, duration_minutes: duration, notes })
-        if (updated) setConsultation(updated)
+        if (updated) setConsultation(prev => prev ? { ...prev, ...updated } : updated)
         toast({ title: 'Sesi Selesai' })
      } catch (error) {}
   }
@@ -99,7 +101,9 @@ export default function DoctorConsultationRoomPage() {
      return <div className="h-screen bg-slate-50 flex p-6"><Skeleton className="w-full h-full rounded-[2rem]" /></div>
   }
 
-  if (!consultation || !consultation.user) return <div className="flex h-screen items-center justify-center font-bold text-slate-500">Sesi Tidak Valid</div>
+  if (!consultation || !consultation.user) {
+     return <div className="flex h-screen items-center justify-center font-bold text-slate-500">Sesi Tidak Valid</div>
+  }
 
   return (
     <div className="h-screen flex flex-col md:flex-row bg-[#F8FAFC] overflow-hidden">
