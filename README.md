@@ -49,7 +49,7 @@ Sistem Glunova mengelola 3 entitas utama dengan integrasi data real-time:
    - Jadwal Konsultasi & Riwayat Medis Pasien.
    - Verifikasi data harian pasien.
 3. **Administrator**
-   - Analitik Kesehatan Global.
+   - Edukasi Medis & Roadmap Terstruktur.
    - Manajemen Konten Edukasi.
    - Approval Pendaftaran Dokter.
 

@@ -26,8 +26,15 @@ import { useProtectedRoute } from '@/hooks/useProtectedRoute'
 
 export default function UserDashboard() {
   useProtectedRoute(['user'])
-  const { profile } = useHealthData()
+  const { profile, roadmap, education, loadRoadmap, loadEducation } = useHealthData()
   const [currentTime, setCurrentTime] = useState<Date | null>(null)
+
+  useEffect(() => {
+    if (profile) {
+      loadRoadmap()
+      loadEducation()
+    }
+  }, [profile, loadRoadmap, loadEducation])
 
   useEffect(() => {
     setCurrentTime(new Date())
@@ -36,11 +43,20 @@ export default function UserDashboard() {
   }, [])
 
   const stats = [
-    { label: 'Gula Darah', value: '112', unit: 'mg/dL', status: 'Normal', icon: Droplets, color: 'text-sky-500', bg: 'bg-sky-500/10 border border-sky-500/20' },
-    { label: 'HbA1c', value: profile?.hba1c?.toString() || '5.7', unit: '%', status: 'Sehat', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10 border border-emerald-500/20' },
-    { label: 'Berat Badan', value: profile?.current_weight?.toString() || '68', unit: 'Kg', status: 'Stabil', icon: Scale, color: 'text-amber-500', bg: 'bg-amber-500/10 border border-amber-500/20', href: '/profile?tab=health' },
-    { label: 'Detak Jantung', value: '72', unit: 'BPM', status: 'Optimal', icon: HeartPulse, color: 'text-rose-500', bg: 'bg-rose-500/10 border border-rose-500/20' },
+    { label: 'HbA1c', value: profile?.hba1c?.toString() || '--', unit: '%', status: profile?.hba1c ? 'Terpantau' : 'Belum Ada Data', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10 border border-emerald-500/20' },
+    { label: 'Berat Badan', value: profile?.current_weight?.toString() || '--', unit: 'Kg', status: profile?.current_weight ? 'Stabil' : 'Lengkapi Profil', icon: Scale, color: 'text-amber-500', bg: 'bg-amber-500/10 border border-amber-500/20', href: '/profile?tab=health' },
+    { label: 'Progres Edukasi', value: (education.content?.length || 0).toString(), unit: 'Materi', status: (education.content?.length || 0) > 0 ? 'Sedang Belajar' : 'Mulai Belajar', icon: Stethoscope, color: 'text-sky-500', bg: 'bg-sky-500/10 border border-sky-500/20', href: '/education' },
+    { label: 'Streak Roadmap', value: roadmap.progress.length > 0 ? Math.max(...roadmap.progress.map(p => p.streak_count || 0)).toString() : '0', unit: 'Hari', status: 'Pertahankan', icon: HeartPulse, color: 'text-rose-500', bg: 'bg-rose-500/10 border border-rose-500/20', href: '/roadmap' },
   ]
+
+  const activeAgendas = roadmap.activities.filter(activity => {
+    const activityProgress = roadmap.progress.find(p => p.activity_id === activity.id);
+    const today = new Date().toISOString().split('T')[0];
+    const lastCompleted = activityProgress?.last_completed_date;
+    
+    // Show if not completed today
+    return lastCompleted !== today;
+  }).slice(0, 3);
 
   const staggerContainer: Variants = {
     hidden: { opacity: 0 },
@@ -187,10 +203,10 @@ export default function UserDashboard() {
             <motion.div variants={itemVariant} className="lg:col-span-12 grid grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                {stats.map((stat, i) => {
                   const CardContent = (
-                     <div key={stat.label} className="bg-white/60 backdrop-blur-2xl border border-white/60 rounded-2xl p-5 md:p-6 hover:bg-white transition-colors group shadow-sm flex flex-col justify-between min-h-[180px] h-full">
+                     <div key={stat.label} className="bg-white border border-neutral-200 rounded-2xl p-5 md:p-6 hover:shadow-xl hover:border-primary-100 transition-all group shadow-sm flex flex-col justify-between min-h-[180px] h-full">
                         <div className="flex items-center justify-between mb-8">
-                           <div className={cn("p-4 rounded-2xl transition-transform duration-500 group-hover:scale-110", stat.bg, stat.color)}>
-                              <stat.icon strokeWidth={2.5} size={24} />
+                           <div className={cn("p-4 rounded-2xl transition-transform duration-500 group-hover:scale-110", stat.bg)}>
+                              <stat.icon className={stat.color} strokeWidth={2.5} size={24} />
                            </div>
                            <div className={cn("px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest font-heading mt-1", stat.bg, stat.color)}>
                               {stat.status}
@@ -221,48 +237,50 @@ export default function UserDashboard() {
             </motion.div>
 
            {/* WIDE BOTTOM CONTAINERS */}
-           <motion.div variants={itemVariant} className="lg:col-span-7 bg-white/60 backdrop-blur-2xl border border-white/60 rounded-2xl p-6 md:p-8 shadow-sm w-full flex flex-col justify-between group">
+           <motion.div variants={itemVariant} className="lg:col-span-7 bg-white border border-neutral-200 rounded-2xl p-6 md:p-8 shadow-sm w-full flex flex-col justify-between group min-h-[300px]">
               <div className="flex items-center justify-between mb-8">
                  <div>
                     <h3 className="text-neutral-900 text-2xl font-black tracking-tight font-heading">Agenda Terdekat</h3>
-                    <p className="text-neutral-400 text-[11px] font-bold uppercase tracking-widest mt-1.5 font-heading">2 Jadwal Pemeriksaan</p>
+                    <p className="text-neutral-500 text-[11px] font-bold uppercase tracking-widest mt-1.5 font-heading">Sesuai Jadwal</p>
                  </div>
-                 <div className="h-14 w-14 bg-primary-50 text-primary-600 rounded-2xl shadow-sm border border-primary-100 flex items-center justify-center">
+                 <div className="h-14 w-14 bg-neutral-100 text-neutral-400 rounded-2xl border border-neutral-200 flex items-center justify-center">
                     <CalendarDays size={24} />
                  </div>
               </div>
 
-              <div className="space-y-4">
-                 {/* Item 1 */}
-                 <div className="p-4 border border-white/80 rounded-xl bg-white/50 flex items-center gap-5 hover:bg-white transition-colors hover:shadow-lg hover:shadow-black/5 cursor-pointer">
-                    <div className="w-16 h-16 rounded-lg bg-white border border-neutral-100 flex flex-col items-center justify-center shrink-0 shadow-sm">
-                       <span className="text-[10px] font-black text-primary-600 uppercase font-heading">Besok</span>
-                       <span className="text-xl font-black text-neutral-900 tabular-nums leading-none mt-0.5">14</span>
-                    </div>
-                    <div className="flex-1">
-                       <h4 className="font-bold text-neutral-900 text-base">Kontrol Gula Darah Rutin</h4>
-                       <p className="text-[11px] font-bold text-neutral-500 mt-1.5 flex items-center gap-1.5">
-                          <Stethoscope size={14} className="text-primary-400" /> dr. Sarah, Sp.PD (K-EMD)
-                       </p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-neutral-300 mr-2" />
-                 </div>
-
-                 {/* Item 2 */}
-                 <div className="p-4 border border-white/80 rounded-xl bg-white/50 flex items-center gap-5 hover:bg-white transition-colors hover:shadow-lg hover:shadow-black/5 cursor-pointer">
-                    <div className="w-16 h-16 rounded-lg bg-white border border-neutral-100 flex flex-col items-center justify-center shrink-0 shadow-sm">
-                       <span className="text-[10px] font-black text-neutral-400 uppercase font-heading">Jum</span>
-                       <span className="text-xl font-black text-neutral-400 tabular-nums leading-none mt-0.5">17</span>
-                    </div>
-                    <div className="flex-1">
-                       <h4 className="font-bold text-neutral-700 text-base">Tes Toleransi Glukosa</h4>
-                       <p className="text-[11px] font-bold text-neutral-500 mt-1.5 flex items-center gap-1.5">
-                          <Activity size={14} className="text-emerald-400" /> Lab Klinik Pusat Diagnostik
-                       </p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-neutral-300 mr-2" />
-                 </div>
-              </div>
+              {activeAgendas.length > 0 ? (
+                  <div className="flex-1 flex flex-col gap-4 mt-2">
+                     {activeAgendas.map((agenda) => (
+                        <div key={agenda.id} className="p-4 bg-neutral-50 rounded-xl border border-neutral-100 flex items-center justify-between group/item hover:bg-white hover:border-primary-100 hover:shadow-md transition-all">
+                           <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-lg bg-white border border-neutral-100 flex items-center justify-center text-primary-600 shadow-sm">
+                                 <Plus size={18} />
+                              </div>
+                              <div>
+                                 <p className="text-sm font-bold text-neutral-900 group-hover/item:text-primary-600 transition-colors uppercase tracking-tight">{agenda.activity_name}</p>
+                                 <p className="text-[10px] text-neutral-500 font-medium uppercase tracking-wider">{agenda.category} • {agenda.duration_minutes} Menit</p>
+                              </div>
+                           </div>
+                           <Link href="/roadmap">
+                              <button className="p-2 rounded-lg bg-white border border-neutral-200 text-neutral-400 opacity-0 group-hover/item:opacity-100 transition-all hover:text-primary-600 hover:border-primary-200">
+                                 <ChevronRight size={18} />
+                              </button>
+                           </Link>
+                        </div>
+                     ))}
+                     <Link href="/roadmap" className="mt-2 text-center">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-600 hover:text-primary-700 transition-colors cursor-pointer">Lihat Semua Jadwal</span>
+                     </Link>
+                  </div>
+               ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center py-10">
+                     <div className="w-20 h-20 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border border-neutral-100">
+                        <CalendarDays size={32} className="text-neutral-200" />
+                     </div>
+                     <p className="text-sm font-bold text-neutral-900">Semua agenda selesai!</p>
+                     <p className="text-[10px] font-medium text-neutral-500 mt-1 uppercase tracking-widest">Kerja bagus untuk hari ini</p>
+                  </div>
+               )}
            </motion.div>
 
            <motion.div variants={itemVariant} className="lg:col-span-5 bg-gradient-to-br from-primary-600 to-sky-500 rounded-2xl p-6 md:p-8 shadow-2xl shadow-primary-500/20 relative overflow-hidden group w-full flex flex-col justify-between min-h-[300px]">

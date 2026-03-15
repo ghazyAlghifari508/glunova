@@ -199,7 +199,7 @@ export default function VisionScannerV2() {
                     {status === 'idle' && (
                        <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--neutral-900)]/80 via-transparent to-[color:var(--neutral-900)]/30 flex flex-col justify-between p-6 md:p-8 z-20">
                           <div className="flex justify-end">
-                             <button onClick={reset} className="w-12 h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all">
+                             <button onClick={reset} className="w-12 h-12 bg-neutral-900/40 hover:bg-neutral-900/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all border border-white/20">
                                <RefreshCcw className="w-5 h-5" />
                              </button>
                           </div>
@@ -220,7 +220,7 @@ export default function VisionScannerV2() {
                     {/* Post-scan Reset floating button */}
                     {status === 'done' && (
                        <div className="absolute top-6 right-6 z-30">
-                          <button onClick={reset} className="px-6 py-3 bg-white/20 hover:bg-white backdrop-blur-md hover:text-[color:var(--neutral-900)] border border-white/30 rounded-full text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-xl font-heading">
+                          <button onClick={reset} className="px-6 py-3 bg-neutral-900/50 hover:bg-neutral-900 backdrop-blur-md text-white border border-white/20 rounded-full font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-xl font-heading">
                             <RefreshCcw className="w-4 h-4" /> Ulangi
                           </button>
                        </div>

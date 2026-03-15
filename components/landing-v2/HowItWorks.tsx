@@ -24,7 +24,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="py-24 bg-[color:var(--neutral-900)] text-white">
+    <section className="py-24 bg-[color:var(--neutral-900)] text-white" id="how-it-works">
       <div className="container w-full mx-auto px-4 max-w-6xl">
         
         <div className="text-center mb-16">

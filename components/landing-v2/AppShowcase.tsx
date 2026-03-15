@@ -3,7 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Camera, BarChart3, MessageSquare, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Camera, BookOpen, MessageSquare, ArrowRight, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 
 const showcases = [
@@ -19,13 +19,13 @@ const showcases = [
     bg: 'var(--primary-50)',
   },
   {
-    icon: BarChart3,
-    title: 'Dashboard Analitik',
-    subtitle: 'Pantau Tren Kesehatan',
-    description: 'Visualisasi data gula darah, HbA1c, dan aktivitas harian Anda dalam grafik interaktif yang mudah dipahami oleh siapa saja.',
+    icon: BookOpen,
+    title: 'Edukasi Medis Glunova',
+    subtitle: 'Kurikulum Kesehatan Terintegrasi',
+    description: 'Akses materi edukasi diabetes yang disusun secara mendalam oleh tim medis. Pahami kondisi Anda dengan literasi kesehatan yang tepat.',
     image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800',
-    imageAlt: 'Medical professional reviewing health analytics',
-    points: ['Grafik tren mingguan', 'Prediksi risiko AI', 'Export laporan PDF'],
+    imageAlt: 'Medical articles and education curriculum',
+    points: ['Artikel kesehatan harian', 'Kurikulum medis terstruktur', 'Progres belajar personal'],
     color: 'var(--success)',
     bg: 'var(--success-bg)',
   },

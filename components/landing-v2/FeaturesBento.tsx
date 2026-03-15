@@ -3,12 +3,12 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Camera, CalendarHeart, MessageSquare, TrendingDown, ArrowRight } from 'lucide-react'
+import { Camera, CalendarHeart, MessageSquare, BookOpen, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
 export function FeaturesBento() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white" id="services">
       <div className="container w-full mx-auto px-4">
         
         <div className="text-center max-w-2xl mx-auto mb-16">
@@ -107,34 +107,43 @@ export function FeaturesBento() {
             </div>
           </motion.div>
 
-          {/* Feature 4: Analytics (2 cols) */}
+          {/* Feature 4: Education (2 cols) */}
           <motion.div
             whileHover={{ y: -5 }}
             className="md:col-span-2 relative rounded-xl overflow-hidden bg-[color:var(--primary-50)] border border-[color:var(--primary-100)] group shadow-sm hover:shadow-xl transition-all duration-300 p-12 flex flex-col md:flex-row items-center gap-12"
           >
             <div className="flex-1">
               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm">
-                <TrendingDown className="w-6 h-6 text-[color:var(--primary-700)]" />
+                <BookOpen className="w-6 h-6 text-[color:var(--primary-700)]" />
               </div>
-              <h4 className="text-2xl font-bold text-[color:var(--neutral-900)] mb-3">Analitik Gula Darah</h4>
+              <h4 className="text-2xl font-bold text-[color:var(--neutral-900)] mb-3">Edukasi Medis Terstruktur</h4>
               <p className="text-[color:var(--neutral-600)] mb-6">
-                Pantau tren HbA1c dan gula darah harian Anda dengan visualisasi yang mudah dimengerti. Prediksi risiko dan tingkatkan kesehatan secara terukur.
+                Pelajari manajemen diabetes melalui kurikulum harian yang disusun oleh ahli medis. Pantau progres belajar Anda dan bangun pemahaman yang lebih baik.
               </p>
-              <Link href="/dashboard" className="inline-flex items-center text-[color:var(--primary-700)] font-bold hover:text-[color:var(--primary-800)] transition-colors">
-                 Lihat Dashboard <ArrowRight className="w-4 h-4 ml-2" />
+              <Link href="/education" className="inline-flex items-center text-[color:var(--primary-700)] font-bold hover:text-[color:var(--primary-800)] transition-colors">
+                 Mulai Belajar <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </div>
             
-            {/* Decorative Chart Area */}
-            <div className="w-full md:w-1/2 h-full bg-white/60 backdrop-blur-sm rounded-2xl border border-white p-4 relative overflow-hidden flex items-end justify-between px-6 pt-12 pb-4">
-              <div className="absolute top-0 right-0 left-0 p-4 border-b border-white flex justify-between items-center bg-white/40">
-                <span className="text-xs font-bold text-[color:var(--neutral-500)]">Trend 7 Hari</span>
-                <span className="text-xs font-black text-[color:var(--success)] bg-[color:var(--success-bg)] px-2 py-1 rounded-md">-12%</span>
+            {/* Decorative Book/Education UI element */}
+            <div className="w-full md:w-1/2 h-full bg-white/60 backdrop-blur-sm rounded-2xl border border-white p-6 relative overflow-hidden flex flex-col gap-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-[color:var(--primary-700)] uppercase tracking-widest">Kurikulum Day 04</span>
+                <span className="text-[10px] font-bold text-[color:var(--success)]">60% Selesai</span>
               </div>
-              {/* Fake bars */}
-              {[40, 70, 50, 90, 60, 45, 80].map((h, i) => (
-                <div key={i} className="w-[10%] bg-gradient-to-t from-[color:var(--primary-500)] to-[color:var(--primary-300)] rounded-t-sm transition-all duration-1000 origin-bottom" style={{ height: `${h}%`, opacity: 0.8 + (i * 0.02) }} />
-              ))}
+              <div className="space-y-3">
+                <div className="h-2 w-full bg-white rounded-full overflow-hidden">
+                  <div className="h-full bg-[color:var(--primary-500)] w-[60%]" />
+                </div>
+                <div className="p-3 bg-white rounded-lg border border-[color:var(--neutral-100)] flex items-center gap-3">
+                   <div className="w-2 h-2 rounded-full bg-[color:var(--primary-500)]" />
+                   <span className="text-xs font-bold text-[color:var(--neutral-800)]">Mengenal Indeks Glikemik</span>
+                </div>
+                <div className="p-3 bg-white/40 rounded-lg border border-[color:var(--neutral-100)] flex items-center gap-3 opacity-50">
+                   <div className="w-2 h-2 rounded-full bg-[color:var(--neutral-300)]" />
+                   <span className="text-xs font-bold text-[color:var(--neutral-800)]">Pola Makan 3J</span>
+                </div>
+              </div>
             </div>
           </motion.div>
 

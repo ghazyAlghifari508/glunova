@@ -68,7 +68,7 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white" id="faq">
       <div className="container w-full mx-auto px-4">
         <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-20 items-start">
 

@@ -72,20 +72,10 @@ export function AdminRiskDistributionChart() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 mt-8">
-        {riskDistribution.map((item) => (
-          <div key={item.name} className="flex items-center justify-between p-4 bg-[color:var(--neutral-50)] border border-[color:var(--neutral-100)] rounded-2xl group hover:bg-[color:var(--neutral-100)] transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
-              <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: 'var(--neutral-500)' }}>{item.name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-               <span className="text-xs font-bold" style={{ color: 'var(--neutral-900)' }}>{item.value}%</span>
-               <div className="w-20 h-1.5 bg-[color:var(--neutral-200)] rounded-full overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
-               </div>
-            </div>
-          </div>
-        ))}
+        <div className="flex flex-col items-center justify-center py-8 opacity-40">
+           <AlertTriangle className="w-8 h-8 text-neutral-300 mb-3" />
+           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Data distribusi risiko belum tersedia</p>
+        </div>
       </div>
     </div>
   )

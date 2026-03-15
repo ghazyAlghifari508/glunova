@@ -114,7 +114,7 @@ export function TopNavbar() {
               : cn(
                   "rounded-2xl shadow-xl",
                   scrolled 
-                    ? "backdrop-blur-xl bg-white/80 shadow-[0_8px_32px_rgba(13,43,107,0.12)] border border-white/50" 
+                    ? "backdrop-blur-xl bg-white/80 shadow-[0_8px_32px_rgba(13,43,107,0.12)] border border-neutral-200" 
                     : "bg-white border border-neutral-100"
                 )
           )}

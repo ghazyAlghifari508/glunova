@@ -48,7 +48,7 @@ export function StatsCounter() {
   const inView = useInView(ref, { once: true, margin: '-100px' })
 
   return (
-    <section className="py-24 bg-white relative overflow-hidden" ref={ref}>
+    <section className="py-24 bg-white relative overflow-hidden" ref={ref} id="stats">
       {/* Subtle background decor */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(26,86,219,0.04)_0%,transparent_70%)] pointer-events-none" />
 

@@ -1,119 +1,193 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Home, ArrowLeft, Stethoscope, HeartPulse } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { Home, ArrowLeft, Search, Activity, Heart, Shield, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useRef } from 'react'
 
 export default function NotFound() {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Floating bubbles data
+  const bubbles = [
+    { size: 120, x: '10%', y: '20%', delay: 0, color: 'rgba(59, 130, 246, 0.08)' },
+    { size: 180, x: '80%', y: '15%', delay: 1, color: 'rgba(37, 99, 235, 0.05)' },
+    { size: 90, x: '75%', y: '70%', delay: 2, color: 'rgba(96, 165, 250, 0.1)' },
+    { size: 150, x: '15%', y: '80%', delay: 1.5, color: 'rgba(59, 130, 246, 0.06)' },
+    { size: 60, x: '50%', y: '10%', delay: 3, color: 'rgba(37, 99, 235, 0.12)' },
+  ]
+
   return (
-    <div className="min-h-screen bg-[color:var(--primary-900)] flex flex-col items-center justify-center relative overflow-hidden px-4">
-      {/* Concentric ring decorations - matching landing page */}
-      <div className="absolute top-[-30%] left-[-15%] w-[700px] h-[700px] border-[50px] border-[color:var(--primary-700)]/15 rounded-full pointer-events-none" />
-      <div className="absolute top-[-25%] left-[-10%] w-[600px] h-[600px] border-[35px] border-[color:var(--primary-50)] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] border-[40px] border-[color:var(--warning-bg)] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-15%] right-[-5%] w-[400px] h-[400px] border-[25px] border-[color:var(--warning)]/5 rounded-full pointer-events-none" />
-
-      {/* Floating medical decor */}
-      <motion.div
-        animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-[15%] right-[15%] w-14 h-14 rounded-2xl bg-[color:var(--primary-100)] flex items-center justify-center"
-      >
-        <HeartPulse className="w-7 h-7 text-[color:var(--warning)]/60" />
-      </motion.div>
-      <motion.div
-        animate={{ y: [0, 15, 0], rotate: [0, -8, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        className="absolute bottom-[20%] left-[12%] w-12 h-12 rounded-2xl bg-[color:var(--warning-bg)] flex items-center justify-center"
-      >
-        <Stethoscope className="w-6 h-6 text-[color:var(--primary-300)]" />
-      </motion.div>
-
-      {/* Main Content */}
-      <div className="relative z-10 max-w-lg w-full text-center space-y-8">
-        {/* Large 404 */}
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-        >
-          <h1 className="text-[140px] sm:text-[180px] font-black leading-none tracking-tighter select-none">
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-[color:var(--warning)] to-[color:var(--warning)]/40">
-              4
-            </span>
-            <span className="relative inline-block">
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white/90 to-white/20">
-                0
-              </span>
-              <motion.div
-                animate={{ scale: [1, 1.15, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-[color:var(--warning)]/30" />
-              </motion.div>
-            </span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-[color:var(--warning)] to-[color:var(--warning)]/40">
-              4
-            </span>
-          </h1>
-        </motion.div>
-
-        {/* Text */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="space-y-4"
-        >
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Halaman Tidak Ditemukan
-          </h2>
-          <p className="text-base sm:text-lg text-white/50 font-medium leading-relaxed max-w-sm mx-auto">
-            Maaf Anda, halaman yang dicari tidak tersedia. Mungkin sudah dipindahkan atau alamatnya salah.
-          </p>
-        </motion.div>
-
-        {/* Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex flex-col sm:flex-row items-center gap-4 justify-center pt-4"
-        >
-          <Button
-            asChild
-            className="w-full sm:w-auto bg-[color:var(--warning)] hover:bg-[#cbe33a] text-[color:var(--primary-900)] rounded-full px-8 h-14 font-black shadow-md transition-all active:scale-95 flex items-center gap-2.5 text-base"
-          >
-            <Link href="/dashboard">
-              <Home className="w-5 h-5" />
-              Ke Dashboard
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => window.history.back()}
-            className="w-full sm:w-auto bg-white/5 border-white/15 text-white/80 rounded-full px-8 h-14 font-bold hover:bg-white/10 hover:text-white transition-all active:scale-95 flex items-center gap-2.5 text-base"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Kembali
-          </Button>
-        </motion.div>
-
-        {/* Bottom branding */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="pt-10"
-        >
-          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white/5 rounded-full border border-white/10">
-            <div className="w-2 h-2 rounded-full bg-[color:var(--warning)] animate-pulse" />
-            <span className="text-[11px] font-black text-white/50 uppercase tracking-[0.2em]">Glunova Diabetes Care</span>
-          </div>
-        </motion.div>
+    <div 
+      ref={containerRef}
+      className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center relative overflow-hidden px-4 font-sans"
+    >
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 z-0">
+        {bubbles.map((bubble, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              y: [0, -40, 0],
+              x: [0, 20, 0]
+            }}
+            transition={{ 
+              duration: 8 + i, 
+              repeat: Infinity, 
+              ease: "easeInOut",
+              delay: bubble.delay 
+            }}
+            className="absolute rounded-full blur-3xl"
+            style={{ 
+              width: bubble.size, 
+              height: bubble.size, 
+              left: bubble.x, 
+              top: bubble.y,
+              backgroundColor: bubble.color 
+            }}
+          />
+        ))}
       </div>
+
+      {/* Glassmorphic Grid Background */}
+      <div className="absolute inset-0 opacity-[0.03] z-0 pointer-events-none" 
+           style={{ backgroundImage: `radial-gradient(var(--primary-700) 1px, transparent 1px)`, backgroundSize: '40px 40px' }} />
+
+      {/* Main Content Card */}
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 max-w-2xl w-full"
+      >
+        <div className="backdrop-blur-xl bg-white/60 border border-white/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] rounded-[40px] p-8 md:p-16 text-center overflow-hidden">
+          
+          {/* Decorative Top Accent */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-400 via-primary-600 to-indigo-500" />
+          
+          {/* Conceptual 404 Visual */}
+          <div className="relative mb-12">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 1 }}
+              className="flex justify-center items-center gap-4 text-primary-950/10 font-black text-9xl md:text-[180px] leading-none select-none"
+            >
+              <span>4</span>
+              <div className="relative">
+                 <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="w-24 h-24 md:w-40 md:h-40 rounded-full border-[12px] md:border-[20px] border-primary-600/5 flex items-center justify-center"
+                 >
+                    <div className="w-full h-full rounded-full border-[2px] border-dashed border-primary-600/20" />
+                 </motion.div>
+                 <motion.div 
+                   animate={{ scale: [1, 1.1, 1] }}
+                   transition={{ duration: 4, repeat: Infinity }}
+                   className="absolute inset-0 flex items-center justify-center"
+                 >
+                    <div className="w-12 h-12 md:w-20 md:h-20 bg-white rounded-3xl shadow-2xl shadow-blue-500/20 flex items-center justify-center border border-blue-50">
+                       <Search className="w-6 h-6 md:w-10 md:h-10 text-primary-600" strokeWidth={2.5} />
+                    </div>
+                 </motion.div>
+              </div>
+              <span>4</span>
+            </motion.div>
+
+            {/* Floating Particles */}
+            <motion.div 
+              animate={{ y: [0, -15, 0] }}
+              transition={{ duration: 5, repeat: Infinity }}
+              className="absolute -top-4 -right-4 w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center border border-indigo-100/50 shadow-sm"
+            >
+               <Sparkles className="w-6 h-6 text-indigo-400" />
+            </motion.div>
+          </div>
+
+          {/* Text Content */}
+          <div className="space-y-6 max-w-md mx-auto relative">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-3">
+                Halaman Terputus <br/> <span className="text-primary-600 italic">dari Sistem.</span>
+              </h1>
+              <p className="text-slate-500 font-medium leading-relaxed">
+                Sepertinya link yang Anda tuju sudah tidak aktif atau salah ketik. Mari kembali ke jalur kesehatan Anda.
+              </p>
+            </motion.div>
+
+            {/* Actions */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-col sm:flex-row items-center gap-4 justify-center pt-6"
+            >
+              <Button
+                asChild
+                className="w-full sm:w-auto bg-[#1a56db] hover:bg-blue-700 text-white rounded-2xl px-10 h-16 font-bold shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3 text-base border-none"
+              >
+                <Link href="/dashboard">
+                  <Home className="w-5 h-5 text-white" />
+                  <span className="text-white">Ke Dashboard</span>
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.history.back()}
+                className="w-full sm:w-auto bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-900 rounded-2xl px-10 h-16 font-bold transition-all active:scale-95 flex items-center gap-3 text-base shadow-sm"
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-600" />
+                Kembali
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* Footer Metrics - Purely Visual Premium Touch */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="mt-16 pt-8 border-t border-slate-100 flex items-center justify-between gap-4 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+          >
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-primary-600" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">System Vital: OK</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-emerald-500" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Secure Protocol</span>
+            </div>
+            <div className="hidden sm:flex items-center gap-2">
+              <Heart className="w-4 h-4 text-rose-500" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Patient Focused</span>
+            </div>
+          </motion.div>
+
+        </div>
+      </motion.div>
+
+      {/* Bottom Branding */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2 }}
+        className="mt-12 text-slate-400"
+      >
+        <p className="text-[11px] font-black uppercase tracking-[0.3em] flex items-center gap-2">
+          <span className="w-8 h-px bg-slate-200" />
+          Glunova Digital Sanctuary
+          <span className="w-8 h-px bg-slate-200" />
+        </p>
+      </motion.div>
     </div>
   )
 }

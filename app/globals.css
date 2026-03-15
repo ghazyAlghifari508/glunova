@@ -7,7 +7,12 @@
    All values MUST come from these CSS variables.
    ============================================================ */
 
-:root {
+
+ html {
+   scroll-behavior: smooth;
+ }
+ 
+ :root {
   /* ---- Primary Blue ---- */
   --primary-950: #071333;
   --primary-900: #0D2B6B;
